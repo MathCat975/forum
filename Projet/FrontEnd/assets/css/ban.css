@@ -67,3 +67,84 @@ main {
 #banRules li:hover {
     transform: translateX(8px);
 }
+
+@media (max-width: 1024px) {
+    #banContainer h1 {
+        font-size: 2.5rem;
+    }
+
+    #banRules {
+        max-width: 90%;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        min-height: calc(100dvh - 76px);
+        padding: 1.5rem;
+    }
+
+    #banContainer {
+        gap: 1.5rem;
+    }
+
+    #banContainer h1 {
+        font-size: 2rem;
+    }
+
+    #banRules {
+        max-width: 100%;
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+
+    #banRules p {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    #banRules li {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 1rem;
+    }
+
+    #banContainer {
+        gap: 1rem;
+    }
+
+    #banContainer h1 {
+        font-size: 1.5rem;
+        letter-spacing: 0.03em;
+    }
+
+    #banRules {
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    #banRules p {
+        font-size: 0.9rem;
+        margin-bottom: 0.8rem;
+    }
+
+    #banRules ul {
+        gap: 0.8rem;
+    }
+
+    #banRules li {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        border-radius: 3px;
+    }
+
+    #banRules li:hover {
+        transform: translateX(5px);
+    }
+}
