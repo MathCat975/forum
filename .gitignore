@@ -1,1 +1,5 @@
 /.idea
+database.db
+database.db-shm
+Projet/BackEnd/go.mod
+database.db-wal
