@@ -1,24 +1,34 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"main/pkg/auth"
+	"main/pkg/routes/api"
 	"net/http"
 
-	"main/pkg/database"
+	"main/pkg/db"
+
+	"github.com/joho/godotenv"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-
 func main() {
-	_, err := database.GetDB()
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: no .env file, using environment variables")
+	}
+
+	if err := auth.Init(); err != nil {
+		log.Fatalf("Auth initialization failed: %v", err)
+	}
+
+	_, err := db.Open("database.db")
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/api/register", api.RegisterHandler)
+	http.HandleFunc("/api/login", api.LoginHandler)
+	http.HandleFunc("/api/upload", api.UploadImageHandler)
+	http.HandleFunc("/api/cdn/", api.ServeUpload)
 
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
