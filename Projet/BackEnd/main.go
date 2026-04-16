@@ -13,18 +13,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
-	db, err := database.GetDB()
+	_, err := database.GetDB()
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	user, dbErr := db.GetUserByID(1)
-	if dbErr != nil {
-		log.Fatalf("Failed to get user: %v", dbErr)
-	}
-	fmt.Println(user)
-
 	http.HandleFunc("/", handler)
+
+	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

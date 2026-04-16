@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"sync"
 
+	"main/pkg/structs"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"main/pkg/structs"
 )
 
 type DB struct {
