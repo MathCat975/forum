@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/chrome.css">
+    <link rel="stylesheet" href="../assets/css/auth.css">
+</head>
+<body>
+    <site-header title="Forum" subtitle="Login"></site-header>
+
+    <main class="auth">
+        <section class="auth-card" aria-label="Login">
+            <header class="auth-head">
+                <h1 class="auth-title">Welcome back</h1>
+                <p class="auth-sub">Login to continue to the forum.</p>
+            </header>
+
+            <nav class="auth-tabs" aria-label="Auth pages">
+                <a class="auth-tab" href="./login.html" aria-current="page">Login</a>
+                <a class="auth-tab" href="./register.html">Register</a>
+            </nav>
+
+            <div class="auth-body">
+                <form class="auth-form">
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+                    </div>
+
+                    <div class="auth-actions">
+                        <button class="btn btn--primary" type="submit">Login</button>
+                        <a class="muted-link" href="./ban.html">View ban page</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <site-footer title="Forum"></site-footer>
+    <script src="../assets/js/chrome.js" defer></script>
+</body>
+</html>
+

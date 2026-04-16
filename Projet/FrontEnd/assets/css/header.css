@@ -3,7 +3,7 @@
 :root {
     --primary: #3D6CE0;
     --secondary: #386B8D;
-    --tertiary: #BBFF00;
+    --tertiary: #7DB6FF;
     --neutral: #1B1B1B;
     --text-light: #E8E8E8;
 }
@@ -112,14 +112,42 @@ nav a:hover::after {
     }
 
     nav a {
-        width: 20vw;
-        padding: 5px 5px;
-        border-bottom: 1px solid var(--primary);
+        padding: 1rem 2rem;
+        border-bottom: 1px solid color-mix(in srgb, var(--tertiary), transparent 90%);
         font-size: 1rem;
         text-align: center;
     }
 
     nav a::after {
+        display: none;
+    }
+
+    nav a:hover {
+        background: color-mix(in srgb, var(--tertiary), transparent 90%);
+    }
+}
+
+nav a:hover {
+    color: var(--tertiary);
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+@media (max-width: 720px) {
+    header {
+        flex-direction: row;
+        height: auto;
+        padding: 1rem;
+    }
+
+    header button img {
+        display: block;
+        margin-bottom: 1rem;
+    }
+
+    nav {
         display: none;
     }
 }
