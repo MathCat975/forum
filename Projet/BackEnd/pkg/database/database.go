@@ -22,7 +22,7 @@ var (
 func GetDB() (*DB, error) {
 	var err error
 	once.Do(func() {
-		dbConn, dbErr := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+		dbConn, dbErr := gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
 		if dbErr != nil {
 			err = fmt.Errorf("failed to connect database: %v", dbErr)
 			return
