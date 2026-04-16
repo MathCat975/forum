@@ -1,0 +1,378 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+    background-color: var(--bg);
+}
+
+main {
+    min-height: calc(100dvh - 76px);
+    width: 100vw;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+#profileHead {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+#profileHead img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    opacity: 0.5;
+}
+
+#profilePhotoName {
+    position: absolute;
+    bottom: -50px;
+    left: 2rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+}
+
+#profilePhotoName img {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    border: 3px solid var(--primary);
+    object-fit: cover;
+    background: var(--bg);
+    transform: translateY(-70%);
+}
+
+#photoName {
+    transform: translateY(-80%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    justify-self: center;
+    align-self: start;
+}
+
+#photoName h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+#photoName p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+#profileContent {
+    margin-top: 4rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+}
+
+#profileSidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.profile-card {
+    background: color-mix(in srgb, var(--primary), transparent 95%);
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    animation: anim infinite linear 3s;
+}
+
+@keyframes anim {
+    0% {
+        border: 1px solid var(--primary);
+    }
+
+    25% {
+        border: 1px solid rgb(47, 47, 248);
+    }
+
+    50% {
+        border: 1px solid var(--secondary);
+    }
+
+    75% {
+        border: 1px solid rgb(47, 47, 248);
+    }
+
+    100% {
+        border: 1px solid var(--primary);
+    }
+}
+
+.profile-card:hover {
+    border-color: var(--secondary);
+}
+
+.profile-card h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary);
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--primary), transparent 80%);
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--tertiary);
+}
+
+#profileMain {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.section-card {
+    background: color-mix(in srgb, var(--secondary), transparent 95%);
+    border: 1px solid var(--secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.section-card:hover {
+    border-color: var(--primary);
+}
+
+.section-header {
+    background: color-mix(in srgb, var(--primary), transparent 35%);
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.section-content {
+    padding: 1.5rem;
+}
+
+.section-content p {
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.group-badge {
+    display: inline-block;
+    background: color-mix(in srgb, var(--primary), transparent 80%);
+    border: 1px solid var(--primary);
+    color: var(--text);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.group-badge:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.btn {
+    background: color-mix(in srgb, var(--primary), transparent 65%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 1024px) {
+    #profileContent {
+        grid-template-columns: 1fr;
+    }
+
+    .section-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #profileHead img {
+        height: 250px;
+    }
+
+    #profilePhotoName {
+        left: 1.5rem;
+    }
+
+    #profilePhotoName img {
+        width: 100px;
+        height: 100px;
+    }
+
+    #photoName h4 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+
+    #profileHead img {
+        height: 200px;
+    }
+
+    #profilePhotoName {
+        bottom: -40px;
+        left: 1rem;
+        gap: 1rem;
+    }
+
+    #profilePhotoName img {
+        width: 80px;
+        height: 80px;
+    }
+
+    #photoName h4 {
+        font-size: 1.25rem;
+    }
+
+    #profileContent {
+        margin-top: 3rem;
+    }
+
+    .profile-card, .section-card {
+        padding: 1rem;
+    }
+
+    .profile-card h3, .section-header {
+        font-size: 0.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    #profileHead img {
+        height: 150px;
+    }
+
+    #profilePhotoName {
+        bottom: -30px;
+        left: 0.75rem;
+        gap: 0.75rem;
+    }
+
+    #profilePhotoName img {
+        width: 60px;
+        height: 60px;
+        border-width: 2px;
+    }
+
+    #photoName h4 {
+        font-size: 1rem;
+    }
+
+    #photoName p {
+        font-size: 0.8rem;
+    }
+
+    #profileContent {
+        margin-top: 2rem;
+        gap: 1rem;
+    }
+
+    .profile-card, .section-card {
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .profile-card h3, .section-header {
+        font-size: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .section-content {
+        padding: 1rem;
+    }
+
+    .group-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .stat-item {
+        padding: 0.5rem 0;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 0.9rem;
+    }
+}
