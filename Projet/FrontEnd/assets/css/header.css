@@ -16,13 +16,16 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 0 2rem;
-    background: linear-gradient(90deg, rgba(61, 108, 224, 0.1) 0%, transparent 100%);
+    background-color: color-mix(in srgb, var(--primary), transparent 90%);
     border-bottom: 2px solid var(--primary);
-    backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 100;
     font-family: 'Space Grotesk', sans-serif;
+}
+
+#logo {
+    color: var(--primary);
 }
 
 header button {
@@ -37,31 +40,21 @@ header button {
 #burger {
     width: 30px;
     height: 24px;
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
 }
 
+
+
 .burger-line {
     width: 100%;
     height: 3px;
-    background: var(--tertiary);
+    background: var(--primary);
     border-radius: 2px;
     transition: all 0.3s ease;
     display: block;
-}
-
-#burger.active .burger-line:nth-child(1) {
-    transform: rotate(45deg) translate(10px, 10px);
-}
-
-#burger.active .burger-line:nth-child(2) {
-    opacity: 0;
-}
-
-#burger.active .burger-line:nth-child(3) {
-    transform: rotate(-45deg) translate(8px, -8px);
 }
 
 nav {
@@ -98,63 +91,35 @@ nav a:hover::after {
     width: 100%;
 }
 
-/* Mobile responsive */
-@media (max-width: 768px) {
+@media (max-width: 720px) {
+
     #burger {
         display: flex;
     }
 
     nav {
         display: none;
+        flex-direction: column;
         position: absolute;
         top: 80px;
-        left: 0;
-        width: 100vw;
-        flex-direction: column;
-        gap: 0;
-        background: linear-gradient(180deg, rgba(61, 108, 224, 0.2) 0%, rgba(56, 107, 141, 0.1) 100%);
-        padding: 2rem 0;
-        border-bottom: 2px solid var(--primary);
-        backdrop-filter: blur(10px);
-        z-index: 99;
+        right: 0;
+        background-color: color-mix(in srgb, var(--primary), transparent 90%);
+        width: 150px;
+        padding: 1rem;
+        border-radius: 8px;
+        justify-content: center;
+        align-items: center;
     }
 
     nav a {
-        padding: 1rem 2rem;
-        border-bottom: 1px solid rgba(187, 255, 0, 0.1);
+        width: 20vw;
+        padding: 5px 5px;
+        border-bottom: 1px solid var(--primary);
         font-size: 1rem;
+        text-align: center;
     }
 
     nav a::after {
-        display: none;
-    }
-
-    nav a:hover {
-        background: rgba(187, 255, 0, 0.1);
-    }
-}
-
-nav a:hover {
-    color: var(--tertiary);
-}
-
-nav a:hover::after {
-    width: 100%;
-}
-
-@media (max-width: 720px) {
-    header {
-        flex-direction: row;
-        height: auto;
-        padding: 1rem;
-    }
-
-    header button img {
-        display: block;
-        margin-bottom: 1rem;
-    }
-
-    nav {
         display: none;
     }
 }
