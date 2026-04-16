@@ -3,7 +3,7 @@
 :root {
     --primary: #3D6CE0;
     --secondary: #386B8D;
-    --tertiary: #BBFF00;
+    --tertiary: #7DB6FF;
     --neutral: #1B1B1B;
     --text-light: #E8E8E8;
 }
@@ -121,7 +121,7 @@ nav a:hover::after {
 
     nav a {
         padding: 1rem 2rem;
-        border-bottom: 1px solid rgba(187, 255, 0, 0.1);
+        border-bottom: 1px solid color-mix(in srgb, var(--tertiary), transparent 90%);
         font-size: 1rem;
     }
 
@@ -130,7 +130,7 @@ nav a:hover::after {
     }
 
     nav a:hover {
-        background: rgba(187, 255, 0, 0.1);
+        background: color-mix(in srgb, var(--tertiary), transparent 90%);
     }
 }
 
