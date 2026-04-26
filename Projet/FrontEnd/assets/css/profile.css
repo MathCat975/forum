@@ -153,9 +153,9 @@ main {
 }
 
 .stat-value {
-    font-size: 1.1rem;
     font-weight: 700;
     color: var(--tertiary);
+    font-size: 0.9rem;
 }
 
 #profileMain {
@@ -202,39 +202,20 @@ main {
     margin-bottom: 1rem;
 }
 
-.group-badge {
-    display: inline-block;
-    background: color-mix(in srgb, var(--primary), transparent 80%);
-    border: 1px solid var(--primary);
-    color: var(--text);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    margin-right: 0.5rem;
-    margin-bottom: 0.5rem;
-    transition: all 0.3s ease;
+.section-content-stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
 
-.group-badge:hover {
-    background: var(--primary);
-    color: white;
+.section-content-content {
+    display: flex;
+    flex-direction: row;
 }
 
-.btn {
-    background: color-mix(in srgb, var(--primary), transparent 65%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Space Grotesk', sans-serif;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
+.section-content-content span {
+    padding-right: 5px;
+    color: var(--primary);
 }
 
 @media (max-width: 1024px) {
