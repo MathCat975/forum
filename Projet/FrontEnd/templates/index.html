@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+    <header class="protocol-topbar" aria-label="Site header">
+        <a class="protocol-brand" href="./index.html" aria-label="Forum home">
+            <span class="brand-node" aria-hidden="true">></span>
+            <span>meow</span>
+        </a>
+
+        <nav class="protocol-tabs" aria-label="Sections">
+            <a href="#feed" aria-current="page">Forums</a>
+            <a href="./register.html">Upgrades</a>
+            <a href="#market">Market</a>
+            <a href="#wiki">Wiki</a>
+        </nav>
+
+        <form class="protocol-search" role="search">
+            <label class="sr-only" for="global-search">Search for posts</label>
+            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
+        </form>
+
+        <nav class="protocol-actions" aria-label="Account">
+            <a href="./login.html" aria-label="Notifications">!</a>
+            <a href="./login.html" aria-label="Messages">[]</a>
+            <a class="operator-badge" href="./login.html" aria-label="Login">ID</a>
+        </nav>
+    </header>
+
+    <main class="protocol-shell" id="top">
+        <aside class="directory-panel" aria-label="Directory">
+            <header class="directory-head">
+                <span class="terminal-icon" aria-hidden="true">>_</span>
+                <div>
+                    <strong>Directory</strong>
+                    <small>Meow</small>
+                </div>
+            </header>
+
+            <nav class="directory-nav" aria-label="Forum navigation">
+                <a class="is-active" href="#feed"><span>::</span>Main Feed</a>
+                <a href="#trending"><span>--</span>Trending</a>
+                <a href="#private"><span>[]</span>Private Nodes</a>
+                <a href="#logs"><span>==</span>System Logs</a>
+                <a href="#archive"><span>##</span>Archive</a>
+            </nav>
+
+            <a class="init-thread" href="./register.html">Create post</a>
+
+            <nav class="directory-footer" aria-label="Support links">
+                <a href="./login.html"><span>+</span>Settings</a>
+                <a href=""><span>?</span>Support</a>
+            </nav>
+        </aside>
+
+        <section class="operations" aria-label="Operational feed">
+            <section class="hero-panel">
+                <div>
+                    <p class="eyebrow">Live forum uplink</p>
+                    <h1>OPERATIONAL_FEED</h1>
+                    <p>Monitoring active discussions. 12,402 nodes currently synchronized with the protocol.</p>
+                </div>
+            </section>
+
+            <section class="forum-board" id="feed" aria-labelledby="latest-posts">
+                <h2 class="sr-only" id="latest-posts">Latest posts</h2>
+
+                <section class="post-cluster post-cluster--blue" aria-labelledby="category1">
+                    <header class="cluster-head">
+                        <h3 id="category1">category1</h3>
+                        <span>root/mainline</span>
+                    </header>
+
+                    <div class="cluster-rows">
+                        <article class="post-row">
+                            <div class="post-glyph post-glyph--primary" aria-hidden="true">#</div>
+                            <div class="post-copy">
+                                <a href="#">Announcements & Global Directives</a>
+                                <p>Official protocol updates and network expansion logs.</p>
+                            </div>
+                            <div class="post-stat">
+                                <strong>1,204</strong>
+                                <span>nodes</span>
+                            </div>
+                            <div class="post-activity">
+                                <a href="#">Network upgrade v0.1</a>
+                                <span>9 mins ago by Admin</span>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="post-cluster post-cluster--lime" aria-labelledby="category2">
+                    <header class="cluster-head">
+                        <h3 id="category2">category2</h3>
+                        <span>root/market</span>
+                    </header>
+
+                    <div class="cluster-rows">
+                        <article class="post-row">
+                            <div class="post-glyph post-glyph--tertiary" aria-hidden="true">?</div>
+                            <div class="post-copy">
+                                <a href="#">Software & Tools</a>
+                                <p>Buy, sell, or trade custom script packages.</p>
+                            </div>
+                            <div class="post-stat">
+                                <strong>312</strong>
+                                <span>assets</span>
+                            </div>
+                            <div class="post-activity">
+                                <a href="#">WTS custom UI toolkit</a>
+                                <span>1 hour ago by Merchant</span>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="post-cluster post-cluster--cyan" aria-labelledby="category3">
+                    <header class="cluster-head">
+                        <h3 id="category3">category3</h3>
+                        <span>root/research</span>
+                    </header>
+
+                    <div class="cluster-rows">
+                        <article class="post-row">
+                            <div class="post-glyph post-glyph--primary" aria-hidden="true">&lt;/&gt;</div>
+                            <div class="post-copy">
+                                <a href="#">Coding & Reversing</a>
+                                <p>C++, Python, ASM and reverse engineering theory.</p>
+                            </div>
+                            <div class="post-stat">
+                                <strong>8.4k</strong>
+                                <span>scripts</span>
+                            </div>
+                            <div class="post-activity">
+                                <a href="#">Native API hooking notes</a>
+                                <span>5 mins ago by DevOps</span>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+            </section>
+        </section>
+
+    </main>
+
+    <footer class="protocol-footer">
+        <strong>meow</strong>
+        <span>v6.1 - 2026 - root/index/policy</span>
+        <nav aria-label="Footer">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">API</a>
+            <a href="#">Donations</a>
+        </nav>
+    </footer>
+</body>
+</html>
