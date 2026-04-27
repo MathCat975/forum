@@ -7,6 +7,7 @@ import (
 
 	"main/pkg/auth"
 	"main/pkg/db"
+	"main/pkg/routes"
 	"main/pkg/structs"
 
 	"golang.org/x/crypto/bcrypt"
@@ -24,25 +25,15 @@ type loginRequest struct {
 	Password string `json:"password"`
 }
 
-type errorResponse struct {
-	Error string `json:"error"`
-}
-
-func jsonError(w http.ResponseWriter, message string, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(errorResponse{Error: message})
-}
-
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		jsonError(w, "method not allowed", http.StatusMethodNotAllowed)
+		routes.JsonError(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req registerRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		jsonError(w, "invalid JSON", http.StatusBadRequest)
+		routes.JsonError(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
@@ -50,12 +41,12 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	database := db.GetDB()
 
 	if _, err := database.GetUserByEmail(req.Email); err == nil {
-		jsonError(w, "email or username already in use", http.StatusConflict)
+		routes.JsonError(w, "email or username already in use", http.StatusConflict)
 		return
 	}
 
 	if _, err := database.GetUserByUsername(req.Username); err == nil {
-		jsonError(w, "email or username already in use", http.StatusConflict)
+		routes.JsonError(w, "email or username already in use", http.StatusConflict)
 		return
 	}
 
@@ -74,19 +65,19 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := database.CreateUser(&user); err != nil {
-		jsonError(w, "failed to create user", http.StatusInternalServerError)
+		routes.JsonError(w, "failed to create user", http.StatusInternalServerError)
 		return
 	}
 
 	created, err := database.GetUserByEmail(req.Email)
 	if err != nil {
-		jsonError(w, "failed to retrieve created user", http.StatusInternalServerError)
+		routes.JsonError(w, "failed to retrieve created user", http.StatusInternalServerError)
 		return
 	}
 
 	tokenStr, err := auth.GenerateToken(created.ID, created.Username, created.Role)
 	if err != nil {
-		jsonError(w, "failed to generate token", http.StatusInternalServerError)
+		routes.JsonError(w, "failed to generate token", http.StatusInternalServerError)
 		return
 	}
 	auth.SetTokenCookie(w, tokenStr)
@@ -98,13 +89,13 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		jsonError(w, "method not allowed", http.StatusMethodNotAllowed)
+		routes.JsonError(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req loginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		jsonError(w, "invalid JSON", http.StatusBadRequest)
+		routes.JsonError(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
@@ -118,27 +109,66 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	case req.Username != "":
 		user, lookupErr = db.GetDB().GetUserByUsername(req.Username)
 	default:
-		jsonError(w, "email or username required", http.StatusBadRequest)
+		routes.JsonError(w, "email or username required", http.StatusBadRequest)
 		return
 	}
 
 	if lookupErr != nil {
-		jsonError(w, "invalid credentials", http.StatusUnauthorized)
+		routes.JsonError(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
-		jsonError(w, "invalid credentials", http.StatusUnauthorized)
+		routes.JsonError(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	tokenStr, err := auth.GenerateToken(user.ID, user.Username, user.Role)
 	if err != nil {
-		jsonError(w, "failed to generate token", http.StatusInternalServerError)
+		routes.JsonError(w, "failed to generate token", http.StatusInternalServerError)
 		return
 	}
 	auth.SetTokenCookie(w, tokenStr)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+}
+
+type userProfileResponse struct {
+	Username  string    `json:"username"`
+	AvatarUrl string    `json:"avatar_url"`
+	Role      string    `json:"role"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		routes.JsonError(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if _, ok := auth.ClaimsFromContext(r.Context()); !ok {
+		routes.JsonError(w, "authentication required", http.StatusUnauthorized)
+		return
+	}
+
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		routes.JsonError(w, "username required", http.StatusBadRequest)
+		return
+	}
+
+	user, err := db.GetDB().GetUserByUsername(username)
+	if err != nil {
+		routes.JsonError(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(userProfileResponse{
+		Username:  user.Username,
+		AvatarUrl: user.AvatarUrl,
+		Role:      user.Role,
+		CreatedAt: user.CreatedAt,
+	})
 }
