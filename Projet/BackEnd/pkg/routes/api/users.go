@@ -135,10 +135,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type userProfileResponse struct {
-	Username  string    `json:"username"`
-	AvatarUrl string    `json:"avatar_url"`
-	Role      string    `json:"role"`
-	CreatedAt time.Time `json:"created_at"`
+	Username     string    `json:"username"`
+	AvatarUrl    string    `json:"avatar_url"`
+	Role         string    `json:"role"`
+	CreatedAt    time.Time `json:"created_at"`
+	PostCount    int64     `json:"post_count"`
+	CommentCount int64     `json:"comment_count"`
+	LikeCount    int64     `json:"like_count"`
+	DislikeCount int64     `json:"dislike_count"`
 }
 
 func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -164,11 +168,21 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	posts, comments, likes, dislikes, err := db.GetDB().UserStats(user.ID)
+	if err != nil {
+		routes.JsonError(w, "failed to load user stats", http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userProfileResponse{
-		Username:  user.Username,
-		AvatarUrl: user.AvatarUrl,
-		Role:      user.Role,
-		CreatedAt: user.CreatedAt,
+		Username:     user.Username,
+		AvatarUrl:    user.AvatarUrl,
+		Role:         user.Role,
+		CreatedAt:    user.CreatedAt,
+		PostCount:    posts,
+		CommentCount: comments,
+		LikeCount:    likes,
+		DislikeCount: dislikes,
 	})
 }
