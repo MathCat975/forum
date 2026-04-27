@@ -142,6 +142,13 @@ input {
     font-size: 0.72rem;
 }
 
+.protocol-actions img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
 .operator-badge {
     border: 1px solid rgba(61, 108, 224, 0.35);
     background: linear-gradient(135deg, rgba(61, 108, 224, 0.85), rgba(56, 107, 141, 0.70));
@@ -150,10 +157,12 @@ input {
 
 .protocol-shell {
     display: grid;
-    grid-template-columns: 250px minmax(0, 1fr);
-    gap: 2.6rem;
-    width: min(1220px, calc(100% - 2rem));
-    margin: 0 auto;
+    grid-template-columns: 270px minmax(0, 1fr);
+    gap: clamp(1.5rem, 2.6vw, 3.25rem);
+    width: 100%;
+    margin: 0;
+    padding-right: clamp(1rem, 2.4vw, 3rem);
+    box-sizing: border-box;
     min-width: 0;
 }
 
@@ -163,7 +172,7 @@ input {
     height: calc(100vh - 50px);
     display: flex;
     flex-direction: column;
-    padding: 2.35rem 1rem 1.5rem 0;
+    padding: 2.35rem 1rem 1.5rem 1.5rem;
     border-right: 1px solid var(--line);
 }
 
@@ -263,7 +272,7 @@ input {
     min-height: 250px;
     display: flex;
     align-items: end;
-    padding: 2.5rem 3rem;
+    padding: 3rem 3rem;
     border: 1px solid var(--line);
     background:
         linear-gradient(90deg, rgba(17, 17, 17, 0.92), rgba(17, 17, 17, 0.72)),
@@ -295,6 +304,7 @@ input {
 .hero-panel > div {
     position: relative;
     z-index: 1;
+    transform: translateY(-1rem);
 }
 
 .eyebrow,
@@ -472,13 +482,15 @@ input {
 
 .protocol-footer {
     display: grid;
-    grid-template-columns: 250px 1fr auto;
+    grid-template-columns: 270px 1fr auto;
     gap: 1.5rem;
     align-items: center;
-    width: min(1220px, calc(100% - 2rem));
+    width: 100%;
     min-height: 66px;
-    margin: -4rem auto 0;
-    padding-left: 250px;
+    margin: -4rem 0 0;
+    padding-right: clamp(1rem, 2.4vw, 3rem);
+    padding-left: 270px;
+    box-sizing: border-box;
     color: rgba(232, 232, 232, 0.42);
     font-size: 0.58rem;
     letter-spacing: 0.10em;
@@ -501,12 +513,13 @@ input {
 
 @media (max-width: 1100px) {
     .protocol-shell {
-        grid-template-columns: 200px minmax(0, 1fr);
+        grid-template-columns: 220px minmax(0, 1fr);
         gap: 1.25rem;
     }
 
     .protocol-footer {
-        padding-left: 200px;
+        grid-template-columns: 220px 1fr auto;
+        padding-left: 220px;
     }
 }
 
@@ -535,6 +548,8 @@ input {
     .protocol-shell {
         grid-template-columns: 1fr;
         width: min(100% - 1.5rem, 760px);
+        margin: 0 auto;
+        padding-right: 0;
         gap: 0;
     }
 
