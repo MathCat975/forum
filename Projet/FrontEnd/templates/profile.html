@@ -27,30 +27,14 @@
 
         <div id="profileContent">
             <div id="left">
-                <div id="status">
-                    <div id="reputation">
-                        <p class="value">1</p>
-                        <p class="nameOfValue">Reputation</p>
-
-                        <div class="btnStatus">
-                            <button>Info</button>
-                            <button>Reload</button>
-                        </div>
-                    </div>
-
-                    <div id="likes">
-                        <p class="value">136</p>
-                        <p class="nameOfValue">Likes</p>
-
-                        <div class="btnStatus">
-                            <button>Info</button>
-                        </div>
-                    </div>
-                </div>
-
                 <div id="infos">
                     <div class="titleOfBlock">
                         <p>Informations</p>
+                    </div>
+
+                    <div class="infosPart">
+                        <p class="infosName">Role</p>
+                        <p class="infosValue">User</p>
                     </div>
 
                     <div class="infosPart">
@@ -73,11 +57,6 @@
                         <p class="infosValue">Less than 1 minute ago</p>
                     </div>
 
-                    <div class="infosPart">
-                        <p class="infosName">Likes Given</p>
-                        <p class="infosValue">4</p>
-                    </div>
-                    
                     <div id="InfosBtns" class="infosPart">
                         <button>More</button>
                         <button>Trustscan</button>
@@ -87,10 +66,49 @@
             </div>
 
             <div id="center">
-                test
+                <div id="statistiques">
+                    <div class="titleOfBlock">
+                        <p>Statistics</p>
+                    </div>
+
+                    <div id="statsContent">
+                        <div class="statsPart">
+                            <p class="statsValue">11</p>
+                            <p class="statsName">Threads</p>
+                        </div>
+
+                        <div class="statsPart">
+                            <p class="statsValue">122</p>
+                            <p class="statsName">Posts</p>
+                        </div>
+
+                        <div class="statsPart">
+                            <p class="statsValue">4</p>
+                            <p class="statsName">Likes Given</p>
+                        </div>
+
+                        <div class="statsPart">
+                            <p class="statsValue">5</p>
+                            <p class="statsName">Commentaries</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="posts">
+
+                    <div class="titleOfBlock">
+                        <p>Lasts Posts</p>
+                    </div>
+
+                    <div id="postContent">
+                        
+                    </div>
+                </div>
             </div>
         </div>
     </main>
+
+    <script src="../assets/js/parseMdProfile.js" defer></script>
 
     <site-footer title="Forum"></site-footer>
     <script src="../assets/js/chrome.js" defer></script>
