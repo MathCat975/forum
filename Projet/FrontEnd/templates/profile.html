@@ -19,8 +19,15 @@
             <span id="profilePhotoName">
                 <img src="../assets/img/profile/photo.jpg" alt="Profile Photo">
                 <div id="photoName">
-                    <h4 id="pseudo">Username</h4>
-                    <p id="description">Description</p>
+                    <div class="editableField">
+                        <h4 id="pseudoProfil">Username</h4>
+                        <button id="editUserBtn" class="editFieldBtn"><img src="../assets/img/profile/edit.png" alt="Edit Profile"></button>
+                    </div>
+
+                    <div class="editableField">
+                        <p id="descriptionProfil">Description</p>
+                        <button id="editDescBtn" class="editFieldBtn"><img src="../assets/img/profile/edit.png" alt="Edit Profile"></button>
+                    </div>
                 </div>
             </span>
         </div>
@@ -101,12 +108,29 @@
                     </div>
 
                     <div id="postContent">
-                        
+                        <div class="cardPost" id="Post1">
+                            
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+    
+    <div id="editFieldModalOverlay"></div>
+    <div id="editFieldModal">
+        <form action="">
+            <label id="editFieldLabel" for="editFieldInput">Field</label>
+            <input type="text" placeholder="Enter value" id="editFieldInput">
+
+            <div class="modalButtons">
+                <button id="cancelEditField" type="button">Cancel</button>
+                <button id="saveEditField" type="button">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <input type="file" id="editPhotoInput" accept="image/*">
 
     <script src="../assets/js/parseMdProfile.js" defer></script>
 
