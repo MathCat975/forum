@@ -137,14 +137,30 @@ if (profileImg) {
 editPhotoInput.addEventListener("change", (e) => {
   let file = e.target.files[0];
   if (file) {
-    let reader = new FileReader();
-    reader.onload = (event) => {
-      let imageData = event.target.result;
-      
-      profileImg.src = imageData;
-      
-      localStorage.setItem("profilePhoto", imageData);
-    };
-    reader.readAsDataURL(file);
+    // Create FormData to send the file
+    let formData = new FormData();
+    formData.append("image", file);
+    
+    // Send to server
+    fetch("http://localhost:8080/api/upload", {
+      method: "POST",
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.url) {
+        // Update the image with the server URL
+        profileImg.src = data.url;
+        
+        // Save the URL to localStorage
+        localStorage.setItem("profilePhoto", data.url);
+      } else {
+        alert("Error uploading image");
+      }
+    })
+    .catch(error => {
+      console.error("Upload error:", error);
+      alert("Failed to upload image");
+    });
   }
 });
