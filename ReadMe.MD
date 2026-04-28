@@ -2,3 +2,5 @@
 ```
 $env:CGO_ENABLED="1"
 ```
+
+> ORM self made (a parler ds le readme/soutenance)
