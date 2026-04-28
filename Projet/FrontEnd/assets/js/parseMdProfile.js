@@ -45,9 +45,6 @@ function openEditFieldModal(fieldType) {
   if (fieldType === 'username') {
     document.getElementById("editFieldLabel").textContent = "Username";
     document.getElementById("editFieldInput").value = document.getElementById("pseudoProfil").textContent;
-  } else if (fieldType === 'description') {
-    document.getElementById("editFieldLabel").textContent = "Description";
-    document.getElementById("editFieldInput").value = document.getElementById("descriptionProfil").textContent;
   }
   
   document.getElementById("editFieldModal").style.display = "flex";
@@ -76,9 +73,6 @@ function saveEditField() {
   if (currentEditField === 'username') {
     document.getElementById("pseudoProfil").textContent = value;
     localStorage.setItem("username", value);
-  } else if (currentEditField === 'description') {
-    document.getElementById("descriptionProfil").textContent = value;
-    localStorage.setItem("description", value);
   }
   
   closeEditFieldModal();
@@ -88,9 +82,6 @@ document.getElementById("editUserBtn").addEventListener("click", () =>
   openEditFieldModal('username')
 );
 
-document.getElementById("editDescBtn").addEventListener("click", () => 
-  openEditFieldModal('description')
-);
 
 // Listeners
 
@@ -117,15 +108,10 @@ document.getElementById("editFieldInput").addEventListener("keydown", (e) => {
 // Load
 function applySavedData() {
   let savedUsername = localStorage.getItem("username");
-  let savedDescription = localStorage.getItem("description");
   let savedProfilePhoto = localStorage.getItem("profilePhoto");
 
   if (savedUsername) {
     document.getElementById("pseudoProfil").textContent = savedUsername;
-  }
-
-  if (savedDescription) {
-    document.getElementById("descriptionProfil").textContent = savedDescription;
   }
 
   if (savedProfilePhoto) {
