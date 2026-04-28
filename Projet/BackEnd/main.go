@@ -31,6 +31,7 @@ func main() {
 	http.HandleFunc("/api/cdn/", api.ServeUpload)
 
 	http.HandleFunc("/api/user/profile", auth.RequireAuth(api.GetUserProfileHandler))
+	http.HandleFunc("/api/user", auth.RequireAuth(api.EditUserHandler))
 
 	http.HandleFunc("/api/categories", api.ListCategoriesHandler)
 

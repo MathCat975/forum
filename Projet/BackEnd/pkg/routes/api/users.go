@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"main/pkg/auth"
@@ -143,6 +144,97 @@ type userProfileResponse struct {
 	CommentCount int64     `json:"comment_count"`
 	LikeCount    int64     `json:"like_count"`
 	DislikeCount int64     `json:"dislike_count"`
+}
+
+type editUserRequest struct {
+	Username  *string `json:"username,omitempty"`
+	AvatarUrl *string `json:"avatar_url,omitempty"`
+}
+
+func EditUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut && r.Method != http.MethodPatch {
+		routes.JsonError(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	claims, ok := auth.ClaimsFromContext(r.Context())
+	if !ok {
+		routes.JsonError(w, "authentication required", http.StatusUnauthorized)
+		return
+	}
+
+	var req editUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		routes.JsonError(w, "invalid JSON", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	database := db.GetDB()
+
+	user, err := database.GetUserByID(claims.UserID)
+	if err != nil {
+		routes.JsonError(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	fields := map[string]any{}
+
+	if req.Username != nil {
+		newName := strings.TrimSpace(*req.Username)
+		if newName == "" {
+			routes.JsonError(w, "username cannot be empty", http.StatusBadRequest)
+			return
+		}
+		if newName != user.Username {
+			if existing, err := database.GetUserByUsername(newName); err == nil && existing.ID != user.ID {
+				routes.JsonError(w, "username already in use", http.StatusConflict)
+				return
+			}
+			fields["username"] = newName
+			user.Username = newName
+		}
+	}
+
+	if req.AvatarUrl != nil {
+		newAvatar := strings.TrimSpace(*req.AvatarUrl)
+		if newAvatar == "" {
+			routes.JsonError(w, "avatar_url cannot be empty", http.StatusBadRequest)
+			return
+		}
+		if !strings.HasPrefix(newAvatar, "/api/cdn/") && newAvatar != "default.png" {
+			routes.JsonError(w, "invalid avatar_url", http.StatusBadRequest)
+			return
+		}
+		fields["avatar_url"] = newAvatar
+		user.AvatarUrl = newAvatar
+	}
+
+	if len(fields) == 0 {
+		routes.JsonError(w, "nothing to update", http.StatusBadRequest)
+		return
+	}
+
+	if err := database.Table("users").Where("id = ?", user.ID).Update(fields); err != nil {
+		routes.JsonError(w, "failed to update user", http.StatusInternalServerError)
+		return
+	}
+
+	if _, renamed := fields["username"]; renamed {
+		tokenStr, err := auth.GenerateToken(user.ID, user.Username, user.Role)
+		if err != nil {
+			routes.JsonError(w, "failed to refresh token", http.StatusInternalServerError)
+			return
+		}
+		auth.SetTokenCookie(w, tokenStr)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]any{
+		"status":     "ok",
+		"username":   user.Username,
+		"avatar_url": user.AvatarUrl,
+	})
 }
 
 func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
