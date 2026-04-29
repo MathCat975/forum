@@ -41,7 +41,21 @@ func main() {
 	http.HandleFunc("/api/categories", api.ListCategoriesHandler)
 	
 	// Front routes
-	http.HandleFunc("/front/profile", front.ProfileHandler)
+	http.HandleFunc("/front/profile", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "profile")
+	})
+	http.HandleFunc("/front/ban", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "ban")
+	})
+	http.HandleFunc("/front/index", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "index")
+	})
+	http.HandleFunc("/front/login", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "login")
+	})
+	http.HandleFunc("/front/register", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "register")
+	})
 
 	http.HandleFunc("/api/posts", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
