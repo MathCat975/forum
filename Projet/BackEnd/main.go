@@ -4,6 +4,8 @@ import (
 	"log"
 	"main/pkg/auth"
 	"main/pkg/routes/api"
+	"main/pkg/routes/front"
+
 	"net/http"
 
 	"main/pkg/db"
@@ -25,6 +27,10 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
+	// Static files
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("../FrontEnd/assets"))))
+
+	// API routes
 	http.HandleFunc("/api/register", api.RegisterHandler)
 	http.HandleFunc("/api/login", api.LoginHandler)
 	http.HandleFunc("/api/upload", api.UploadImageHandler)
@@ -32,8 +38,10 @@ func main() {
 
 	http.HandleFunc("/api/user/profile", auth.RequireAuth(api.GetUserProfileHandler))
 	http.HandleFunc("/api/user", auth.RequireAuth(api.EditUserHandler))
-
 	http.HandleFunc("/api/categories", api.ListCategoriesHandler)
+	
+	// Front routes
+	http.HandleFunc("/front/profile", front.ProfileHandler)
 
 	http.HandleFunc("/api/posts", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
