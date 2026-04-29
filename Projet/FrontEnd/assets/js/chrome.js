@@ -39,8 +39,8 @@ class SiteHeader extends HTMLElement {
 
     <div class="site-actions">
       <nav class="site-nav" aria-label="Primary">
-        <a href="#" data-nav data-login-link>Login</a>
-        <a href="#" data-nav data-register-link>Register</a>
+        <a href="/login" data-nav data-login-link>Login</a>
+        <a href="/register" data-nav data-register-link>Register</a>
       </nav>
       <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mobile-drawer">
         <span class="menu-btn__lines" aria-hidden="true"><span></span><span></span><span></span></span>
@@ -52,9 +52,9 @@ class SiteHeader extends HTMLElement {
 <div class="mobile-drawer" id="mobile-drawer" hidden>
   <div class="container mobile-drawer__inner">
     <div class="mobile-drawer__meta">Account</div>
-    <a href="#" data-nav data-login-link>Login <span aria-hidden="true">↗</span></a>
-    <a href="#" data-nav data-register-link>Register <span aria-hidden="true">↗</span></a>
-    <a href="#" data-nav data-ban-link>Ban page <span aria-hidden="true">↗</span></a>
+    <a href="/login" data-nav data-login-link>Login <span aria-hidden="true">↗</span></a>
+    <a href="/register" data-nav data-register-link>Register <span aria-hidden="true">↗</span></a>
+    <a href="/ban" data-nav data-ban-link>Ban page <span aria-hidden="true">↗</span></a>
   </div>
 </div>
 `;
@@ -62,7 +62,7 @@ class SiteHeader extends HTMLElement {
         const resolve = (value) => {
             const base = this.getAttribute("base");
             try {
-                return new URL(value, base ? new URL(base, window.location.href) : window.location.href).toString();
+                return value.startsWith('/') ? value : '/' + value;
             } catch {
                 return value;
             }
@@ -73,10 +73,10 @@ class SiteHeader extends HTMLElement {
         const register = this.querySelectorAll("[data-register-link]");
         const ban = this.querySelectorAll("[data-ban-link]");
 
-        for (const el of home) el.setAttribute("href", resolve("./login.html"));
-        for (const el of login) el.setAttribute("href", resolve("./login.html"));
-        for (const el of register) el.setAttribute("href", resolve("./register.html"));
-        for (const el of ban) el.setAttribute("href", resolve("./ban.html"));
+        for (const el of home) el.setAttribute("href", resolve("/front/login"));
+        for (const el of login) el.setAttribute("href", resolve("/front/login"));
+        for (const el of register) el.setAttribute("href", resolve("/front/register"));
+        for (const el of ban) el.setAttribute("href", resolve("/front/ban"));
 
         const menuBtn = this.querySelector(".menu-btn");
         const drawer = this.querySelector("#mobile-drawer");
@@ -141,15 +141,15 @@ class SiteFooter extends HTMLElement {
     <div class="footer-col">
       <h4>Account</h4>
       <ul class="footer-links">
-        <li><a href="#" data-login-link>Login</a></li>
-        <li><a href="#" data-register-link>Register</a></li>
+        <li><a href="/login" data-login-link>Login</a></li>
+        <li><a href="/register" data-register-link>Register</a></li>
       </ul>
     </div>
 
     <div class="footer-col">
       <h4>Pages</h4>
       <ul class="footer-links">
-        <li><a href="#" data-ban-link>Ban</a></li>
+        <li><a href="/ban" data-ban-link>Ban</a></li>
       </ul>
     </div>
 
@@ -178,9 +178,9 @@ class SiteFooter extends HTMLElement {
             for (const el of this.querySelectorAll(selector)) el.setAttribute("href", resolve(href));
         };
 
-        setAll("[data-login-link]", "./login.html");
-        setAll("[data-register-link]", "./register.html");
-        setAll("[data-ban-link]", "./ban.html");
+        setAll("[data-login-link]", "/front/login");
+        setAll("[data-register-link]", "/front/register");
+        setAll("[data-ban-link]", "/front/ban");
 
         this.querySelector("[data-top]")?.addEventListener("click", () => {
             window.scrollTo({ top: 0, behavior: "smooth" });
