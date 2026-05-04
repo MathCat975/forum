@@ -55,6 +55,8 @@ func main() {
 	http.HandleFunc("/api/posts/vote", auth.RequireAuth(api.VotePostHandler))
 	http.HandleFunc("/api/comments", auth.RequireAuth(api.DeleteCommentHandler))
 
+	http.HandleFunc("/api/search", api.SearchHandler)
+
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
