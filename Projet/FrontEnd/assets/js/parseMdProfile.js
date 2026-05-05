@@ -46,6 +46,10 @@ function printInfos(profile) {
   document.getElementById("profilPhoto").src = profile.avatar_url;
   localStorage.setItem("profilePhoto", profile.avatar_url);
 
+  if (profile.avatar_url && !profile.avatar_url.startsWith('blob:')) {
+    localStorage.setItem("profilePhoto", profile.avatar_url);
+  }
+
   // Role
   document.getElementById("userRole").textContent = profile.role;
 
@@ -60,6 +64,12 @@ function printInfos(profile) {
   // Connexion Service
   document.getElementById("connexionService").textContent = profile.connexionService;
 
+  if (profile.connexionService.includes("@")) {
+    document.getElementById("infosNameEmail").textContent = "Email";
+  } else {
+    document.getElementById("infosNameEmail").textContent = "Git Account";
+  }
+
   // Stats
   document.getElementById("statsPosts").textContent = profile.post_count || 0;
   document.getElementById("statsComments").textContent = profile.comment_count || 0;
@@ -72,8 +82,51 @@ function openEditFieldModal(fieldType) {
   currentEditField = fieldType;
 
   if (fieldType === 'username') {
+    document.getElementById("btnConnexion").innerHTML = "";
+    document.getElementById("editFieldInput").style.display = "block";
     document.getElementById("editFieldLabel").textContent = "Username";
     document.getElementById("editFieldInput").value = document.getElementById("pseudoProfil").textContent;
+  }
+
+  if (fieldType === 'connexionService') {
+    const input = document.getElementById("editFieldInput");
+    const container = document.getElementById("btnConnexion");
+    container.innerHTML = "";
+    document.getElementById("saveEditField").style.display = "none";
+
+    document.getElementById("editFieldLabel").textContent = "Connect your account";
+
+    let divBtnConnexion = document.createElement("div");
+    divBtnConnexion.id = "divBtnConnexion";
+
+    let btnGit = document.createElement("a");
+    btnGit.href = "https://www.google.fr";
+    btnGit.className = "oauthBtn";
+    btnGit.id = "btnGit";
+    btnGit.innerHTML = '<img src="/assets/img/profile/gitLogo.webp" alt="GitHub"> <p id="textGit">Connect with GitHub</p>';
+
+
+    let btnEmail = document.createElement("a");
+    btnEmail.href = "https://www.google.fr"; 
+    btnEmail.id = "btnEmail";
+    btnEmail.className = "oauthBtn";
+    btnEmail.innerHTML = '<img src="/assets/img/profile/googleLogo.webp" alt="Google"> <p id="textGoogle">Connect with Google</p>';
+
+    divBtnConnexion.appendChild(btnGit);
+    divBtnConnexion.appendChild(btnEmail);
+    container.appendChild(divBtnConnexion);
+
+    if (profil.connexionType === "git") {
+      btnGit.style.borderColor = "var(--primary)";
+      btnGit.style.pointerEvents = "none";
+      btnGit.querySelector("#textGit").textContent = "Already connected with GitHub";
+    } else if (profil.connexionType === "email") {
+      btnEmail.style.borderColor = "var(--primary)";
+      btnEmail.style.pointerEvents = "none";
+      btnEmail.querySelector("#textGoogle").textContent = "Already connected with Google";
+    }
+
+    input.style.display = "none";
   }
 
   document.getElementById("editFieldModal").style.display = "flex";
@@ -85,6 +138,17 @@ function closeEditFieldModal() {
   document.getElementById("editFieldModal").style.display = "none";
   document.getElementById("editFieldModalOverlay").style.display = "none";
   currentEditField = null;
+}
+
+// Check if git username exists
+
+async function checkGitHubUser(username) {
+  try {
+    const response = await fetch('https://api.github.com/users/' + encodeURIComponent(username));
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
 }
 
 async function saveEditField() {
@@ -99,50 +163,92 @@ async function saveEditField() {
     return;
   }
 
-  if (devMode) {
-    profil.username = value;
-    localStorage.setItem("username", value);
-    printInfos(profil);
-    closeEditFieldModal();
-    return;
-  }
+  // Check mail
 
-  try {
-    const updateData = {};
+  if (currentEditField === 'connexionService') {
+    let isEmail = value.endsWith('@gmail.com') && value.includes('.');
+    let isGit = value.length >= 3;
 
-    if (currentEditField === 'username') {
-      updateData.username = value;
-    }
-
-    const response = await fetch('/api/user', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updateData)
-    });
-
-    if (!response.ok) {
-      alert("Error during update of informations ! Please try again soon.")
+    if (isGit) {
+      if (await checkGitHubUser(value)) {
+        alert("Git username doesn't exist. Please try again.");
+        return;
+      }
+    } else if (isEmail) {
+      if (value.toLowerCase().endsWith("@gmail.com")) {
+        alert("Please enter a valid Gmail address.");
+        return;
+      }
+    } else {
+      alert("Please enter a valid email or Git username.");
       return;
     }
 
-    const result = await response.json();
+    if (devMode) {
+      profil.connexionService = value;
+      localStorage.setItem("connexionService", value);
+      printInfos(profil);
+      closeEditFieldModal();
+      return;
+    }
+  }
 
-    // Keep modal open with update data
+  // Username
 
-    if (currentEditField === 'username') {
-      document.getElementById("pseudoProfil").textContent = result.username;
-      if (currentUserProfile) {
-        currentUserProfile.username = result.username;
-      }
+  if (currentEditField === 'username') {
+    if (devMode) {
+      profil.username = value;
+      localStorage.setItem("username", value);
+      printInfos(profil);
+      closeEditFieldModal();
+      return;
     }
 
-    closeEditFieldModal();
-  } catch (error) {
-    alert('Error during update of informations ! Please try again soon.');
+    try {
+      const updateData = {};
+
+      if (currentEditField === 'username') {
+        updateData.username = value;
+      }
+
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      if (!response.ok) {
+        alert("Error during update of informations ! Please try again soon.")
+        return;
+      }
+
+      const result = await response.json();
+
+      // Keep modal open with update data
+
+      if (currentEditField === 'username') {
+        document.getElementById("pseudoProfil").textContent = result.username;
+        if (currentUserProfile) {
+          currentUserProfile.username = result.username;
+        }
+      }
+    } catch (error) {
+      alert('Error during update of informations ! Please try again soon.');
+    }
+  } else if (currentEditField === 'connexionService') {
+    if (devMode) {
+      profil.connexionService = value;
+      printInfos(profil);
+      closeEditFieldModal();
+      return;
+    }
+
   }
+
+  closeEditFieldModal();
 }
 
 // Update profile image
@@ -197,6 +303,12 @@ document.getElementById("editUserBtn")?.addEventListener("click", () =>
   openEditFieldModal('username')
 );
 
+// Change address service
+document.getElementById("editConnexionServiceBtn")?.addEventListener("click", () =>
+  openEditFieldModal('connexionService')
+);
+
+
 // Modal
 document.getElementById("cancelEditField")?.addEventListener("click", closeEditFieldModal);
 document.getElementById("editFieldModalOverlay")?.addEventListener("click", closeEditFieldModal);
@@ -227,9 +339,14 @@ function applySavedData() {
   }
 
   if (savedProfilePhoto) {
-    let profileImg = document.getElementById("profilPhoto");
-    if (profileImg) {
-      profileImg.src = savedProfilePhoto;
+    // If it's a temp link, we load default image
+    if (savedProfilePhoto.startsWith('blob:')) {
+      localStorage.removeItem("profilePhoto");
+    } else {
+      let profileImg = document.getElementById("profilPhoto");
+      if (profileImg) {
+        profileImg.src = savedProfilePhoto;
+      }
     }
   }
 }
@@ -257,7 +374,8 @@ const profil = {
   comment_count: 12,
   like_count: 8,
   dislike_count: 2,
-  connexionService: "exemple.git"
+  connexionService: "test@exemple.com",
+  connexionType: "email",
 };
 
 document.addEventListener("DOMContentLoaded", () => {

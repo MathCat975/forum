@@ -181,6 +181,19 @@ main {
     color: green;
 }
 
+.connexionServiceDiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.connexionServiceDiv button img {
+    width: 20px !important;
+    height: 20px !important;
+}
+
 #InfosBtns {
     justify-content: center;
     gap: 20px;
@@ -276,6 +289,26 @@ main {
 }
 
 /* Edit */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 #editFieldModalOverlay {
     position: fixed;
     display: none;
@@ -285,63 +318,126 @@ main {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 9999;
+    animation: overlayFadeIn 0.2s ease-out;
+    backdrop-filter: blur(2px);
 }
 
 #editFieldModal {
     position: fixed;
     display: none;
     flex-direction: column;
+    justify-content: center;
     gap: 1rem;
     padding: 1.5rem;
     background-color: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     z-index: 10000;
     width: 300px;
     height: auto;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    animation: modalSlideIn 0.3s ease-out;
 }
 
 #editFieldModal form {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 1rem;
 }
 
+#editFieldModal h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 #editFieldModal label {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--text);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 #editFieldModal input {
-    padding: 0.5rem;
+    padding: 0.7rem 0.8rem;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-family: inherit;
+    background-color: var(--neutral);
+    color: var(--text);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
 }
 
 #editFieldModal input:focus {
     outline: none;
     border-color: var(--primary);
+    background-color: var(--surface);
 }
 
 #editFieldModal .modalButtons {
     display: flex;
     gap: 0.75rem;
-    justify-content: flex-end;
+    justify-content: center;
+}
+
+#divBtnConnexion {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0.75rem;
+}
+
+.oauthBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    background: color-mix(in var(--neutral), 0.5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    width: 100%;
+}
+
+.oauthBtn:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.oauthBtn img {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 #cancelEditField, #saveEditField {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.75rem;
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 150ms ease;
+    transition: all 0.2s ease;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 #saveEditField {
@@ -351,16 +447,22 @@ main {
 
 #saveEditField:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
+}
+
+#saveEditField:active {
+    transform: translateY(0);
 }
 
 #cancelEditField {
-    background: var(--border);
+    background: var(--neutral);
     color: var(--text);
+    border: 1px solid var(--border);
 }
 
 #cancelEditField:hover {
     background: var(--border);
-    opacity: 0.8;
+    border-color: var(--border);
 }
 
 @media (max-width: 1200px) {

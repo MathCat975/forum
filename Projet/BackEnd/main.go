@@ -45,38 +45,13 @@ func main() {
 
 	http.HandleFunc("/api/upload", auth.RequireAuth(
 		ratelimit.PerUser(ratelimit.Upload, api.UploadImageHandler)))
-	// Static files
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("../FrontEnd/assets"))))
-
-	// API routes
-	http.HandleFunc("/api/register", api.RegisterHandler)
-	http.HandleFunc("/api/login", api.LoginHandler)
-	http.HandleFunc("/api/upload", api.UploadImageHandler)
 	http.HandleFunc("/api/cdn/", api.ServeUpload)
 
 	http.HandleFunc("/api/user/profile", auth.RequireAuth(api.GetUserProfileHandler))
 	http.HandleFunc("/api/user", auth.RequireAuth(
 		ratelimit.PerUser(ratelimit.EditProfile, api.EditUserHandler)))
 
-	http.HandleFunc("/api/user", auth.RequireAuth(api.EditUserHandler))
 	http.HandleFunc("/api/categories", api.ListCategoriesHandler)
-	
-	// Front routes
-	http.HandleFunc("/front/profile", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "profile")
-	})
-	http.HandleFunc("/front/ban", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "ban")
-	})
-	http.HandleFunc("/front/index", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "index")
-	})
-	http.HandleFunc("/front/login", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "login")
-	})
-	http.HandleFunc("/front/register", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "register")
-	})
 
 	http.HandleFunc("/api/posts", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -102,6 +77,20 @@ func main() {
 		ratelimit.PerUser(ratelimit.DeleteComment, api.DeleteCommentHandler)))
 
 	http.HandleFunc("/api/search", ratelimit.PerIP(ratelimit.Search, api.SearchHandler))
+
+	// Static files
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("../FrontEnd/assets"))))
+	
+	// Front routes
+	http.HandleFunc("/front/profile", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "profile")
+	})
+	http.HandleFunc("/front/ban", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "ban")
+	})
+	http.HandleFunc("/front/index", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "index")
+	})
 
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
