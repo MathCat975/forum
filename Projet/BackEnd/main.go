@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"main/pkg/auth"
+	"main/pkg/oauth"
 	"main/pkg/ratelimit"
 	"main/pkg/routes/api"
 	"net/http"
@@ -21,6 +22,10 @@ func main() {
 		log.Fatalf("Auth initialization failed: %v", err)
 	}
 
+	if err := oauth.Init(); err != nil {
+		log.Fatalf("OAuth initialization failed: %v", err)
+	}
+
 	_, err := db.Open("database.db")
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
@@ -29,6 +34,12 @@ func main() {
 	http.HandleFunc("/api/register", ratelimit.PerIP(ratelimit.Register, api.RegisterHandler))
 
 	http.HandleFunc("/api/login", ratelimit.PerIP(ratelimit.Login, api.LoginHandler))
+
+	http.HandleFunc("/api/auth/github", ratelimit.PerIP(ratelimit.Login, api.GitHubLoginHandler))
+	http.HandleFunc("/api/auth/github/callback", api.GitHubCallbackHandler)
+	http.HandleFunc("/api/auth/google", ratelimit.PerIP(ratelimit.Login, api.GoogleLoginHandler))
+	http.HandleFunc("/api/auth/google/callback", api.GoogleCallbackHandler)
+	http.HandleFunc("/api/auth/oauth/complete", ratelimit.PerIP(ratelimit.Register, api.OAuthCompleteHandler))
 
 	http.HandleFunc("/api/upload", auth.RequireAuth(
 		ratelimit.PerUser(ratelimit.Upload, api.UploadImageHandler)))
