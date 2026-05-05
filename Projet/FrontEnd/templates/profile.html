@@ -17,7 +17,7 @@
         <div id="profileHead">
             <img src="/assets/img/profile/banner.png" alt="Banner">
             <span id="profilePhotoName">
-                <img src="/assets/img/profile/profil.png" alt="Profile Photo">
+                <img src="/assets/img/profile/profil.png" alt="Profile Photo" id="profilPhoto">
                 <div id="photoName">
                     <div class="editableField">
                         <h4 id="pseudoProfil">Username</h4>
@@ -36,7 +36,7 @@
 
                     <div class="infosPart">
                         <p class="infosName">Role</p>
-                        <p class="infosValue">User</p>
+                        <p class="infosValue" id="userRole">User</p>
                     </div>
 
                     <div class="infosPart">
@@ -46,24 +46,29 @@
 
                     <div class="infosPart">
                         <p class="infosName">UID</p>
-                        <p class="infosValue">XXXXXX</p>
+                        <p class="infosValue" id="userUID">XXXXXX</p>
                     </div>
 
                     <div class="infosPart">
                         <p class="infosName">Regisration Date</p>
-                        <p class="infosValue">23 March, 2019</p>
+                        <p class="infosValue" id="creationDate">23 March, 2019</p>
                     </div>
 
                     <div class="infosPart">
                         <p class="infosName">Last Visit</p>
-                        <p class="infosValue">Less than 1 minute ago</p>
+                        <p class="infosValue" id="lastVisit">Less than 1 minute ago</p>
                     </div>
 
-                    <div id="InfosBtns" class="infosPart">
+                    <div class="infosPart">
+                        <p class="infosName">Connexion service</p>
+                        <p class="infosValue" id="connexionService">Git</p>
+                    </div>
+
+                    <!--<div id="InfosBtns" class="infosPart">
                         <button>More</button>
                         <button>Trustscan</button>
                         <button>Items</button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
@@ -75,22 +80,22 @@
 
                     <div id="statsContent">
                         <div class="statsPart">
-                            <p class="statsValue">11</p>
-                            <p class="statsName">Threads</p>
-                        </div>
-
-                        <div class="statsPart">
-                            <p class="statsValue">122</p>
+                            <p class="statsValue" id="statsPosts">122</p>
                             <p class="statsName">Posts</p>
                         </div>
 
+                         <div class="statsPart">
+                            <p class="statsValue" id="statsDislikesGiver">11</p>
+                            <p class="statsName">Dislikes</p>
+                        </div>
+
                         <div class="statsPart">
-                            <p class="statsValue">4</p>
+                            <p class="statsValue" id="statsLikesGiven">4</p>
                             <p class="statsName">Likes Given</p>
                         </div>
 
                         <div class="statsPart">
-                            <p class="statsValue">5</p>
+                            <p class="statsValue" id="statsComments">5</p>
                             <p class="statsName">Commentaries</p>
                         </div>
                     </div>

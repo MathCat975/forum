@@ -1,52 +1,81 @@
-function simpleMarkdown(text) {
-  return text
-    .replace(/# (.*)/g, '<h1>$1</h1>')
-    .replace(/## (.*)/g, '<h2>$1</h2>')
-    .replace(/### (.*)/g, '<h3>$1</h3>')
-    .replace(/#### (.*)/g, '<h4>$1</h4>')
-    .replace(/##### (.*)/g, '<h5>$1</h5>')
-    .replace(/###### (.*)/g, '<h6>$1</h6>')
-}
-
-const md = "# Hello World\nThis is a **bold** text and this is an *italic* text.\n[Google](https://www.google.com)";
-
-let ligns = md.split('\n').map(line => simpleMarkdown(line.trim())).join('<br>');
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Lasts Posts
-
-let date = new Date().toLocaleDateString();
-
-for (let i = 0; i < 5; i++) {
-  let post = document.createElement('div');
-  post.classList.add('cardPost');
-  post.id = 'post' + (i + 1);
-  post.innerHTML = '<h3>Post Title ' + (i + 1) + '</h3>';
-  post.innerHTML += '<p class="postDate">Posted on ' + date + '</p>';
-  let viewBtn = document.createElement("button");
-  viewBtn.innerText = "View";
-  viewBtn.classList.add('viewPostButton');
-  post.appendChild(viewBtn);
-  document.getElementById('postContent').appendChild(post);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Edit Modal
-
+let currentUserProfile = null;
 let currentEditField = null;
 
+function getUsernameFromURL() {
+  let params = new URLSearchParams(window.location.search);
+  return params.get('username');
+}
+
+// Call server to ask data
+async function fetchUserProfile(username) {
+  try {
+    let url = '/api/user/profile?username=' + encodeURIComponent(username);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        window.location.href = '/front/login';
+        return null;
+      }
+      console.error('Failed to fetch profile:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    currentUserProfile = data;
+    return data;
+  } catch (error) {
+    return null;
+  }
+}
+
+// Display data
+function printInfos(profile) {
+  if (!profile) {
+    return
+  };
+
+  // name
+  document.getElementById("pseudoProfil").textContent = profile.username;
+
+  // Update avatar
+  document.getElementById("profilPhoto").src = profile.avatar_url;
+  localStorage.setItem("profilePhoto", profile.avatar_url);
+
+  // Role
+  document.getElementById("userRole").textContent = profile.role;
+
+  // UID
+  document.getElementById("userUID").textContent = profile.id || profile.uid;
+
+  // Date
+  const creationDateDom = document.getElementById("creationDate");
+  let createdDate = new Date(profile.created_at).toLocaleDateString();
+  creationDateDom.textContent = createdDate;
+
+  // Connexion Service
+  document.getElementById("connexionService").textContent = profile.connexionService;
+
+  // Stats
+  document.getElementById("statsPosts").textContent = profile.post_count || 0;
+  document.getElementById("statsComments").textContent = profile.comment_count || 0;
+  document.getElementById("statsLikesGiven").textContent = profile.like_count || 0;
+  document.getElementById("statsDislikesGiver").textContent = profile.dislike_count || 0;
+}
+
+// Edit modale
 function openEditFieldModal(fieldType) {
   currentEditField = fieldType;
-  
+
   if (fieldType === 'username') {
     document.getElementById("editFieldLabel").textContent = "Username";
     document.getElementById("editFieldInput").value = document.getElementById("pseudoProfil").textContent;
   }
-  
+
   document.getElementById("editFieldModal").style.display = "flex";
   document.getElementById("editFieldModalOverlay").style.display = "block";
   document.getElementById("editFieldInput").focus();
@@ -58,40 +87,123 @@ function closeEditFieldModal() {
   currentEditField = null;
 }
 
-function saveEditField() {
+async function saveEditField() {
   if (!currentEditField) {
     return
   };
-  
+
   let value = document.getElementById("editFieldInput").value.trim();
-  
+
   if (!value) {
-    alert("Please enter a value");
+    alert("You didn't enter a value. Please retry !");
     return;
   }
-  
-  if (currentEditField === 'username') {
-    document.getElementById("pseudoProfil").textContent = value;
+
+  if (devMode) {
+    profil.username = value;
     localStorage.setItem("username", value);
+    printInfos(profil);
+    closeEditFieldModal();
+    return;
   }
-  
-  closeEditFieldModal();
+
+  try {
+    const updateData = {};
+
+    if (currentEditField === 'username') {
+      updateData.username = value;
+    }
+
+    const response = await fetch('/api/user', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData)
+    });
+
+    if (!response.ok) {
+      alert("Error during update of informations ! Please try again soon.")
+      return;
+    }
+
+    const result = await response.json();
+
+    // Keep modal open with update data
+
+    if (currentEditField === 'username') {
+      document.getElementById("pseudoProfil").textContent = result.username;
+      if (currentUserProfile) {
+        currentUserProfile.username = result.username;
+      }
+    }
+
+    closeEditFieldModal();
+  } catch (error) {
+    alert('Error during update of informations ! Please try again soon.');
+  }
 }
 
-document.getElementById("editUserBtn").addEventListener("click", () => 
+// Update profile image
+
+document.getElementById("editPhotoInput")?.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+
+  if (!file) {
+    return
+  };
+
+  // Create URL for image
+  let urlImage = URL.createObjectURL(file);
+
+  if (devMode) {
+    profil.avatar_url = urlImage;
+    printInfos(profil);
+    return;
+  }
+
+  let formData = new FormData();
+  formData.append("image", file);
+
+  try {
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    if (result.url) {
+      localStorage.setItem("profilePhoto", result.url);
+      document.getElementById('profilPhoto').src = result.url;
+    }
+  } catch (error) {
+    alert("Error during upload");
+    document.getElementById('profilPhoto').src = urlImage;
+  }
+
+  // Update avatar DOM
+  document.getElementById('profilPhoto').src = URL.createObjectURL(file);
+});
+
+// Click on photo to change
+document.querySelector('profilPhoto')?.addEventListener('click', () => {
+  document.getElementById("editPhotoInput").click();
+});
+
+// Change username
+
+document.getElementById("editUserBtn")?.addEventListener("click", () =>
   openEditFieldModal('username')
 );
 
-
-// Listeners
-
-document.getElementById("cancelEditField").addEventListener("click", closeEditFieldModal);
-
-document.getElementById("editFieldModalOverlay").addEventListener("click", closeEditFieldModal);
-
-document.getElementById("saveEditField").addEventListener("click", saveEditField);
-
-// Keys actions
+// Modal
+document.getElementById("cancelEditField")?.addEventListener("click", closeEditFieldModal);
+document.getElementById("editFieldModalOverlay")?.addEventListener("click", closeEditFieldModal);
+document.getElementById("saveEditField")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  saveEditField();
+});
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && document.getElementById("editFieldModal").style.display === "flex") {
@@ -115,7 +227,7 @@ function applySavedData() {
   }
 
   if (savedProfilePhoto) {
-    let profileImg = document.querySelector("#profilePhotoName > img");
+    let profileImg = document.getElementById("profilPhoto");
     if (profileImg) {
       profileImg.src = savedProfilePhoto;
     }
@@ -125,7 +237,7 @@ function applySavedData() {
 applySavedData();
 
 // Photo
-const profileImg = document.querySelector("#profilePhotoName > img");
+const profileImg = document.getElementById("profilPhoto");
 const editPhotoInput = document.getElementById("editPhotoInput");
 
 if (profileImg) {
@@ -134,33 +246,23 @@ if (profileImg) {
   });
 }
 
-editPhotoInput.addEventListener("change", (e) => {
-  let file = e.target.files[0];
-  if (file) {
-    // Create FormData to send the file
-    let formData = new FormData();
-    formData.append("image", file);
-    
-    // Send to server
-    fetch("http://localhost:8080/api/upload", {
-      method: "POST",
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.url) {
-        // Update the image with the server URL
-        profileImg.src = data.url;
-        
-        // Save the URL to localStorage
-        localStorage.setItem("profilePhoto", data.url);
-      } else {
-        alert("Error uploading image");
-      }
-    })
-    .catch(error => {
-      console.error("Upload error:", error);
-      alert("Failed to upload image");
-    });
+const devMode = true;
+const profil = {
+  username: localStorage.getItem("username") || "TestUser",
+  avatar_url: localStorage.getItem("profilePhoto") || "/assets/img/profile/profil.png",
+  role: "Admin",
+  id: "12345",
+  created_at: "2026-01-15T10:00:00Z",
+  post_count: 5,
+  comment_count: 12,
+  like_count: 8,
+  dislike_count: 2,
+  connexionService: "exemple.git"
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (devMode) {
+    printInfos(profil);
   }
 });
+
