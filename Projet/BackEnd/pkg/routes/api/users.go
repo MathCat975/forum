@@ -56,10 +56,11 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	hashStr := string(hashedPassword)
 	user := structs.User{
 		Username:     req.Username,
 		Email:        req.Email,
-		PasswordHash: string(hashedPassword),
+		PasswordHash: &hashStr,
 		CreatedAt:    time.Now(),
 		AvatarUrl:    "default.png",
 		Role:         "user",
@@ -119,7 +120,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+	if user.PasswordHash == nil {
+		routes.JsonError(w, "invalid credentials", http.StatusUnauthorized)
+		return
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(*user.PasswordHash), []byte(req.Password)); err != nil {
 		routes.JsonError(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
