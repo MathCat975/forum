@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"main/pkg/auth"
+	"main/pkg/ratelimit"
 	"main/pkg/routes/api"
 	"main/pkg/routes/front"
 
@@ -27,6 +28,12 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
+	http.HandleFunc("/api/register", ratelimit.PerIP(ratelimit.Register, api.RegisterHandler))
+
+	http.HandleFunc("/api/login", ratelimit.PerIP(ratelimit.Login, api.LoginHandler))
+
+	http.HandleFunc("/api/upload", auth.RequireAuth(
+		ratelimit.PerUser(ratelimit.Upload, api.UploadImageHandler)))
 	// Static files
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("../FrontEnd/assets"))))
 
@@ -37,6 +44,9 @@ func main() {
 	http.HandleFunc("/api/cdn/", api.ServeUpload)
 
 	http.HandleFunc("/api/user/profile", auth.RequireAuth(api.GetUserProfileHandler))
+	http.HandleFunc("/api/user", auth.RequireAuth(
+		ratelimit.PerUser(ratelimit.EditProfile, api.EditUserHandler)))
+
 	http.HandleFunc("/api/user", auth.RequireAuth(api.EditUserHandler))
 	http.HandleFunc("/api/categories", api.ListCategoriesHandler)
 	
@@ -62,20 +72,25 @@ func main() {
 		case http.MethodGet:
 			api.GetPostHandler(w, r)
 		case http.MethodPost:
-			auth.RequireAuth(api.CreatePostHandler)(w, r)
+			auth.RequireAuth(ratelimit.PerUser(ratelimit.CreatePost, api.CreatePostHandler))(w, r)
 		case http.MethodPut, http.MethodPatch:
-			auth.RequireAuth(api.EditPostHandler)(w, r)
+			auth.RequireAuth(ratelimit.PerUser(ratelimit.EditPost, api.EditPostHandler))(w, r)
 		case http.MethodDelete:
-			auth.RequireAuth(api.DeletePostHandler)(w, r)
+			auth.RequireAuth(ratelimit.PerUser(ratelimit.EditPost, api.DeletePostHandler))(w, r)
 		default:
 			w.Header().Set("Allow", "GET, POST, PUT, PATCH, DELETE")
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
 	http.HandleFunc("/api/posts/list", api.ListPostsByCategoryHandler)
-	http.HandleFunc("/api/posts/reply", auth.RequireAuth(api.ReplyToPostHandler))
-	http.HandleFunc("/api/posts/vote", auth.RequireAuth(api.VotePostHandler))
-	http.HandleFunc("/api/comments", auth.RequireAuth(api.DeleteCommentHandler))
+	http.HandleFunc("/api/posts/reply", auth.RequireAuth(
+		ratelimit.PerUser(ratelimit.CreatePost, api.ReplyToPostHandler)))
+	http.HandleFunc("/api/posts/vote", auth.RequireAuth(
+		ratelimit.PerUser(ratelimit.Vote, api.VotePostHandler)))
+	http.HandleFunc("/api/comments", auth.RequireAuth(
+		ratelimit.PerUser(ratelimit.DeleteComment, api.DeleteCommentHandler)))
+
+	http.HandleFunc("/api/search", ratelimit.PerIP(ratelimit.Search, api.SearchHandler))
 
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
