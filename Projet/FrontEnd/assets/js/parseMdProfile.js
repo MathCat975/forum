@@ -1,10 +1,120 @@
 let currentUserProfile = null;
 let currentEditField = null;
 
+const devMode = true;
+const profil = {
+  username: localStorage.getItem("username") || "TestUser",
+  avatar_url: localStorage.getItem("profilePhoto") || "/assets/img/profile/profil2.png",
+  role: "Admin",
+  id: "12345",
+  created_at: "2026-01-15T10:00:00Z",
+  online: true,
+  post_count: 5,
+  comment_count: 12,
+  like_count: 8,
+  dislike_count: 2,
+  connexionService: JSON.parse(localStorage.getItem("connexionService")) || {
+    git: "",
+    email: "test@exemple.com",
+    none: ""
+  },
+  connexionType: JSON.parse(localStorage.getItem("connexionType")) || {
+    git: false,
+    email: true,
+    none: false
+  },
+  lastPosts: {
+    post1: {
+      title: "First post",
+      content: "This is the first post content. This is the first post content. This is the first post content. This is the first post content. This is the first post content.",
+      date: "2023-07-25"
+    },
+    post2: {
+      title: "Second post",
+      content: "This is the second post content.",
+      date: "2023-07-26"
+    },
+    post3: {
+      title: "Third post",
+      content: "This is the third post content.",
+      date: "2023-07-27"
+    },
+    post4: {
+      title: "Fourth post",
+      content: "This is the fourth post content.",
+      date: "2023-07-28"
+    },
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (devMode) {
+    printInfos(profil);
+  }
+});
+
 function getUsernameFromURL() {
   let params = new URLSearchParams(window.location.search);
   return params.get('username');
 }
+
+// Disconnect
+const disconnect = (type) => {
+  if (devMode) {
+    profil.connexionService = "None";
+    profil.connexionType = "none";
+    localStorage.setItem("connexionService", "None");
+    localStorage.setItem("connexionType", "none");
+    printInfos(profil);
+    closeEditFieldModal();
+    setTimeout(() => openEditFieldModal("connexionService"), 10);
+    return;
+  }
+
+  if (type === "Git") {
+    profil.connexionType.git = false;
+    profil.connexionService.git = "";
+    localStorage.setItem("connexionType", stringify(profil.connexionType));
+    localStorage.setItem("connexionService", stringify(profil.connexionService));
+    printInfos(profil);
+    return;
+  }
+
+  if (type === "Google") {
+    profil.connexionType.email = false;
+    profil.connexionService.email = "";
+    localStorage.setItem("connexionType", stringify(profil.connexionType));
+    localStorage.setItem("connexionService", stringify(profil.connexionService));
+    printInfos(profil)
+    return;
+  }
+}
+
+// Print lastPosts
+const postContentDom = document.getElementById("postContent");
+
+function printLastPosts() {
+  postContentDom.innerHTML = "";
+
+  for (let [key, value] of Object.entries(profil.lastPosts)) {
+    let div = document.createElement("div");
+    div.className = "cardPost";
+    div.id = key;
+
+    let contentText = value.content;
+    
+    // Content max length 100 characters
+    if (value.content.length > 100) {
+      contentText = value.content.substring(0, 100) + "...";
+    }
+
+    div.innerHTML = '<h4> ' + value.title + ' </h4> <p> ' + contentText + ' </p> <span class="postDate"> ' + new Date(value.date).toLocaleDateString() + ' </span> <button class="viewPostButton">See post</button>';
+    postContentDom.appendChild(div);
+  }
+}
+
+printLastPosts();
+
 
 // Call server to ask data
 async function fetchUserProfile(username) {
@@ -50,11 +160,24 @@ function printInfos(profile) {
     localStorage.setItem("profilePhoto", profile.avatar_url);
   }
 
-  // Role
-  document.getElementById("userRole").textContent = profile.role;
+  // Online
+  const onlineBall = document.getElementById("isOnlineBall");
+  const onlineText = document.getElementById("isOnline");
+  if (profile.online) {
+    onlineBall.classList.add("Online");
+    onlineBall.classList.remove("Offline");
+    onlineText.textContent = "Online";
+    onlineText.style.color = "green";
+  } else {
+    onlineBall.classList.add("Offline");
+    onlineBall.classList.remove("Online");
+    onlineText.textContent = "Offline";
+    onlineText.style.color = "red";
+  }
 
-  // UID
-  document.getElementById("userUID").textContent = profile.id || profile.uid;
+
+  // Role
+  document.getElementById("userRole").textContent = profile.role || "User";
 
   // Date
   const creationDateDom = document.getElementById("creationDate");
@@ -62,12 +185,19 @@ function printInfos(profile) {
   creationDateDom.textContent = createdDate;
 
   // Connexion Service
-  document.getElementById("connexionService").textContent = profile.connexionService;
+  const serviceDom = document.getElementById("connexionService");
+  const infosNameDom = document.getElementById("infosNameEmail");
 
-  if (profile.connexionService.includes("@")) {
-    document.getElementById("infosNameEmail").textContent = "Email";
+  // On détermine quel service est actif
+  if (profile.connexionType.git) {
+    serviceDom.textContent = profile.connexionService.git;
+    infosNameDom.textContent = "Git Account";
+  } else if (profile.connexionType.email) {
+    serviceDom.textContent = profile.connexionService.email;
+    infosNameDom.textContent = "Email";
   } else {
-    document.getElementById("infosNameEmail").textContent = "Git Account";
+    serviceDom.textContent = "No service linked";
+    infosNameDom.textContent = "Status";
   }
 
   // Stats
@@ -99,34 +229,86 @@ function openEditFieldModal(fieldType) {
     let divBtnConnexion = document.createElement("div");
     divBtnConnexion.id = "divBtnConnexion";
 
+    let btnGitDiv = document.createElement("div");
+    btnGitDiv.id = "btnGitDiv";
     let btnGit = document.createElement("a");
-    btnGit.href = "https://www.google.fr";
+    btnGit.href = "#";
+    btnGit.addEventListener("click", () => {
+      profil.connexionType.git = true;
+      profil.connexionService.git = "test git";
+      localStorage.setItem("connexionType", stringify(profil.connexionType));
+      printInfos(profil);
+      closeEditFieldModal();
+    });
     btnGit.className = "oauthBtn";
     btnGit.id = "btnGit";
     btnGit.innerHTML = '<img src="/assets/img/profile/gitLogo.webp" alt="GitHub"> <p id="textGit">Connect with GitHub</p>';
+    btnGitDiv.appendChild(btnGit);
+    let btnDisconnectGit = document.createElement("button");
+    btnDisconnectGit.id = "btnRemoveGit";
+    btnDisconnectGit.type = "button";
+    btnDisconnectGit.addEventListener("click", () => disconnect("Git"));
+    btnDisconnectGit.className = "btnRemove";
+    btnDisconnectGit.textContent = "Remove connection";
+    btnGitDiv.appendChild(btnDisconnectGit);
 
-
+    let btnEmailDiv = document.createElement("div");
+    btnEmailDiv.id = "btnEmailDiv";
     let btnEmail = document.createElement("a");
-    btnEmail.href = "https://www.google.fr"; 
+    btnEmail.href = "#";
+    btnEmail.addEventListener("click", () => {
+      profil.connexionType.email = true;
+      profil.connexionService.email = "test@exemple.com";
+      localStorage.setItem("connexionType", stringify(profil.connexionType));
+      printInfos(profil);
+      closeEditFieldModal();
+    });
     btnEmail.id = "btnEmail";
     btnEmail.className = "oauthBtn";
     btnEmail.innerHTML = '<img src="/assets/img/profile/googleLogo.webp" alt="Google"> <p id="textGoogle">Connect with Google</p>';
+    btnEmailDiv.appendChild(btnEmail);
+    let btnDisconnectGoogle = document.createElement("button");
+    btnDisconnectGoogle.id = "btnRemoveGoogle";
+    btnDisconnectGoogle.type = "button";
+    btnDisconnectGoogle.addEventListener("click", () => disconnect("Google"));
+    btnDisconnectGoogle.className = "btnRemove";
+    btnDisconnectGoogle.textContent = "Remove connection";
+    btnEmailDiv.appendChild(btnDisconnectGoogle);
 
-    divBtnConnexion.appendChild(btnGit);
-    divBtnConnexion.appendChild(btnEmail);
+    divBtnConnexion.appendChild(btnGitDiv);
+    divBtnConnexion.appendChild(btnEmailDiv);
     container.appendChild(divBtnConnexion);
 
-    if (profil.connexionType === "git") {
+    if (profil.connexionType.git === false) {
+      document.getElementById("btnRemoveGit").style.display = "none";
+    } else if (profil.connexionType.git === true) {
       btnGit.style.borderColor = "var(--primary)";
       btnGit.style.pointerEvents = "none";
       btnGit.querySelector("#textGit").textContent = "Already connected with GitHub";
-    } else if (profil.connexionType === "email") {
+      document.getElementById("btnRemoveGit").style.display = "block";
+      document.getElementById("btnRemoveGit").disabled = false;
+    }
+
+    if (profil.connexionType.email === false) {
+      document.getElementById("btnRemoveGoogle").style.display = "none";
+    } else if (profil.connexionType.email === true) {
       btnEmail.style.borderColor = "var(--primary)";
       btnEmail.style.pointerEvents = "none";
       btnEmail.querySelector("#textGoogle").textContent = "Already connected with Google";
+      document.getElementById("btnRemoveGoogle").style.display = "block";
+      document.getElementById("btnRemoveGoogle").disabled = false;
+    }
+
+    if (profil.connexionType.none === true) {
+      document.getElementById("btnRemoveGit").style.display = "none";
+      document.getElementById("btnRemoveGoogle").style.display = "none";
     }
 
     input.style.display = "none";
+
+    // Resize
+    const modal = document.getElementById("editFieldModal");
+    modal.classList.add("modal-resize");
   }
 
   document.getElementById("editFieldModal").style.display = "flex";
@@ -138,6 +320,10 @@ function closeEditFieldModal() {
   document.getElementById("editFieldModal").style.display = "none";
   document.getElementById("editFieldModalOverlay").style.display = "none";
   currentEditField = null;
+
+  // Remove class
+  const modal = document.getElementById("editFieldModal");
+  modal.classList.remove("modal-resize");
 }
 
 // Check if git username exists
@@ -170,7 +356,7 @@ async function saveEditField() {
     let isGit = value.length >= 3;
 
     if (isGit) {
-      if (await checkGitHubUser(value)) {
+      if (!await checkGitHubUser(value)) {
         alert("Git username doesn't exist. Please try again.");
         return;
       }
@@ -293,7 +479,7 @@ document.getElementById("editPhotoInput")?.addEventListener('change', async (e) 
 });
 
 // Click on photo to change
-document.querySelector('profilPhoto')?.addEventListener('click', () => {
+document.querySelector('#profilPhoto')?.addEventListener('click', () => {
   document.getElementById("editPhotoInput").click();
 });
 
@@ -359,28 +545,7 @@ const editPhotoInput = document.getElementById("editPhotoInput");
 
 if (profileImg) {
   profileImg.addEventListener("click", () => {
-    editPhotoInput.click();
+    //editPhotoInput.click();
   });
 }
-
-const devMode = true;
-const profil = {
-  username: localStorage.getItem("username") || "TestUser",
-  avatar_url: localStorage.getItem("profilePhoto") || "/assets/img/profile/profil.png",
-  role: "Admin",
-  id: "12345",
-  created_at: "2026-01-15T10:00:00Z",
-  post_count: 5,
-  comment_count: 12,
-  like_count: 8,
-  dislike_count: 2,
-  connexionService: "test@exemple.com",
-  connexionType: "email",
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (devMode) {
-    printInfos(profil);
-  }
-});
 
