@@ -3,144 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum</title>
+    <title>MEOW | Shadow Protocol</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/theme.css">
     <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 <body>
-    <header class="protocol-topbar" aria-label="Site header">
-        <a class="protocol-brand" href="/front/index" aria-label="Forum home">
-            <span class="brand-node" aria-hidden="true">></span>
-            <span>meow</span>
-        </a>
+    <div class="page-shell">
+        <!-- SIDEBAR FUSIONNÉE -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark">></span>
+                <div>
+                    <p class="brand-title">MEOW_PROTOCOL</p>
+                    <p class="brand-subtitle">v4.2.8 | meow meow</p>
+                </div>
+            </div>
 
-        <nav class="protocol-tabs" aria-label="Sections">
-            <a href="#feed" aria-current="page">Forums</a>
-            <a href="/front/register">Upgrades</a>
-            <a href="#wiki">Wiki</a>
-        </nav>
-
-        <form class="protocol-search" role="search">
-            <label class="sr-only" for="global-search">Search for posts</label>
-            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
-        </form>
-
-        <nav class="protocol-actions" aria-label="Account">
-            <a href="/front/login" aria-label="Notifications">
-                <img src="/assets/img/header/notif.png" alt="">
-            </a>
-            <a href="/front/login" aria-label="Messages">
-                <img src="/assets/img/header/message.png" alt="">
-            </a>
-            <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
-        </nav>
-    </header>
-
-    <main class="protocol-shell" id="top">
-        <aside class="directory-panel" aria-label="Directory">
-
-            <nav class="directory-nav" aria-label="Forum navigation">
-                <a class="is-active" href="#feed"><span>::</span>Main Feed</a>
-                <a href="#trending"><span>--</span>Trending</a>
-                <a href="#private"><span>[]</span>Private Nodes</a>
-                <a href="#logs"><span>==</span>System Logs</a>
-                <a href="#archive"><span>##</span>Archive</a>
+            <nav class="side-nav">
+                <a href="#feed" class="side-link active"><span>::</span> Main Feed</a>
+                <a href="#trending" class="side-link"><span>--</span> Trending</a>
+                <a href="#private" class="side-link"><span>[]</span> Private Nodes</a>
+                <a href="#logs" class="side-link"><span>==</span> System Logs</a>
+                <a href="#archive" class="side-link"><span>##</span> Archive</a>
             </nav>
 
-            <a class="init-thread" href="/front/register">Create post</a>
+            <button class="thread-button">Initialize Thread</button>
 
-            <nav class="directory-footer" aria-label="Support links">
-                <a href="/front/login"><span>+</span>Settings</a>
-                <a href=""><span>?</span>Support</a>
-            </nav>
+            <div class="sidebar-footer">
+                <a href="/front/login" class="side-link subtle"><span>+</span> Settings</a>
+                <a href="#" class="side-link subtle"><span>?</span> Support</a>
+            </div>
         </aside>
 
-        <section class="operations" aria-label="Operational feed">
+        <main class="content">
+            <!-- TOPBAR FUSIONNÉE -->
+            <header class="topbar">
+                <nav class="topbar-nav">
+                    <a href="#feed" aria-current="page">Forums</a>
+                    <a href="/front/register">Upgrades</a>
+                    <a href="#market">Market</a>
+                    <a href="#wiki">Wiki</a>
+                </nav>
+
+                <div class="protocol-actions">
+                    <form class="protocol-search" role="search" style="display: inline-block; margin-right: 20px;">
+                        <input id="global-search" name="q" type="search" placeholder="Scan network..." autocomplete="off">
+                    </form>
+                    
+                    <a href="/front/login" aria-label="Notifications"><img src="/assets/img/header/notif.png" alt="!"></a>
+                    <a href="/front/login" aria-label="Messages"><img src="/assets/img/header/message.png" alt="M"></a>
+                    <a class="operator-badge" href="/front/profile">ID</a>
+                </div>
+            </header>
+
+            <!-- HERO PANEL -->
             <section class="hero-panel">
-                <div>
+                <div class="hero-copy">
+                    <p class="eyebrow">Operational Feed</p>
                     <h1>MEOW</h1>
-                    <p>Moewing posts. meow meow meow.</p>
+                    <p class="hero-text">Meowing posts. Meow meow meow. Encryption relay online.</p>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <span class="stat-value">12.4K</span>
+                        <span class="stat-label">Indexed Nodes</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">98.7%</span>
+                        <span class="stat-label">Uptime</span>
+                    </div>
                 </div>
             </section>
 
-            <section class="forum-board" id="feed" aria-labelledby="latest-posts">
-                <h2 class="sr-only" id="latest-posts">Latest posts</h2>
-
-                <section class="post-cluster post-cluster--blue" aria-labelledby="category1">
-                    <header class="cluster-head">
-                        <h3 id="category1">category1</h3>
-                    </header>
-
-                    <div class="cluster-rows">
+            <!-- FORUM BOARD -->
+            <section class="results-layout" id="feed">
+                <div class="results-column">
+                    
+                    <!-- CATEGORY 1 -->
+                    <section class="post-cluster post-cluster--blue">
+                        <header class="cluster-head">
+                            <h3>category1</h3>
+                        </header>
                         <article class="post-row">
-                            <div class="post-glyph post-glyph--primary" aria-hidden="true">#</div>
+                            <div class="post-glyph">#</div>
                             <div class="post-copy">
                                 <a href="#">Announcements & Global Directives</a>
                                 <p>Official protocol updates and network expansion logs.</p>
                             </div>
                             <div class="post-stat">
-                                <strong>1,204</strong>
-                                <span>nodes</span>
+                                <strong>1,204</strong><span>nodes</span>
                             </div>
                             <div class="post-activity">
                                 <a href="#">Network upgrade v0.1</a>
                                 <span>9 mins ago by Admin</span>
                             </div>
                         </article>
-                    </div>
-                </section>
+                    </section>
 
-                <section class="post-cluster post-cluster--lime" aria-labelledby="category2">
-                    <header class="cluster-head">
-                        <h3 id="category2">category2</h3>
-                    </header>
-
-                    <div class="cluster-rows">
+                    <!-- CATEGORY 2 -->
+                    <section class="post-cluster post-cluster--lime">
+                        <header class="cluster-head">
+                            <h3>category2</h3>
+                        </header>
                         <article class="post-row">
-                            <div class="post-glyph post-glyph--tertiary" aria-hidden="true">?</div>
+                            <div class="post-glyph">?</div>
                             <div class="post-copy">
                                 <a href="#">Software & Tools</a>
                                 <p>Buy, sell, or trade custom script packages.</p>
                             </div>
                             <div class="post-stat">
-                                <strong>312</strong>
-                                <span>assets</span>
+                                <strong>312</strong><span>assets</span>
                             </div>
                             <div class="post-activity">
                                 <a href="#">WTS custom UI toolkit</a>
                                 <span>1 hour ago by Merchant</span>
                             </div>
                         </article>
-                    </div>
-                </section>
+                    </section>
 
-                <section class="post-cluster post-cluster--cyan" aria-labelledby="category3">
-                    <header class="cluster-head">
-                        <h3 id="category3">category3</h3>
-                    </header>
+                </div>
 
-                    <div class="cluster-rows">
-                        <article class="post-row">
-                            <div class="post-glyph post-glyph--primary" aria-hidden="true">&lt;/&gt;</div>
-                            <div class="post-copy">
-                                <a href="#">Coding & Reversing</a>
-                                <p>C++, Python, ASM and reverse engineering theory.</p>
-                            </div>
-                            <div class="post-stat">
-                                <strong>8.4k</strong>
-                                <span>scripts</span>
-                            </div>
-                            <div class="post-activity">
-                                <a href="#">Native API hooking notes</a>
-                                <span>5 mins ago by DevOps</span>
-                            </div>
-                        </article>
+                <!-- INSIGHTS COLUMN (From Shadow Protocol) -->
+                <aside class="insights-column">
+                    <div class="info-card">
+                        <p class="card-title">Live Pulse</p>
+                        <ul class="mini-feed">
+                            <li>Vulnerability Disclosure Queue</li>
+                            <li>Encryption Exchange traffic spike</li>
+                            <li>Market access requests elevated</li>
+                        </ul>
                     </div>
-                </section>
+
+                    <div class="info-card">
+                        <p class="card-title">Trending Tags</p>
+                        <div class="trend-list">
+                            <button class="tag-chip">#exploit</button>
+                            <button class="tag-chip">#security</button>
+                            <button class="tag-chip">#meow</button>
+                        </div>
+                    </div>
+                </aside>
             </section>
-        </section>
-
-    </main>
+        </main>
+    </div>
 
     <footer class="protocol-footer">
         <strong>meow</strong>
@@ -151,5 +159,7 @@
             <a href="#">Donations</a>
         </nav>
     </footer>
+
+    <script src="../assets/js/index.js"></script>
 </body>
 </html>
