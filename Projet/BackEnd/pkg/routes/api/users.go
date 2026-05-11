@@ -283,3 +283,40 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		DislikeCount: dislikes,
 	})
 }
+
+func GetSelfHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		routes.JsonError(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	claims, ok := auth.ClaimsFromContext(r.Context())
+	if !ok {
+		routes.JsonError(w, "authentication required", http.StatusUnauthorized)
+		return
+	}
+
+	user, err := db.GetDB().GetUserByUsername(claims.Username)
+	if err != nil {
+		routes.JsonError(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	posts, comments, likes, dislikes, err := db.GetDB().UserStats(user.ID)
+	if err != nil {
+		routes.JsonError(w, "failed to load user stats", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(userProfileResponse{
+		Username:     user.Username,
+		AvatarUrl:    user.AvatarUrl,
+		Role:         user.Role,
+		CreatedAt:    user.CreatedAt,
+		PostCount:    posts,
+		CommentCount: comments,
+		LikeCount:    likes,
+		DislikeCount: dislikes,
+	})
+}
