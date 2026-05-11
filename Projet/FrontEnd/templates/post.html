@@ -10,16 +10,14 @@
 </head>
 <body>
     <header class="protocol-topbar" aria-label="Site header">
-        <a class="protocol-brand" href="./index.html" aria-label="Forum home">
+        <a class="protocol-brand" href="/front/index" aria-label="Forum home">
             <span class="brand-node" aria-hidden="true">></span>
             <span>meow</span>
         </a>
 
         <nav class="protocol-tabs" aria-label="Sections">
-            <a href="./index.html" aria-current="page">Forums</a>
-            <a href="./register.html">Upgrades</a>
-            <a href="#market">Market</a>
-            <a href="#wiki">Wiki</a>
+            <a href="/front/index" aria-current="page">Forums</a>
+            <a href="/front/register">Upgrades</a>
         </nav>
 
         <form class="protocol-search" role="search">
@@ -28,13 +26,13 @@
         </form>
 
         <nav class="protocol-actions" aria-label="Account">
-            <a href="./login.html" aria-label="Notifications">
-                <img src="../assets/img/header/notif.png" alt="">
+            <a href="/front/login" aria-label="Notifications">
+                <img src="/assets/img/header/notif.png" alt="">
             </a>
-            <a href="./login.html" aria-label="Messages">
-                <img src="../assets/img/header/message.png" alt="">
+            <a href="/front/login" aria-label="Messages">
+                <img src="/assets/img/header/message.png" alt="">
             </a>
-            <a class="operator-badge" href="./login.html" aria-label="Login">ID</a>
+            <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
         </nav>
     </header>
 
@@ -49,17 +47,17 @@
             </div>
 
             <nav class="directory-nav" aria-label="Forum navigation">
-                <a href="./index.html"><span>::</span>Main Feed</a>
+                <a href="/front/index"><span>::</span>Main Feed</a>
                 <a href="#trending"><span>--</span>Trending</a>
                 <a class="nav-link-neutral" href="#private"><span>[]</span>Private Nodes</a>
                 <a href="#logs"><span>==</span>System Logs</a>
                 <a href="#archive"><span>##</span>Archive</a>
             </nav>
 
-            <a class="init-thread" href="./register.html">Create post</a>
+            <a class="init-thread" href="/front/post">Create post</a>
 
             <nav class="directory-footer" aria-label="Support links">
-                <a href="./login.html"><span>+</span>Settings</a>
+                <a href="/front/login"><span>+</span>Settings</a>
                 <a href="#"><span>?</span>Support</a>
             </nav>
         </aside>
@@ -76,25 +74,25 @@
                     </div>
                 </section>
 
-                <article class="thread-card thread-card--primary">
+                <article
+                    class="thread-card thread-card--primary"
+                    data-reply-author="null_vector"
+                    data-reply-label="Original post"
+                    data-reply-message="I've been monitoring the uplink traffic from the new v9 Neural-Link implants. There's a consistent packet leakage occurring during the REM sleep synchronization phase."
+                >
                     <aside class="thread-author" aria-label="Original author">
                         <div class="avatar-frame avatar-frame--blue">
                             <div class="avatar-core" aria-hidden="true"></div>
                         </div>
                         <strong>null_vector</strong>
-                        <span>Elite operator</span>
                         <dl class="author-meta">
-                            <div>
-                                <dt>Priority</dt>
-                                <dd>1.0%</dd>
-                            </div>
-                            <div>
-                                <dt>Reputation</dt>
-                                <dd>+320</dd>
-                            </div>
                             <div>
                                 <dt>Joined</dt>
                                 <dd>Jan 2033</dd>
+                            </div>
+                            <div>
+                                <dt>Posts</dt>
+                                <dd>15</dd>
                             </div>
                         </dl>
                     </aside>
@@ -113,20 +111,23 @@
 
                         <div class="thread-actions" aria-label="Post actions">
                             <button type="button">Upvote (42)</button>
-                            <button type="button">Flag</button>
-                            <button class="thread-quote" type="button">Quote post</button>
+                            <button type="button" class="thread-reply-trigger">Reply</button>
                         </div>
                     </div>
                 </article>
 
                 <!-- Single comment item kept intentionally for backend wiring -->
-                <article class="thread-card thread-card--reply">
+                <article
+                    class="thread-card thread-card--reply"
+                    data-reply-author="cyber_punk_42"
+                    data-reply-label="Post #1"
+                    data-reply-message="Confirmed on my test rig. I just pulled the logs and the timing matches exactly. This is big."
+                >
                     <aside class="thread-author thread-author--compact" aria-label="Reply author">
                         <div class="avatar-frame avatar-frame--ghost">
                             <div class="avatar-core avatar-core--ghost" aria-hidden="true"></div>
                         </div>
                         <strong>cyber_punk_42</strong>
-                        <span>Novice</span>
                         <dl class="author-meta author-meta--compact">
                             <div>
                                 <dt>Posts</dt>
@@ -142,6 +143,9 @@
                             <span>Post #1</span>
                             <span>2 hours ago</span>
                         </div>
+                        <div class="thread-actions" aria-label="Reply actions">
+                            <button type="button" class="thread-reply-trigger">Reply</button>
+                        </div>
                     </div>
                 </article>
 
@@ -150,15 +154,34 @@
                         <h2 id="create-post-title">Create post</h2>
                     </div>
 
+                    <div id="reply-indicator" class="reply-indicator" hidden>
+                        <div class="reply-indicator__copy">
+                            <span class="reply-indicator__eyebrow">Replying to</span>
+                            <strong id="reply-target-meta"></strong>
+                            <p id="reply-target-message"></p>
+                        </div>
+                        <button type="button" id="clear-reply-target" class="reply-indicator__clear">Clear</button>
+                    </div>
+
                     <label class="sr-only" for="reply-box">Write your reply</label>
-                    <textarea id="reply-box" name="reply" rows="7" placeholder="Type your encrypted response here..."></textarea>
+                    <div class="composer-editor-shell">
+                        <div
+                            id="reply-preview"
+                            class="composer-preview"
+                            aria-hidden="true"
+                            data-placeholder="Type your encrypted response here..."
+                        ></div>
+                        <textarea
+                            id="reply-box"
+                            class="composer-input"
+                            name="reply"
+                            rows="7"
+                            placeholder="Type your encrypted response here..."
+                            spellcheck="true"
+                        ></textarea>
+                    </div>
 
                     <div class="composer-actions">
-                        <label class="composer-toggle">
-                            <input type="checkbox" name="notify">
-                            <span>Notify on new replies</span>
-                        </label>
-
                         <div class="composer-buttons">
                             <button type="button" class="composer-button composer-button--ghost">Preview</button>
                             <button type="submit" class="composer-button composer-button--primary">Post reply</button>
@@ -178,5 +201,6 @@
             <a href="#">Donations</a>
         </nav>
     </footer>
+    <script src="../assets/js/postComposer.js"></script>
 </body>
 </html>

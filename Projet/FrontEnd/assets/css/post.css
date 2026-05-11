@@ -296,40 +296,201 @@
     text-transform: uppercase;
 }
 
-.composer-panel textarea {
+.reply-indicator {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem;
+    border-left: 2px solid rgba(61, 108, 224, 0.7);
+    background: rgba(61, 108, 224, 0.08);
+}
+
+.reply-indicator[hidden] {
+    display: none;
+}
+
+.reply-indicator__copy {
+    min-width: 0;
+}
+
+.reply-indicator__eyebrow {
+    display: inline-block;
+    margin-bottom: 0.3rem;
+    color: rgba(159, 186, 255, 0.76);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.reply-indicator__copy strong {
+    display: block;
+    color: #fff;
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.reply-indicator__copy p {
+    margin: 0.35rem 0 0;
+    color: rgba(232, 232, 232, 0.72);
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.reply-indicator__clear {
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: transparent;
+    color: rgba(232, 232, 232, 0.7);
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0.55rem 0.85rem;
+}
+
+.reply-indicator__clear:hover {
+    color: #fff;
+}
+
+.composer-editor-shell {
+    position: relative;
+}
+
+.composer-preview,
+.composer-input {
+    box-sizing: border-box;
     width: 100%;
     min-height: 170px;
     padding: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.07);
     background: rgba(57, 57, 57, 0.85);
-    color: #fff;
-    resize: vertical;
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.7;
 }
 
-.composer-panel textarea::placeholder {
+.composer-preview {
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.86);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow: hidden;
+}
+
+.composer-preview[data-empty="true"]::before {
+    content: attr(data-placeholder);
     color: rgba(232, 232, 232, 0.34);
+}
+
+.composer-input {
+    position: absolute;
+    inset: 0;
+    resize: vertical;
+    overflow-y: auto;
+    color: transparent;
+    caret-color: #fff;
+    white-space: pre-wrap;
+    word-break: break-word;
+    outline: none;
+    background: transparent;
+}
+
+.composer-input::placeholder {
+    color: transparent;
+}
+
+.composer-input::selection {
+    background: rgba(61, 108, 224, 0.32);
+}
+
+.composer-input:focus {
+    border-color: rgba(61, 108, 224, 0.58);
+    box-shadow: inset 0 0 0 1px rgba(61, 108, 224, 0.18);
+}
+
+.md-inline {
+    white-space: inherit;
+}
+
+.md-line {
+    display: block;
+    width: 100%;
+}
+
+.md-line__content {
+    min-width: 0;
+}
+
+.md-line--h1 .md-line__content,
+.md-line--h2 .md-line__content {
+    color: #fff;
+    font-weight: 700;
+}
+
+.md-line--quote .md-line__content {
+    color: rgba(232, 232, 232, 0.78);
+    font-style: italic;
+}
+
+.md-line--list .md-line__content::before {
+    content: "•";
+    margin-right: 0.5rem;
+    color: rgba(159, 186, 255, 0.88);
+}
+
+.md-inline strong,
+.md-inline em,
+.md-inline s,
+.md-inline code {
+    color: #fff;
+}
+
+.md-inline strong {
+    font-weight: 700;
+}
+
+.md-inline em {
+    font-style: italic;
+}
+
+.md-inline s {
+    text-decoration-thickness: 1px;
+}
+
+.md-inline code {
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.md-syntax {
+    color: rgba(232, 232, 232, 0.32);
+    font-size: 0.78em;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+.md-syntax--block {
+    margin-right: 0.35rem;
 }
 
 .composer-actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 1rem;
     margin-top: 1rem;
-}
-
-.composer-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: rgba(232, 232, 232, 0.56);
-    font-size: 0.64rem;
-    text-transform: uppercase;
 }
 
 .composer-buttons {
     display: flex;
     gap: 0.65rem;
+    margin-left: auto;
 }
 
 .composer-button {
@@ -390,8 +551,14 @@
         display: grid;
     }
 
+    .reply-indicator {
+        grid-template-columns: 1fr;
+        display: grid;
+    }
+
     .composer-buttons {
         justify-content: stretch;
+        margin-left: 0;
     }
 
     .composer-button {
