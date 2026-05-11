@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum | Post</title>
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/post.css">
+</head>
+<body>
+    <header class="protocol-topbar" aria-label="Site header">
+        <a class="protocol-brand" href="./index.html" aria-label="Forum home">
+            <span class="brand-node" aria-hidden="true">></span>
+            <span>meow</span>
+        </a>
+
+        <nav class="protocol-tabs" aria-label="Sections">
+            <a href="./index.html" aria-current="page">Forums</a>
+            <a href="./register.html">Upgrades</a>
+            <a href="#market">Market</a>
+            <a href="#wiki">Wiki</a>
+        </nav>
+
+        <form class="protocol-search" role="search">
+            <label class="sr-only" for="global-search">Search for posts</label>
+            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
+        </form>
+
+        <nav class="protocol-actions" aria-label="Account">
+            <a href="./login.html" aria-label="Notifications">
+                <img src="../assets/img/header/notif.png" alt="">
+            </a>
+            <a href="./login.html" aria-label="Messages">
+                <img src="../assets/img/header/message.png" alt="">
+            </a>
+            <a class="operator-badge" href="./login.html" aria-label="Login">ID</a>
+        </nav>
+    </header>
+
+    <main class="protocol-shell post-shell">
+        <aside class="directory-panel" aria-label="Directory">
+            <div class="directory-head">
+                <span class="terminal-icon" aria-hidden="true">></span>
+                <div>
+                    <strong>Directory</strong>
+                    <small>Protocol v4.2.0</small>
+                </div>
+            </div>
+
+            <nav class="directory-nav" aria-label="Forum navigation">
+                <a href="./index.html"><span>::</span>Main Feed</a>
+                <a href="#trending"><span>--</span>Trending</a>
+                <a class="nav-link-neutral" href="#private"><span>[]</span>Private Nodes</a>
+                <a href="#logs"><span>==</span>System Logs</a>
+                <a href="#archive"><span>##</span>Archive</a>
+            </nav>
+
+            <a class="init-thread" href="./register.html">Create post</a>
+
+            <nav class="directory-footer" aria-label="Support links">
+                <a href="./login.html"><span>+</span>Settings</a>
+                <a href="#"><span>?</span>Support</a>
+            </nav>
+        </aside>
+
+        <section class="operations post-operations" aria-label="Post thread">
+            <div class="thread-wrap">
+                <section class="thread-header" aria-label="Thread title">
+                    <p class="thread-path">node_05 &gt; ex032 &gt; secured_channels</p>
+                    <h1>Vulnerability discovered in the neural-link v9 protocols</h1>
+                    <div class="thread-stats" aria-label="Thread statistics">
+                        <span>2 hours ago</span>
+                        <span>14 replies</span>
+                        <span>1.2k views</span>
+                    </div>
+                </section>
+
+                <article class="thread-card thread-card--primary">
+                    <aside class="thread-author" aria-label="Original author">
+                        <div class="avatar-frame avatar-frame--blue">
+                            <div class="avatar-core" aria-hidden="true"></div>
+                        </div>
+                        <strong>null_vector</strong>
+                        <span>Elite operator</span>
+                        <dl class="author-meta">
+                            <div>
+                                <dt>Priority</dt>
+                                <dd>1.0%</dd>
+                            </div>
+                            <div>
+                                <dt>Reputation</dt>
+                                <dd>+320</dd>
+                            </div>
+                            <div>
+                                <dt>Joined</dt>
+                                <dd>Jan 2033</dd>
+                            </div>
+                        </dl>
+                    </aside>
+
+                    <div class="thread-copy">
+                        <p>I&apos;ve been monitoring the uplink traffic from the new v9 Neural-Link implants. There&apos;s a consistent packet leakage occurring during the REM sleep synchronization phase. It seems like the encryption handshake fails for approximately 4ms every cycle, leaving the visual cortex data buffer exposed.</p>
+                        <p>If someone were to time a packet injection during this window, they could potentially overlay subconscious commands or worse, extract direct visual feed data in raw hex format.</p>
+
+                        <div class="signal-block" role="note" aria-label="Code sample">
+                            <p>// vulnerable sequence detected in v9-alpha</p>
+                            <p>0x4F 0x2A [buffer_sync] 0x00 -- leak here</p>
+                            <p>exit 0x1A [ENCRYPT_RESTART]</p>
+                        </div>
+
+                        <p>Anyone else seeing this on their local nodes? This feels like a deliberate backdoor rather than a bug.</p>
+
+                        <div class="thread-actions" aria-label="Post actions">
+                            <button type="button">Upvote (42)</button>
+                            <button type="button">Flag</button>
+                            <button class="thread-quote" type="button">Quote post</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Single comment item kept intentionally for backend wiring -->
+                <article class="thread-card thread-card--reply">
+                    <aside class="thread-author thread-author--compact" aria-label="Reply author">
+                        <div class="avatar-frame avatar-frame--ghost">
+                            <div class="avatar-core avatar-core--ghost" aria-hidden="true"></div>
+                        </div>
+                        <strong>cyber_punk_42</strong>
+                        <span>Novice</span>
+                        <dl class="author-meta author-meta--compact">
+                            <div>
+                                <dt>Posts</dt>
+                                <dd>12</dd>
+                            </div>
+                        </dl>
+                    </aside>
+
+                    <div class="thread-copy">
+                        <p class="reply-quote">If someone were to time a packet injection during this window, they could potentially overlay subconscious commands...</p>
+                        <p>Confirmed on my test rig. I just pulled the logs and the timing matches exactly. This is big. If this is the persistence marker, the entire privacy layer is compromised. I&apos;m seeing the same hex values at 0x4F.</p>
+                        <div class="reply-meta">
+                            <span>Post #1</span>
+                            <span>2 hours ago</span>
+                        </div>
+                    </div>
+                </article>
+
+                <section class="composer-panel" aria-labelledby="create-post-title">
+                    <div class="composer-head">
+                        <h2 id="create-post-title">Create post</h2>
+                    </div>
+
+                    <label class="sr-only" for="reply-box">Write your reply</label>
+                    <textarea id="reply-box" name="reply" rows="7" placeholder="Type your encrypted response here..."></textarea>
+
+                    <div class="composer-actions">
+                        <label class="composer-toggle">
+                            <input type="checkbox" name="notify">
+                            <span>Notify on new replies</span>
+                        </label>
+
+                        <div class="composer-buttons">
+                            <button type="button" class="composer-button composer-button--ghost">Preview</button>
+                            <button type="submit" class="composer-button composer-button--primary">Post reply</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <footer class="protocol-footer">
+        <strong>meow</strong>
+        <nav aria-label="Footer">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">API</a>
+            <a href="#">Donations</a>
+        </nav>
+    </footer>
+</body>
+</html>
