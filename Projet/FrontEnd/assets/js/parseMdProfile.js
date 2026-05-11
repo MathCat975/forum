@@ -4,7 +4,7 @@ let currentEditField = null;
 const devMode = true;
 const profil = {
   username: localStorage.getItem("username") || "TestUser",
-  avatar_url: localStorage.getItem("profilePhoto") || "/assets/img/profile/profil2.png",
+  avatar_url: localStorage.getItem("profilePhoto") || selectRandomProfilePhoto(),
   role: "Admin",
   id: "12345",
   created_at: "2026-01-15T10:00:00Z",
@@ -47,12 +47,6 @@ const profil = {
   }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (devMode) {
-    printInfos(profil);
-  }
-});
-
 function getUsernameFromURL() {
   let params = new URLSearchParams(window.location.search);
   return params.get('username');
@@ -60,22 +54,11 @@ function getUsernameFromURL() {
 
 // Disconnect
 const disconnect = (type) => {
-  if (devMode) {
-    profil.connexionService = "None";
-    profil.connexionType = "none";
-    localStorage.setItem("connexionService", "None");
-    localStorage.setItem("connexionType", "none");
-    printInfos(profil);
-    closeEditFieldModal();
-    setTimeout(() => openEditFieldModal("connexionService"), 10);
-    return;
-  }
-
   if (type === "Git") {
     profil.connexionType.git = false;
     profil.connexionService.git = "";
-    localStorage.setItem("connexionType", stringify(profil.connexionType));
-    localStorage.setItem("connexionService", stringify(profil.connexionService));
+    localStorage.setItem("connexionType", JSON.stringify(profil.connexionType));
+    localStorage.setItem("connexionService", JSON.stringify(profil.connexionService));
     printInfos(profil);
     return;
   }
@@ -83,8 +66,8 @@ const disconnect = (type) => {
   if (type === "Google") {
     profil.connexionType.email = false;
     profil.connexionService.email = "";
-    localStorage.setItem("connexionType", stringify(profil.connexionType));
-    localStorage.setItem("connexionService", stringify(profil.connexionService));
+    localStorage.setItem("connexionType", JSON.stringify(profil.connexionType));
+    localStorage.setItem("connexionService", JSON.stringify(profil.connexionService));
     printInfos(profil)
     return;
   }
@@ -102,7 +85,7 @@ function printLastPosts() {
     div.id = key;
 
     let contentText = value.content;
-    
+
     // Content max length 100 characters
     if (value.content.length > 100) {
       contentText = value.content.substring(0, 100) + "...";
@@ -232,14 +215,14 @@ function openEditFieldModal(fieldType) {
     let btnGitDiv = document.createElement("div");
     btnGitDiv.id = "btnGitDiv";
     let btnGit = document.createElement("a");
-    btnGit.href = "#";
-    btnGit.addEventListener("click", () => {
+    btnGit.href = "/api/auth/github";
+    /*btnGit.addEventListener("click", () => {
       profil.connexionType.git = true;
       profil.connexionService.git = "test git";
-      localStorage.setItem("connexionType", stringify(profil.connexionType));
+      localStorage.setItem("connexionType", JSON.stringify(profil.connexionType));
       printInfos(profil);
       closeEditFieldModal();
-    });
+    });*/
     btnGit.className = "oauthBtn";
     btnGit.id = "btnGit";
     btnGit.innerHTML = '<img src="/assets/img/profile/gitLogo.webp" alt="GitHub"> <p id="textGit">Connect with GitHub</p>';
@@ -255,14 +238,15 @@ function openEditFieldModal(fieldType) {
     let btnEmailDiv = document.createElement("div");
     btnEmailDiv.id = "btnEmailDiv";
     let btnEmail = document.createElement("a");
-    btnEmail.href = "#";
-    btnEmail.addEventListener("click", () => {
+    btnEmail.href = "/api/auth/google";
+    /*btnEmail.addEventListener("click", () => {
       profil.connexionType.email = true;
       profil.connexionService.email = "test@exemple.com";
-      localStorage.setItem("connexionType", stringify(profil.connexionType));
+      localStorage.setItem("connexionType", JSON.stringify(profil.connexionType));
+      localStorage.setItem("connexionService", JSON.stringify(profil.connexionService));
       printInfos(profil);
       closeEditFieldModal();
-    });
+    });*/
     btnEmail.id = "btnEmail";
     btnEmail.className = "oauthBtn";
     btnEmail.innerHTML = '<img src="/assets/img/profile/googleLogo.webp" alt="Google"> <p id="textGoogle">Connect with Google</p>';
@@ -549,3 +533,46 @@ if (profileImg) {
   });
 }
 
+// Select random banner 
+const banners = [
+  "/assets/img/profile/banner2.png",
+  "/assets/img/profile/banner3.png",
+  "/assets/img/profile/banner4.png",
+  "/assets/img/profile/banner5.png",
+];
+
+const bannerImg = document.getElementById("banner");
+
+function getRandomBanner() {
+  const randomIndex = Math.floor(Math.random() * banners.length);
+  return banners[randomIndex];
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (devMode) {
+    printInfos(profil);
+  } else {
+    const username = getUsernameFromURL();
+    if (username) {
+      fetchUserProfile(username).then(profile => {
+        if (profile) {
+          printInfos(profile);
+        }
+      });
+    }
+  }
+
+  if (bannerImg) {
+    bannerImg.src = getRandomBanner();
+  }
+});
+
+function selectRandomProfilePhoto() {
+  const profilePhotos = [
+    "/assets/img/profile/profil2.png",
+    "/assets/img/profile/profil3.png",
+  ];
+
+  const randomIndex = Math.floor(Math.random() * profilePhotos.length);
+  return profilePhotos[randomIndex];
+}
