@@ -7,15 +7,42 @@
     <title>Profile</title>
     <link rel="stylesheet" href="/assets/css/theme.css">
     <link rel="stylesheet" href="/assets/css/chrome.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/profile.css">
 </head>
 
 <body>
-    <site-header title="Forum" subtitle="Account status"></site-header>
+    <header class="protocol-topbar" aria-label="Site header">
+        <a class="protocol-brand" href="/front/index" aria-label="Forum home">
+            <span class="brand-node" aria-hidden="true">></span>
+            <span>meow</span>
+        </a>
+
+        <nav class="protocol-tabs" aria-label="Sections">
+            <a href="#feed" aria-current="page">Forums</a>
+            <a href="/front/register">Upgrades</a>
+            <a href="#wiki">Wiki</a>
+        </nav>
+
+        <form class="protocol-search" role="search">
+            <label class="sr-only" for="global-search">Search for posts</label>
+            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
+        </form>
+
+        <nav class="protocol-actions" aria-label="Account">
+            <a href="/front/login" aria-label="Notifications">
+                <img src="/assets/img/header/notif.png" alt="">
+            </a>
+            <a href="/front/login" aria-label="Messages">
+                <img src="/assets/img/header/message.png" alt="">
+            </a>
+            <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
+        </nav>
+    </header>
 
     <main>
         <div id="profileHead">
-            <img src="/assets/img/profile/banner2.png" alt="Banner">
+            <img src="/assets/img/profile/banner3.png" alt="Banner">
             <span id="profilePhotoName">
                 <img src="/assets/img/profile/profil2.png" alt="Profile Photo" id="profilPhoto">
                 <span id="isOnlineBall"></span>
@@ -137,8 +164,15 @@
 
     <script src="/assets/js/parseMdProfile.js" defer></script>
 
-    <site-footer title="Forum"></site-footer>
-    <script src="/assets/js/chrome.js" defer></script>
+     <footer class="protocol-footer">
+        <strong>meow</strong>
+        <nav aria-label="Footer">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">API</a>
+            <a href="#">Donations</a>
+        </nav>
+    </footer>
 </body>
 
 </html>

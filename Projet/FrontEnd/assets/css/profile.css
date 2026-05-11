@@ -7,7 +7,6 @@
 body {
     overflow-x: hidden;
     font-family: "Space Grotesk", Inter, system-ui, sans-serif;
-    background-color: var(--neutral);
 }
 
 main {
@@ -33,7 +32,7 @@ main {
     height: 225px;
     display: block;
     position: relative;
-    opacity: 0.6;
+    opacity: 1;
 }
 
 #profilePhotoName {
@@ -561,6 +560,15 @@ main {
     border-color: var(--border);
 }
 
+footer {
+    bottom: 0 !important;
+    position: fixed !important;
+    display: flex;
+    justify-self: center;
+    width: 100vw;
+    height: auto;
+}
+
 @media (max-width: 1200px) {
     #profileContent {
         grid-template-columns: 280px 1fr;
@@ -637,14 +645,14 @@ main {
         align-items: flex-end;
         flex-direction: row;
         gap: 1.5rem;
-        transform: translateY(70%) !important;
+        transform: translateY(60%) !important;
         z-index: 8888;
         border-radius: var(--radius-sm);
     }
 
     #profilePhotoName img {
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
     }
 
     #photoName {
