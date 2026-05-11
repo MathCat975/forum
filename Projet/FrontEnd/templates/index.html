@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Protocol | Search</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+    <div class="page-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark"></span>
+                <div>
+                    <p class="brand-title">SHADOW_PROTOCOL</p>
+                    <p class="brand-subtitle">Protocol v4.2.8</p>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <a href="#" class="side-link">Main Feed</a>
+                <a href="#" class="side-link">Trending</a>
+                <a href="#" class="side-link active">Search Nodes</a>
+                <a href="#" class="side-link">Private Nodes</a>
+                <a href="#" class="side-link">System Logs</a>
+                <a href="#" class="side-link">Archive</a>
+            </nav>
+
+            <button class="thread-button">Initialize Thread</button>
+
+            <div class="sidebar-footer">
+                <a href="#" class="side-link subtle">Settings</a>
+                <a href="#" class="side-link subtle">Support</a>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="topbar">
+                <nav class="topbar-nav">
+                    <a href="#">Forums</a>
+                    <a href="#">Upgrades</a>
+                    <a href="#">Market</a>
+                    <a href="#">Wiki</a>
+                </nav>
+                <div class="topbar-status">
+                    <span class="status-dot"></span>
+                    <span>Encrypted relay online</span>
+                </div>
+            </header>
+
+            <section class="hero-panel">
+                <div class="hero-copy">
+                    <p class="eyebrow">Search Protocol</p>
+                    <h1>Locate threads, operators, and classified nodes.</h1>
+                    <p class="hero-text">
+                        Query the network, narrow by category, and surface the most active transmissions
+                        across the protocol.
+                    </p>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <span class="stat-value">12.4K</span>
+                        <span class="stat-label">Indexed Threads</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">98.7%</span>
+                        <span class="stat-label">Search Integrity</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="search-panel">
+                <div class="search-bar">
+                    <label class="search-input-wrap" for="searchInput">
+                        <span class="search-icon">&#9906;</span>
+                        <input id="searchInput" type="text" placeholder="Keyword (q): title, message, comment..." />
+                    </label>
+                    <button id="searchButton" class="primary-button">Execute Scan</button>
+                </div>
+
+                <div class="filters">
+                    <select id="scopeFilter">
+                        <option value="all">Scope: all</option>
+                        <option value="titles">Scope: titles</option>
+                        <option value="comments">Scope: comments</option>
+                    </select>
+
+                    <input id="usernameFilter" class="filter-input" type="text" placeholder="Username" />
+
+                    <input id="categoryFilter" class="filter-input" type="number" min="1" placeholder="Category ID" />
+
+                    <input id="fromFilter" class="filter-input" type="date" />
+
+                    <input id="toFilter" class="filter-input" type="date" />
+
+                    <select id="sizeFilter">
+                        <option value="20">Size: 20</option>
+                        <option value="10">Size: 10</option>
+                        <option value="30">Size: 30</option>
+                        <option value="50">Size: 50</option>
+                    </select>
+                </div>
+
+                <div class="quick-tags">
+                    <button class="tag-chip" data-query="exploit">#exploit</button>
+                    <button class="tag-chip" data-query="security">#security</button>
+                    <button class="tag-chip" data-query="api">#api</button>
+                    <button class="tag-chip" data-query="bug">#bug</button>
+                    <button class="tag-chip" data-query="guide">#guide</button>
+                </div>
+
+                <p class="search-hint">
+                    Public endpoint: <code>/api/search</code>. At least one filter is required:
+                    <code>q</code>, <code>username</code>, <code>category_id</code>, <code>from</code>, or <code>to</code>.
+                </p>
+                <p id="searchMessage" class="search-message" aria-live="polite"></p>
+            </section>
+
+            <section class="results-layout">
+                <div class="results-column">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">Query Output</p>
+                            <h2>Matched signals</h2>
+                        </div>
+                        <p id="resultsCount" class="results-count">0 results</p>
+                    </div>
+
+                    <div id="resultsList" class="results-list"></div>
+
+                    <div class="pagination">
+                        <button id="prevPageButton" class="secondary-button" type="button">Previous</button>
+                        <p id="pageIndicator" class="results-count">Page 1</p>
+                        <button id="nextPageButton" class="secondary-button" type="button">Next</button>
+                    </div>
+                </div>
+
+                <aside class="insights-column">
+                    <div class="info-card">
+                        <p class="card-title">Live Pulse</p>
+                        <ul class="mini-feed">
+                            <li>Vulnerability Disclosure Queue</li>
+                            <li>Encryption Exchange traffic spike</li>
+                            <li>Market access requests elevated</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <p class="card-title">Trending Queries</p>
+                        <div class="trend-list">
+                            <button class="trend-item" data-query="zero day">zero day</button>
+                            <button class="trend-item" data-query="credential leak">credential leak</button>
+                            <button class="trend-item" data-query="secure relay">secure relay</button>
+                            <button class="trend-item" data-query="forensics">forensics</button>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <p class="card-title">Search Tips</p>
+                        <p class="muted-copy">
+                            Combine operator names, technical keywords, or sector filters to surface
+                            precise transmissions faster.
+                        </p>
+                    </div>
+                </aside>
+            </section>
+        </main>
+    </div>
+
+    <script src="../assets/js/index.js"></script>
+</body>
+</html>
