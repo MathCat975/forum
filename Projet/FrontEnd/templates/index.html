@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,21 +11,23 @@
     <link rel="stylesheet" href="/assets/css/theme.css">
     <link rel="stylesheet" href="/assets/css/main.css">
 </head>
+
 <body>
     <div class="page-shell">
-        <!-- SIDEBAR FUSIONNÉE -->
+        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="brand">
                 <span class="brand-mark">></span>
                 <div>
                     <p class="brand-title">MEOW_PROTOCOL</p>
-                    <p class="brand-subtitle">v4.2.8 | meow meow</p>
+                    <p class="brand-subtitle">v4.2.8 | search_active</p>
                 </div>
             </div>
 
             <nav class="side-nav">
-                <a href="#feed" class="side-link active"><span>::</span> Main Feed</a>
+                <a href="#feed" class="side-link"><span>::</span> Main Feed</a>
                 <a href="#trending" class="side-link"><span>--</span> Trending</a>
+                <a href="#search" class="side-link active"><span>//</span> Search Nodes</a>
                 <a href="#private" class="side-link"><span>[]</span> Private Nodes</a>
                 <a href="#logs" class="side-link"><span>==</span> System Logs</a>
                 <a href="#archive" class="side-link"><span>##</span> Archive</a>
@@ -39,22 +42,26 @@
         </aside>
 
         <main class="content">
-            <!-- TOPBAR FUSIONNÉE -->
+            <!-- TOPBAR -->
             <header class="topbar">
                 <nav class="topbar-nav">
-                    <a href="#feed" aria-current="page">Forums</a>
+                    <a href="#feed">Forums</a>
                     <a href="/front/register">Upgrades</a>
                     <a href="#market">Market</a>
                     <a href="#wiki">Wiki</a>
                 </nav>
 
                 <div class="protocol-actions">
-                    <form class="protocol-search" role="search" style="display: inline-block; margin-right: 20px;">
-                        <input id="global-search" name="q" type="search" placeholder="Scan network..." autocomplete="off">
-                    </form>
-                    
-                    <a href="/front/login" aria-label="Notifications"><img src="/assets/img/header/notif.png" alt="!"></a>
-                    <a href="/front/login" aria-label="Messages"><img src="/assets/img/header/message.png" alt="M"></a>
+                    <div class="topbar-status">
+                        <span class="status-dot"></span>
+                        <span>Encrypted relay online</span>
+                    </div>
+                    <a href="/front/login" aria-label="Notifications">
+                        <img src="/assets/img/header/notif.png" alt="!">
+                    </a>
+                    <a href="/front/login" aria-label="Messages">
+                        <img src="/assets/img/header/message.png" alt="M">
+                    </a>
                     <a class="operator-badge" href="/front/profile">ID</a>
                 </div>
             </header>
@@ -62,71 +69,128 @@
             <!-- HERO PANEL -->
             <section class="hero-panel">
                 <div class="hero-copy">
-                    <p class="eyebrow">Operational Feed</p>
-                    <h1>MEOW</h1>
-                    <p class="hero-text">Meowing posts. Meow meow meow. Encryption relay online.</p>
+                    <p class="eyebrow">Search Protocol</p>
+                    <h1>Locate threads, operators, and classified nodes.</h1>
+                    <p class="hero-text">
+                        Query the network, narrow by category, and surface the most active transmissions across the protocol.
+                    </p>
                 </div>
                 <div class="hero-stats">
                     <div class="stat-card">
                         <span class="stat-value">12.4K</span>
-                        <span class="stat-label">Indexed Nodes</span>
+                        <span class="stat-label">Indexed Threads</span>
                     </div>
                     <div class="stat-card">
                         <span class="stat-value">98.7%</span>
-                        <span class="stat-label">Uptime</span>
+                        <span class="stat-label">Search Integrity</span>
                     </div>
                 </div>
             </section>
 
-            <!-- FORUM BOARD -->
-            <section class="results-layout" id="feed">
-                <div class="results-column">
-                    
-                    <!-- CATEGORY 1 -->
-                    <section class="post-cluster post-cluster--blue">
-                        <header class="cluster-head">
-                            <h3>category1</h3>
-                        </header>
-                        <article class="post-row">
-                            <div class="post-glyph">#</div>
-                            <div class="post-copy">
-                                <a href="#">Announcements & Global Directives</a>
-                                <p>Official protocol updates and network expansion logs.</p>
-                            </div>
-                            <div class="post-stat">
-                                <strong>1,204</strong><span>nodes</span>
-                            </div>
-                            <div class="post-activity">
-                                <a href="#">Network upgrade v0.1</a>
-                                <span>9 mins ago by Admin</span>
-                            </div>
-                        </article>
-                    </section>
-
-                    <!-- CATEGORY 2 -->
-                    <section class="post-cluster post-cluster--lime">
-                        <header class="cluster-head">
-                            <h3>category2</h3>
-                        </header>
-                        <article class="post-row">
-                            <div class="post-glyph">?</div>
-                            <div class="post-copy">
-                                <a href="#">Software & Tools</a>
-                                <p>Buy, sell, or trade custom script packages.</p>
-                            </div>
-                            <div class="post-stat">
-                                <strong>312</strong><span>assets</span>
-                            </div>
-                            <div class="post-activity">
-                                <a href="#">WTS custom UI toolkit</a>
-                                <span>1 hour ago by Merchant</span>
-                            </div>
-                        </article>
-                    </section>
-
+            <!-- SEARCH PANEL -->
+            <section class="search-panel" id="search">
+                <div class="search-bar">
+                    <label class="search-input-wrap" for="searchInput">
+                        <span class="search-icon">&#9906;</span>
+                        <input id="searchInput" type="text" placeholder="Keyword (q): title, message, comment..." />
+                    </label>
+                    <button id="searchButton" class="primary-button">Execute Scan</button>
                 </div>
 
-                <!-- INSIGHTS COLUMN (From Shadow Protocol) -->
+                <div class="filters">
+                    <select id="scopeFilter">
+                        <option value="all">Scope: all</option>
+                        <option value="titles">Scope: titles</option>
+                        <option value="comments">Scope: comments</option>
+                    </select>
+                    <input id="usernameFilter" class="filter-input" type="text" placeholder="Username" />
+                    <input id="categoryFilter" class="filter-input" type="number" min="1" placeholder="Category ID" />
+                    <input id="fromFilter" class="filter-input" type="date" />
+                    <input id="toFilter" class="filter-input" type="date" />
+                    <select id="sizeFilter">
+                        <option value="20">Size: 20</option>
+                        <option value="10">Size: 10</option>
+                        <option value="30">Size: 30</option>
+                        <option value="50">Size: 50</option>
+                    </select>
+                </div>
+
+                <div class="quick-tags">
+                    <button class="tag-chip" data-query="exploit">#exploit</button>
+                    <button class="tag-chip" data-query="security">#security</button>
+                    <button class="tag-chip" data-query="api">#api</button>
+                    <button class="tag-chip" data-query="bug">#bug</button>
+                    <button class="tag-chip" data-query="guide">#guide</button>
+                </div>
+
+                <p class="search-hint">
+                    Public endpoint: <code>/api/search</code>. At least one filter is required.
+                </p>
+                <p id="searchMessage" class="search-message" aria-live="polite"></p>
+            </section>
+
+            <!-- RESULTS LAYOUT -->
+            <section class="results-layout">
+                <div class="results-column">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">Query Output</p>
+                            <h2>Matched signals</h2>
+                        </div>
+                        <div id="resultsCountDisplay" class="results-count">Showing latest nodes</div>
+                    </div>
+
+                    <div id="resultsList" class="results-list">
+                        <!-- Forum Categories as Results -->
+                        <section class="post-cluster post-cluster--blue">
+                            <header class="cluster-head">
+                                <h3>category1</h3>
+                            </header>
+                            <div class="cluster-rows">
+                                <article class="post-row">
+                                    <div class="post-glyph post-glyph--primary">#</div>
+                                    <div class="post-copy">
+                                        <a href="#">Announcements & Global Directives</a>
+                                        <p>Official protocol updates and network expansion logs.</p>
+                                    </div>
+                                    <div class="post-stat"><strong>1,204</strong><span>nodes</span></div>
+                                    <div class="post-activity">
+                                        <a href="#">Network upgrade v0.1</a>
+                                        <span>9 mins ago by Admin</span>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+
+                        <section class="post-cluster post-cluster--lime">
+                            <header class="cluster-head">
+                                <h3>category2</h3>
+                            </header>
+                            <div class="cluster-rows">
+                                <article class="post-row">
+                                    <div class="post-glyph post-glyph--tertiary">?</div>
+                                    <div class="post-copy">
+                                        <a href="#">Software & Tools</a>
+                                        <p>Buy, sell, or trade custom script packages.</p>
+                                    </div>
+                                    <div class="post-stat"><strong>312</strong><span>assets</span></div>
+                                    <div class="post-activity">
+                                        <a href="#">WTS custom UI toolkit</a>
+                                        <span>1 hour ago by Merchant</span>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="pagination">
+                        <button id="prevPageButton" class="secondary-button" type="button">Previous</button>
+                        <p id="pageIndicator" class="results-count">Page 1</p>
+                        <button id="nextPageButton" class="secondary-button" type="button">Next</button>
+                    </div>
+                </div>
+
+                <!-- INSIGHTS COLUMN -->
                 <aside class="insights-column">
                     <div class="info-card">
                         <p class="card-title">Live Pulse</p>
@@ -138,12 +202,20 @@
                     </div>
 
                     <div class="info-card">
-                        <p class="card-title">Trending Tags</p>
+                        <p class="card-title">Trending Queries</p>
                         <div class="trend-list">
-                            <button class="tag-chip">#exploit</button>
-                            <button class="tag-chip">#security</button>
-                            <button class="tag-chip">#meow</button>
+                            <button class="trend-item" data-query="zero day">zero day</button>
+                            <button class="trend-item" data-query="credential leak">credential leak</button>
+                            <button class="trend-item" data-query="secure relay">secure relay</button>
+                            <button class="trend-item" data-query="forensics">forensics</button>
                         </div>
+                    </div>
+
+                    <div class="info-card">
+                        <p class="card-title">Search Tips</p>
+                        <p class="muted-copy">
+                            Combine operator names, technical keywords, or sector filters to surface precise transmissions faster.
+                        </p>
                     </div>
                 </aside>
             </section>
@@ -162,4 +234,5 @@
 
     <script src="/assets/js/index.js"></script>
 </body>
+
 </html>
