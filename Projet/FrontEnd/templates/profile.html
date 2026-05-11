@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="/assets/css/theme.css">
+    <link rel="stylesheet" href="/assets/css/chrome.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/profile.css">
+</head>
+
+<body>
+    <header class="protocol-topbar" aria-label="Site header">
+        <a class="protocol-brand" href="/front/index" aria-label="Forum home">
+            <span class="brand-node" aria-hidden="true">></span>
+            <span>meow</span>
+        </a>
+
+        <nav class="protocol-tabs" aria-label="Sections">
+            <a href="#feed" aria-current="page">Forums</a>
+            <a href="/front/register">Upgrades</a>
+            <a href="#wiki">Wiki</a>
+        </nav>
+
+        <form class="protocol-search" role="search">
+            <label class="sr-only" for="global-search">Search for posts</label>
+            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
+        </form>
+
+        <nav class="protocol-actions" aria-label="Account">
+            <a href="/front/login" aria-label="Notifications">
+                <img src="/assets/img/header/notif.png" alt="">
+            </a>
+            <a href="/front/login" aria-label="Messages">
+                <img src="/assets/img/header/message.png" alt="">
+            </a>
+            <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
+        </nav>
+    </header>
+
+    <main>
+        <div id="profileHead">
+            <img src="/assets/img/profile/banner3.png" alt="Banner">
+            <span id="profilePhotoName">
+                <img src="/assets/img/profile/profil2.png" alt="Profile Photo" id="profilPhoto">
+                <span id="isOnlineBall"></span>
+                <div id="photoName">
+                    <div class="editableField">
+                        <h4 id="pseudoProfil">Username</h4>
+                        <button id="editUserBtn" class="editFieldBtn"><img src="/assets/img/profile/edit.png"
+                                alt="Edit Profile"></button>
+                    </div>
+                </div>
+            </span>
+        </div>
+
+        <div id="profileContent">
+            <div id="left">
+                <div id="infos">
+                    <div class="titleOfBlock">
+                        <p>Informations</p>
+                    </div>
+
+                    <div class="infosPart">
+                        <p class="infosName">Role</p>
+                        <p class="infosValue" id="userRole">User</p>
+                    </div>
+
+                    <div class="infosPart">
+                        <p class="infosName">Status</p>
+                        <p class="infosValue" id="isOnline">Online</p>
+                    </div>
+
+                    <div class="infosPart">
+                        <p class="infosName">Regisration Date</p>
+                        <p class="infosValue" id="creationDate">23 March, 2019</p>
+                    </div>
+
+                    <div class="infosPart">
+                        <p class="infosName">Last Visit</p>
+                        <p class="infosValue" id="lastVisit">Less than 1 minute ago</p>
+                    </div>
+
+                    <div class="infosPart">
+                        <p class="infosName" id="infosNameEmail">Email</p>
+                        <div class="infosValue connexionServiceDiv">
+                            <p id="connexionService">Git</p>
+                            <button type="button" id="editConnexionServiceBtn" class="editFieldBtn"><img
+                                    src="/assets/img/profile/edit.png" alt="Edit your email"></button>
+                        </div>
+                    </div>
+
+                    <!--<div id="InfosBtns" class="infosPart">
+                        <button>More</button>
+                        <button>Trustscan</button>
+                        <button>Items</button>
+                    </div> -->
+                </div>
+            </div>
+
+            <div id="center">
+                <div id="statistiques">
+                    <div class="titleOfBlock">
+                        <p>Statistics</p>
+                    </div>
+
+                    <div id="statsContent">
+                        <div class="statsPart">
+                            <p class="statsValue" id="statsPosts">122</p>
+                            <p class="statsName">Posts</p>
+                        </div>
+
+                        <div class="statsPart">
+                            <p class="statsValue" id="statsDislikesGiver">11</p>
+                            <p class="statsName">Dislikes</p>
+                        </div>
+
+                        <div class="statsPart">
+                            <p class="statsValue" id="statsLikesGiven">4</p>
+                            <p class="statsName">Likes Given</p>
+                        </div>
+
+                        <div class="statsPart">
+                            <p class="statsValue" id="statsComments">5</p>
+                            <p class="statsName">Commentaries</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="posts">
+
+                    <div class="titleOfBlock">
+                        <p>Lasts Posts</p>
+                    </div>
+
+                    <div id="postContent">
+                        <div class="cardPost" id="Post1">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="editFieldModalOverlay"></div>
+    <div id="editFieldModal">
+        <form action="">
+            <label id="editFieldLabel" for="editFieldInput">Field</label>
+            <input type="text" placeholder="Enter value" id="editFieldInput" required>
+
+            <div id="btnConnexion"></div>
+
+            <div class="modalButtons">
+                <button id="cancelEditField" type="button">Cancel</button>
+                <button id="saveEditField" type="button">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <input type="file" id="editPhotoInput" accept="image/*">
+
+    <script src="/assets/js/parseMdProfile.js" defer></script>
+
+     <footer class="protocol-footer">
+        <strong>meow</strong>
+        <nav aria-label="Footer">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">API</a>
+            <a href="#">Donations</a>
+        </nav>
+    </footer>
+</body>
+
+</html>

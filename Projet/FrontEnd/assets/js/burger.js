@@ -1,20 +1,15 @@
 const burger = document.getElementById("burger");
-const lines = document.querySelectorAll(".burger-line");
-
-burger.addEventListener("click", menu);
-
+const nav = document.querySelector("nav");
 let ismenuOpen = false;
 
-const menu = () => {
-    const nav = document.querySelector("nav");
-
-    if (ismenuOpen === false) {
+const toggleMenu = () => {
+    if (!ismenuOpen) {
         nav.style.display = "flex";
-        burger.classList.add("active");
         ismenuOpen = true;
     } else {
         nav.style.display = "none";
-        burger.classList.remove("active");
         ismenuOpen = false;
     }
-}
+};
+
+burger.addEventListener("click", toggleMenu);

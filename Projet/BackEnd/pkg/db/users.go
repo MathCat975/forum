@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"main/pkg/structs"
 )
@@ -39,3 +40,38 @@ func (db *DB) CreateUser(user *structs.User) error {
 }
 
 var ErrNoRows = sql.ErrNoRows
+
+func (db *DB) UserStats(userID uint) (posts, comments, likes, dislikes int64, err error) {
+	posts, err = db.Table("posts").Where("author_id = ?", userID).Count()
+	if err != nil {
+		return
+	}
+
+	comments, err = db.Table("messages").Where("author_id = ?", userID).Count()
+	if err != nil {
+		return
+	}
+
+	var userPosts []structs.Post
+	if err = db.Table("posts").Where("author_id = ?", userID).Find(&userPosts); err != nil {
+		return
+	}
+	if len(userPosts) == 0 {
+		return
+	}
+
+	ids := make([]any, len(userPosts))
+	placeholders := make([]string, len(userPosts))
+	for i, p := range userPosts {
+		ids[i] = p.ID
+		placeholders[i] = "?"
+	}
+	inClause := "post_id IN (" + strings.Join(placeholders, ",") + ")"
+
+	likes, err = db.Table("postvotes").Where(inClause, ids...).Where("value = ?", 1).Count()
+	if err != nil {
+		return
+	}
+	dislikes, err = db.Table("postvotes").Where(inClause, ids...).Where("value = ?", -1).Count()
+	return
+}

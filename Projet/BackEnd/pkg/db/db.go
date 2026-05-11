@@ -35,12 +35,18 @@ func Open(path string) (*DB, error) {
 		fmt.Println("Database ready")
 		if err := instance.AutoMigrate(
 			&structs.User{},
+			&structs.Post{},
+			&structs.Message{},
+			&structs.PostVote{},
+			&structs.UserOAuthAccount{},
 		); err != nil {
 			initErr = err
 			instance = nil
 			return
 		}
 		_ = instance.Migrate("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'")
+		_ = instance.Migrate("CREATE UNIQUE INDEX IF NOT EXISTS idx_postvotes_user_post ON postvotes(user_id, post_id)")
+		_ = instance.Migrate("CREATE UNIQUE INDEX IF NOT EXISTS idx_oauth_provider_user ON useroauthaccounts(provider, provider_user_id)")
 	})
 	if initErr != nil {
 		return nil, initErr

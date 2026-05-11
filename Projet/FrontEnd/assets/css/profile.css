@@ -1,0 +1,716 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+}
+
+main {
+    min-height: calc(100dvh - 76px);
+    width: 100%;
+    max-width: 100vw;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Banner */
+
+#profileHead {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+}
+
+#profileHead img {
+    width: 100%;
+    height: 225px;
+    display: block;
+    position: relative;
+    opacity: 1;
+}
+
+#profilePhotoName {
+    position: absolute;
+    bottom: 20px;
+    left: 2rem;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: flex-end;
+    flex-direction: row;
+    gap: 1.5rem;
+    transform: translateY(65%) !important;
+    z-index: 8888;
+    /*background-color: rgba(27, 27, 27, 0.4) !important;*/
+    border-radius: var(--radius-sm);
+}
+
+#isOnlineBall {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 15px;
+    left: 95px;
+    border: 1px solid white;
+    z-index: 9999;
+}
+
+.Online {
+    background-color: green !important;
+}
+
+.Offline {
+    background-color: red !important;
+}
+
+#profilePhotoName>img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--neutral);
+    cursor: pointer;
+    transition: opacity 0.3s;
+    flex-shrink: 0;
+    opacity: 1 !important;
+    border: 3px solid var(--primary);
+}
+
+#profilePhotoName>img:hover {
+    opacity: 0.7 !important;
+}
+
+#photoName {
+    transform: translateY(-15%) !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.25rem;
+    margin-left: -0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 0.3rem 0.6rem;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-sm);
+}
+
+#photoName h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+#photoName p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.editableField {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.editFieldBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editFieldBtn img {
+    width: 16px !important;
+    height: 16px !important;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.editFieldBtn:hover img {
+    opacity: 0.5;
+}
+
+#editPhotoInput {
+    display: none;
+}
+
+/* Main content */
+
+#profileContent {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 350px auto;
+    gap: 2rem;
+    margin-top: 4.5rem;
+}
+
+#left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+#infos {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.titleOfBlock {
+    background: var(--primary);
+    padding: 0.4rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.titleOfBlock p {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.infosPart {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.infosPart:last-child {
+    border-bottom: none;
+}
+
+.infosName {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.infosValue {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 500;
+    margin: 0;
+}
+
+#isOnline {
+    color: green;
+}
+
+.connexionServiceDiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.connexionServiceDiv button img {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+#InfosBtns {
+    justify-content: center;
+    gap: 20px;
+}
+
+#InfosBtns button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 150ms ease;
+    font-weight: 600;
+}
+
+#InfosBtns button:hover {
+    transform: translateY(-2px);
+}
+
+#center {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+#statistiques {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+#statsContent {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 10px;
+    text-align: center;
+}
+
+#statsContent .statsPart .statsValue {
+    font-size: 20px;
+}
+
+#statsContent .statsPart .statsName {
+    color: gray;
+}
+
+#postContent {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    height: 170px;
+    overflow-y: auto;
+}
+
+.cardPost {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 15px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.cardPost:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-light);
+}
+
+.cardPost h4 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    color: var(--text);
+    max-width: 80%;
+}
+
+.cardPost p {
+    margin: 0 0 8px 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    overflow: hidden;
+}
+
+.viewPostButton {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.viewPostButton:hover {
+    background: var(--tertiary);
+    color: white;
+    transform: translateY(-50%) scale(1.05);
+}
+
+.postDate {
+    font-size: 0.7rem;
+    color: var(--primary);
+    font-weight: 500;
+}
+
+/* Edit */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+#editFieldModalOverlay {
+    position: fixed;
+    display: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    animation: overlayFadeIn 0.2s ease-out;
+    backdrop-filter: blur(2px);
+}
+
+#editFieldModal {
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    width: 300px;
+    height: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.modal-resize {
+    width: 400px !important;
+}
+
+#editFieldModal form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#editFieldModal h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#editFieldModal label {
+    display: flex;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--text);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#editFieldModal input {
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background-color: var(--neutral);
+    color: var(--text);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+#editFieldModal input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: var(--surface);
+}
+
+#editFieldModal .modalButtons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+#divBtnConnexion {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0.75rem;
+}
+
+.oauthBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    width: 100%;
+}
+
+.oauthBtn:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.oauthBtn img {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+#btnGitDiv,
+#btnEmailDiv {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background: color-mix(in var(--neutral), 0.5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.btnRemove {
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.7rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    max-width: 100px;
+}
+
+.btnRemove:hover {
+    transform: translateY(-2px);
+}
+
+#cancelEditField,
+#saveEditField {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#saveEditField {
+    background: var(--primary);
+    color: white;
+}
+
+#saveEditField:hover {
+    transform: translateY(-2px);
+}
+
+#saveEditField:active {
+    transform: translateY(0);
+}
+
+#cancelEditField {
+    background: var(--neutral);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+#cancelEditField:hover {
+    background: var(--border);
+    border-color: var(--border);
+}
+
+footer {
+    bottom: 0 !important;
+    position: fixed !important;
+    display: flex;
+    justify-self: center;
+    width: 100vw;
+    height: auto;
+}
+
+@media (max-width: 1200px) {
+    #profileContent {
+        grid-template-columns: 280px 1fr;
+    }
+
+    #right {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    main {
+        padding: 1.5rem;
+    }
+
+    #profileHead img {
+        height: 250px;
+    }
+
+    #profilePhotoName {
+        left: 1.5rem;
+    }
+
+    #profilePhotoName img {
+        width: 100px;
+        height: 100px;
+    }
+
+    #photoName {
+        transform: translateY(-100%);
+    }
+
+    #photoName h4 {
+        font-size: 1.3rem;
+    }
+
+    #profileContent {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    #left {
+        grid-column: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    #profileHead img {
+        height: 200px;
+    }
+
+    #isOnlineBall {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 9px;
+        left: 80px;
+        border: 1px solid white;
+        z-index: 9999;
+    }
+
+    #profilePhotoName {
+        position: absolute;
+        bottom: 20px;
+        left: 1rem;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: flex-end;
+        flex-direction: row;
+        gap: 1.5rem;
+        transform: translateY(60%) !important;
+        z-index: 8888;
+        border-radius: var(--radius-sm);
+    }
+
+    #profilePhotoName img {
+        width: 100px;
+        height: 100px;
+    }
+
+    #photoName {
+        transform: translateY(-100%);
+    }
+
+    #photoName h4 {
+        font-size: 1.1rem;
+    }
+
+    #profileContent {
+        grid-template-columns: 1fr;
+    }
+
+    #status {
+        flex-direction: row;
+    }
+
+    #status>div {
+        flex: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+
+    #profileHead img {
+        height: 150px;
+    }
+
+    #profilePhotoName {
+        bottom: -30px;
+        left: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    #profilePhotoName img {
+        width: 60px;
+        height: 60px;
+        border-width: 2px;
+    }
+
+    #photoName h4 {
+        font-size: 0.9rem;
+    }
+
+    #photoName p {
+        font-size: 0.8rem;
+    }
+
+    #profileContent {
+        grid-template-columns: 1fr;
+    }
+
+    #status {
+        flex-direction: column;
+    }
+}
