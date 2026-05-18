@@ -1,179 +1,216 @@
 let currentUserProfile = null;
 let currentEditField = null;
 
-const devMode = true;
+const devMode = false;
 const profil = {
   username: localStorage.getItem("username") || "TestUser",
-  avatar_url: localStorage.getItem("profilePhoto") || selectRandomProfilePhoto(),
-  role: "Admin",
-  id: "12345",
-  created_at: "2026-01-15T10:00:00Z",
+  avatar_url: localStorage.getItem("profilePhoto") || "/assets/img/profile/profil2.png",
+  role: "User",
+  id: "",
+  created_at: "",
   online: true,
-  post_count: 5,
-  comment_count: 12,
-  like_count: 8,
-  dislike_count: 2,
-  connexionService: JSON.parse(localStorage.getItem("connexionService")) || {
+  lastConnexion: "Unknown",
+  post_count: 0,
+  comment_count: 0,
+  like_count: 0,
+  dislike_count: 0,
+  connexionService: {
     git: "",
-    email: "test@exemple.com",
+    email: "",
     none: ""
   },
-  connexionType: JSON.parse(localStorage.getItem("connexionType")) || {
+  connexionType: {
     git: false,
-    email: true,
-    none: false
+    email: false,
+    none: true
   },
-  lastPosts: {
-    post1: {
-      title: "First post",
-      content: "This is the first post content. This is the first post content. This is the first post content. This is the first post content. This is the first post content.",
-      date: "2023-07-25"
-    },
-    post2: {
-      title: "Second post",
-      content: "This is the second post content.",
-      date: "2023-07-26"
-    },
-    post3: {
-      title: "Third post",
-      content: "This is the third post content.",
-      date: "2023-07-27"
-    },
-    post4: {
-      title: "Fourth post",
-      content: "This is the fourth post content.",
-      date: "2023-07-28"
-    },
-  }
+  lastPosts: {}
 };
+
+// Get data
 
 function getUsernameFromURL() {
   let params = new URLSearchParams(window.location.search);
   return params.get('username');
 }
 
+async function getProfil() {
+  try {
+    // Get self info
+    const result = await fetch("/api/user/me", {
+      method: "GET",
+      credentials: "include"
+    });
+
+    if (!result.ok) {
+      if (result.status === 401) {
+        window.location.href = "/front/login";
+        return;
+      }
+      console.error("Failed to fetch self:", result.status);
+      return;
+    }
+
+    const me = await result.json();
+
+    // Get profile (with stats)
+    const targetUsername = getUsernameFromURL() || me.username;
+    const profileRes = await fetch("/api/user/profile?username=" + encodeURIComponent(targetUsername), {
+      method: "GET",
+      credentials: "include"
+    });
+
+    if (!profileRes.ok) {
+      console.error("Failed to fetch profile:", profileRes.status);
+      return;
+    }
+
+    const data = await profileRes.json();
+
+    profil.username = data.username;
+    profil.avatar_url = data.avatar_url || "/assets/img/profile/profil2.png";
+    profil.role = data.role || "User";
+    profil.id = data.id;
+    profil.created_at = data.created_at;
+    profil.online = true;
+    profil.lastConnexion = "Online";
+    profil.post_count = data.post_count || 0;
+    profil.comment_count = data.comment_count || 0;
+    profil.like_count = data.like_count || 0;
+    profil.dislike_count = data.dislike_count || 0;
+
+    if (data.oauth_providers && data.oauth_providers.includes("github")) {
+      profil.connexionType.none = false;
+      profil.connexionType.git = true;
+      profil.connexionService.git = data.email;
+    } else if (data.email) {
+      profil.connexionType.none = false;
+      profil.connexionType.email = true;
+      profil.connexionService.email = data.email;
+    } else {
+      profil.connexionType.none = true;
+      profil.connexionType.git = false;
+      profil.connexionType.email = false;
+      profil.connexionService = { git: "", email: "", none: "" };
+    }
+
+    profil.lastPosts = data.last_posts || {};
+
+    printInfos(profil);
+    printLastPosts();
+
+  } catch (error) {
+    console.error("Error get profil data:", error);
+  }
+}
+
 // Disconnect
+
 const disconnect = (type) => {
   if (type === "Git") {
     profil.connexionType.git = false;
     profil.connexionService.git = "";
-    localStorage.setItem("connexionType", JSON.stringify(profil.connexionType));
-    localStorage.setItem("connexionService", JSON.stringify(profil.connexionService));
-    printInfos(profil);
-    return;
-  }
-
-  if (type === "Google") {
+  } else if (type === "Google") {
     profil.connexionType.email = false;
     profil.connexionService.email = "";
-    localStorage.setItem("connexionType", JSON.stringify(profil.connexionType));
-    localStorage.setItem("connexionService", JSON.stringify(profil.connexionService));
-    printInfos(profil)
-    return;
   }
-}
 
-// Print lastPosts
+  if (!profil.connexionType.git && !profil.connexionType.email) {
+    profil.connexionType.none = true;
+  }
+
+  printInfos(profil);
+
+  if (currentEditField === 'connexionService') {
+    closeEditFieldModal();
+    setTimeout(() => {
+      openEditFieldModal('connexionService');
+    }, 10);
+  }
+};
+
+// Posts
+
 const postContentDom = document.getElementById("postContent");
 
 function printLastPosts() {
   postContentDom.innerHTML = "";
+
+  if (!profil.lastPosts || Object.keys(profil.lastPosts).length === 0) {
+    postContentDom.innerHTML = "<p>No recent posts.</p>";
+    return;
+  }
 
   for (let [key, value] of Object.entries(profil.lastPosts)) {
     let div = document.createElement("div");
     div.className = "cardPost";
     div.id = key;
 
-    let contentText = value.content;
-
-    // Content max length 100 characters
-    if (value.content.length > 100) {
-      contentText = value.content.substring(0, 100) + "...";
+    let contentText = value.content || "";
+    if (contentText.length > 100) {
+      contentText = contentText.substring(0, 100) + "...";
     }
 
-    div.innerHTML = '<h4> ' + value.title + ' </h4> <p> ' + contentText + ' </p> <span class="postDate"> ' + new Date(value.date).toLocaleDateString() + ' </span> <button class="viewPostButton">See post</button>';
+    div.innerHTML = `
+      <h4>${value.title}</h4>
+      <p>${contentText}</p>
+      <span class="postDate">${new Date(value.date).toLocaleDateString()}</span>
+      <button class="viewPostButton">See post</button>
+    `;
     postContentDom.appendChild(div);
   }
 }
 
-printLastPosts();
+// Display info
 
-
-// Call server to ask data
-async function fetchUserProfile(username) {
-  try {
-    let url = '/api/user/profile?username=' + encodeURIComponent(username);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        window.location.href = '/front/login';
-        return null;
-      }
-      console.error('Failed to fetch profile:', response.status);
-      return null;
-    }
-
-    const data = await response.json();
-    currentUserProfile = data;
-    return data;
-  } catch (error) {
-    return null;
-  }
-}
-
-// Display data
 function printInfos(profile) {
   if (!profile) {
-    return
-  };
+    return;
+  }
 
-  // name
-  document.getElementById("pseudoProfil").textContent = profile.username;
+  // Username
+  const pseudoDom = document.getElementById("pseudoProfil");
+  pseudoDom.textContent = profile.username;
 
-  // Update avatar
-  document.getElementById("profilPhoto").src = profile.avatar_url;
-  localStorage.setItem("profilePhoto", profile.avatar_url);
-
+  // Avatar
+  const photoDom = document.getElementById("profilPhoto");
+  photoDom.src = profile.avatar_url;
   if (profile.avatar_url && !profile.avatar_url.startsWith('blob:')) {
     localStorage.setItem("profilePhoto", profile.avatar_url);
   }
 
-  // Online
+  // Online Offline
   const onlineBall = document.getElementById("isOnlineBall");
   const onlineText = document.getElementById("isOnline");
-  if (profile.online) {
-    onlineBall.classList.add("Online");
-    onlineBall.classList.remove("Offline");
+  if (profile.online === 1 || profile.online === true) {
+    onlineBall.className = "Online";
     onlineText.textContent = "Online";
     onlineText.style.color = "green";
   } else {
-    onlineBall.classList.add("Offline");
-    onlineBall.classList.remove("Online");
+    onlineBall.className = "Offline";
     onlineText.textContent = "Offline";
     onlineText.style.color = "red";
   }
 
+  // Last visit
+  const lastVisitDom = document.getElementById("lastVisit");
+  lastVisitDom.textContent = profile.lastConnexion;
 
   // Role
-  document.getElementById("userRole").textContent = profile.role || "User";
+  const roleDom = document.getElementById("userRole");
+  roleDom.textContent = profile.role || "User";
 
-  // Date
+  // Create date
   const creationDateDom = document.getElementById("creationDate");
-  let createdDate = new Date(profile.created_at).toLocaleDateString();
-  creationDateDom.textContent = createdDate;
+  if (profile.created_at) {
+    creationDateDom.textContent = new Date(profile.created_at).toLocaleDateString();
+  }
 
-  // Connexion Service
+  // Connect service
   const serviceDom = document.getElementById("connexionService");
   const infosNameDom = document.getElementById("infosNameEmail");
-
-  // On détermine quel service est actif
   if (profile.connexionType.git) {
-    serviceDom.textContent = profile.connexionService.git;
+    serviceDom.textContent = profile.connexionService.git || "Connected via GitHub";
     infosNameDom.textContent = "Git Account";
   } else if (profile.connexionType.email) {
     serviceDom.textContent = profile.connexionService.email;
@@ -184,260 +221,209 @@ function printInfos(profile) {
   }
 
   // Stats
-  document.getElementById("statsPosts").textContent = profile.post_count || 0;
-  document.getElementById("statsComments").textContent = profile.comment_count || 0;
-  document.getElementById("statsLikesGiven").textContent = profile.like_count || 0;
-  document.getElementById("statsDislikesGiver").textContent = profile.dislike_count || 0;
+  const stats = {
+    statsPosts: profile.post_count,
+    statsComments: profile.comment_count,
+    statsLikesGiven: profile.like_count,
+    statsDislikesGiver: profile.dislike_count
+  };
+  for (let [id, val] of Object.entries(stats)) {
+    const statDom = document.getElementById(id);
+    statDom.textContent = val || 0;
+  }
 }
 
-// Edit modale
+// Modal
+
 function openEditFieldModal(fieldType) {
   currentEditField = fieldType;
+  const container = document.getElementById("btnConnexion");
+  const input = document.getElementById("editFieldInput");
+  const label = document.getElementById("editFieldLabel");
+  const saveBtn = document.getElementById("saveEditField");
+
+  container.innerHTML = "";
 
   if (fieldType === 'username') {
-    document.getElementById("btnConnexion").innerHTML = "";
-    document.getElementById("editFieldInput").style.display = "block";
-    document.getElementById("editFieldLabel").textContent = "Username";
-    document.getElementById("editFieldInput").value = document.getElementById("pseudoProfil").textContent;
+    saveBtn.style.display = "block";
+    input.style.display = "block";
+    input.value = document.getElementById("pseudoProfil").textContent || "";
+    label.textContent = "Username";
   }
 
   if (fieldType === 'connexionService') {
-    const input = document.getElementById("editFieldInput");
-    const container = document.getElementById("btnConnexion");
-    container.innerHTML = "";
-    document.getElementById("saveEditField").style.display = "none";
-
-    document.getElementById("editFieldLabel").textContent = "Connect your account";
+    saveBtn.style.display = "none";
+    input.style.display = "none";
+    label.textContent = "Connect your account";
 
     let divBtnConnexion = document.createElement("div");
     divBtnConnexion.id = "divBtnConnexion";
 
+    // Git
     let btnGitDiv = document.createElement("div");
     btnGitDiv.id = "btnGitDiv";
+
     let btnGit = document.createElement("a");
     btnGit.href = "/api/auth/github";
-    /*btnGit.addEventListener("click", () => {
-      profil.connexionType.git = true;
-      profil.connexionService.git = "test git";
-      localStorage.setItem("connexionType", JSON.stringify(profil.connexionType));
-      printInfos(profil);
-      closeEditFieldModal();
-    });*/
     btnGit.className = "oauthBtn";
     btnGit.id = "btnGit";
     btnGit.innerHTML = '<img src="/assets/img/profile/gitLogo.webp" alt="GitHub"> <p id="textGit">Connect with GitHub</p>';
     btnGitDiv.appendChild(btnGit);
+
     let btnDisconnectGit = document.createElement("button");
     btnDisconnectGit.id = "btnRemoveGit";
     btnDisconnectGit.type = "button";
-    btnDisconnectGit.addEventListener("click", () => disconnect("Git"));
     btnDisconnectGit.className = "btnRemove";
     btnDisconnectGit.textContent = "Remove connection";
+    btnDisconnectGit.addEventListener("click", () => {
+      disconnect("Git");
+    });
     btnGitDiv.appendChild(btnDisconnectGit);
 
+    // Google
     let btnEmailDiv = document.createElement("div");
     btnEmailDiv.id = "btnEmailDiv";
+
     let btnEmail = document.createElement("a");
     btnEmail.href = "/api/auth/google";
-    /*btnEmail.addEventListener("click", () => {
-      profil.connexionType.email = true;
-      profil.connexionService.email = "test@exemple.com";
-      localStorage.setItem("connexionType", JSON.stringify(profil.connexionType));
-      localStorage.setItem("connexionService", JSON.stringify(profil.connexionService));
-      printInfos(profil);
-      closeEditFieldModal();
-    });*/
     btnEmail.id = "btnEmail";
     btnEmail.className = "oauthBtn";
     btnEmail.innerHTML = '<img src="/assets/img/profile/googleLogo.webp" alt="Google"> <p id="textGoogle">Connect with Google</p>';
     btnEmailDiv.appendChild(btnEmail);
+
     let btnDisconnectGoogle = document.createElement("button");
     btnDisconnectGoogle.id = "btnRemoveGoogle";
     btnDisconnectGoogle.type = "button";
-    btnDisconnectGoogle.addEventListener("click", () => disconnect("Google"));
     btnDisconnectGoogle.className = "btnRemove";
     btnDisconnectGoogle.textContent = "Remove connection";
+    btnDisconnectGoogle.addEventListener("click", () => {
+      disconnect("Google");
+    });
     btnEmailDiv.appendChild(btnDisconnectGoogle);
 
     divBtnConnexion.appendChild(btnGitDiv);
     divBtnConnexion.appendChild(btnEmailDiv);
     container.appendChild(divBtnConnexion);
 
-    if (profil.connexionType.git === false) {
-      document.getElementById("btnRemoveGit").style.display = "none";
-    } else if (profil.connexionType.git === true) {
+    // Git
+    if (!profil.connexionType.git) {
+      btnDisconnectGit.style.display = "none";
+    } else {
       btnGit.style.borderColor = "var(--primary)";
       btnGit.style.pointerEvents = "none";
       btnGit.querySelector("#textGit").textContent = "Already connected with GitHub";
-      document.getElementById("btnRemoveGit").style.display = "block";
-      document.getElementById("btnRemoveGit").disabled = false;
+      btnDisconnectGit.style.display = "block";
     }
 
-    if (profil.connexionType.email === false) {
-      document.getElementById("btnRemoveGoogle").style.display = "none";
-    } else if (profil.connexionType.email === true) {
+    // Google
+    if (!profil.connexionType.email) {
+      btnDisconnectGoogle.style.display = "none";
+    } else {
       btnEmail.style.borderColor = "var(--primary)";
       btnEmail.style.pointerEvents = "none";
       btnEmail.querySelector("#textGoogle").textContent = "Already connected with Google";
-      document.getElementById("btnRemoveGoogle").style.display = "block";
-      document.getElementById("btnRemoveGoogle").disabled = false;
+      btnDisconnectGoogle.style.display = "block";
     }
 
-    if (profil.connexionType.none === true) {
-      document.getElementById("btnRemoveGit").style.display = "none";
-      document.getElementById("btnRemoveGoogle").style.display = "none";
-    }
-
-    input.style.display = "none";
-
-    // Resize
     const modal = document.getElementById("editFieldModal");
     modal.classList.add("modal-resize");
   }
 
-  document.getElementById("editFieldModal").style.display = "flex";
-  document.getElementById("editFieldModalOverlay").style.display = "block";
-  document.getElementById("editFieldInput").focus();
+  const modal = document.getElementById("editFieldModal");
+  const overlay = document.getElementById("editFieldModalOverlay");
+  modal.style.display = "flex";
+  overlay.style.display = "block";
+  if (fieldType === 'username') {
+    input.focus();
+  }
 }
 
 function closeEditFieldModal() {
-  document.getElementById("editFieldModal").style.display = "none";
-  document.getElementById("editFieldModalOverlay").style.display = "none";
-  currentEditField = null;
-
-  // Remove class
   const modal = document.getElementById("editFieldModal");
+  const overlay = document.getElementById("editFieldModalOverlay");
+  modal.style.display = "none";
   modal.classList.remove("modal-resize");
+  overlay.style.display = "none";
+  currentEditField = null;
 }
 
-// Check if git username exists
+// Save
 
-async function checkGitHubUser(username) {
-  try {
-    const response = await fetch('https://api.github.com/users/' + encodeURIComponent(username));
-    return response.ok;
-  } catch (error) {
-    return false;
+async function displayAlertMessage(text, isSuccess = false) {
+  const messageDom = document.getElementById("message");
+  if (!messageDom) {
+    alert(text);
+    return;
   }
+  messageDom.textContent = text;
+  messageDom.style.display = "block";
+  if (isSuccess) {
+    messageDom.style.backgroundColor = "rgb(122, 216, 122)";
+  } else {
+    messageDom.style.backgroundColor = "transparent";
+  }
+
+  await new Promise(resolve => {
+    setTimeout(resolve, 2000);
+  });
+  messageDom.style.display = "none";
 }
 
 async function saveEditField() {
   if (!currentEditField) {
-    return
-  };
-
-  let value = document.getElementById("editFieldInput").value.trim();
-
-  if (!value) {
-    alert("You didn't enter a value. Please retry !");
     return;
   }
 
-  // Check mail
+  let value = document.getElementById("editFieldInput").value.trim();
 
-  if (currentEditField === 'connexionService') {
-    let isEmail = value.endsWith('@gmail.com') && value.includes('.');
-    let isGit = value.length >= 3;
-
-    if (isGit) {
-      if (!await checkGitHubUser(value)) {
-        alert("Git username doesn't exist. Please try again.");
-        return;
-      }
-    } else if (isEmail) {
-      if (value.toLowerCase().endsWith("@gmail.com")) {
-        alert("Please enter a valid Gmail address.");
-        return;
-      }
-    } else {
-      alert("Please enter a valid email or Git username.");
-      return;
-    }
-
-    if (devMode) {
-      profil.connexionService = value;
-      localStorage.setItem("connexionService", value);
-      printInfos(profil);
-      closeEditFieldModal();
-      return;
-    }
+  if (!value && currentEditField === 'username') {
+    await displayAlertMessage("Please enter a value!");
+    return;
   }
 
-  // Username
-
-  if (currentEditField === 'username') {
-    if (devMode) {
-      profil.username = value;
-      localStorage.setItem("username", value);
-      printInfos(profil);
+  if (currentEditField === "username") {
+    if (value === profil.username) {
       closeEditFieldModal();
       return;
     }
 
     try {
-      const updateData = {};
-
-      if (currentEditField === 'username') {
-        updateData.username = value;
-      }
-
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
+      const response = await fetch("/api/user", {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: value })
       });
 
-      if (!response.ok) {
-        alert("Error during update of informations ! Please try again soon.")
-        return;
-      }
+      const data = await response.json();
 
-      const result = await response.json();
-
-      // Keep modal open with update data
-
-      if (currentEditField === 'username') {
-        document.getElementById("pseudoProfil").textContent = result.username;
-        if (currentUserProfile) {
-          currentUserProfile.username = result.username;
-        }
+      if (response.ok) {
+        profil.username = value;
+        localStorage.setItem("username", value);
+        await displayAlertMessage(data.message || "Profile updated!", true);
+        printInfos(profil);
+        closeEditFieldModal();
+      } else {
+        await displayAlertMessage(data.error || "Error during update. Please try again.");
       }
     } catch (error) {
-      alert('Error during update of informations ! Please try again soon.');
+      console.error(error);
+      await displayAlertMessage("Error during update. Please try again.");
     }
-  } else if (currentEditField === 'connexionService') {
-    if (devMode) {
-      profil.connexionService = value;
-      printInfos(profil);
-      closeEditFieldModal();
-      return;
-    }
-
   }
-
-  closeEditFieldModal();
 }
 
-// Update profile image
+// Edit banner
 
 document.getElementById("editPhotoInput")?.addEventListener('change', async (e) => {
   const file = e.target.files[0];
-
   if (!file) {
-    return
-  };
-
-  // Create URL for image
-  let urlImage = URL.createObjectURL(file);
-
-  if (devMode) {
-    profil.avatar_url = urlImage;
-    printInfos(profil);
     return;
   }
+
+  let urlImage = URL.createObjectURL(file);
+  const photoEl = document.getElementById('profilPhoto');
+  photoEl.src = urlImage;
 
   let formData = new FormData();
   formData.append("image", file);
@@ -445,41 +431,34 @@ document.getElementById("editPhotoInput")?.addEventListener('change', async (e) 
   try {
     const response = await fetch('/api/upload', {
       method: 'POST',
+      credentials: 'include',
       body: formData
     });
-
     const result = await response.json();
     if (result.url) {
       localStorage.setItem("profilePhoto", result.url);
-      document.getElementById('profilPhoto').src = result.url;
+      profil.avatar_url = result.url;
+      printInfos(profil);
     }
   } catch (error) {
-    alert("Error during upload");
-    document.getElementById('profilPhoto').src = urlImage;
+    console.error("Upload error:", error);
+    await displayAlertMessage("Error during upload");
   }
-
-  // Update avatar DOM
-  document.getElementById('profilPhoto').src = URL.createObjectURL(file);
 });
 
-// Click on photo to change
 document.querySelector('#profilPhoto')?.addEventListener('click', () => {
   document.getElementById("editPhotoInput").click();
 });
 
-// Change username
+document.getElementById("editUserBtn")?.addEventListener("click", () => {
+  openEditFieldModal('username');
+});
+document.getElementById("editConnexionServiceBtn")?.addEventListener("click", () => {
+  openEditFieldModal('connexionService');
+});
 
-document.getElementById("editUserBtn")?.addEventListener("click", () =>
-  openEditFieldModal('username')
-);
+// Event listener
 
-// Change address service
-document.getElementById("editConnexionServiceBtn")?.addEventListener("click", () =>
-  openEditFieldModal('connexionService')
-);
-
-
-// Modal
 document.getElementById("cancelEditField")?.addEventListener("click", closeEditFieldModal);
 document.getElementById("editFieldModalOverlay")?.addEventListener("click", closeEditFieldModal);
 document.getElementById("saveEditField")?.addEventListener("click", (e) => {
@@ -493,47 +472,14 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-document.getElementById("editFieldInput").addEventListener("keydown", (e) => {
+document.getElementById("editFieldInput")?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     saveEditField();
   }
 });
 
-// Load
-function applySavedData() {
-  let savedUsername = localStorage.getItem("username");
-  let savedProfilePhoto = localStorage.getItem("profilePhoto");
+// Random banner
 
-  if (savedUsername) {
-    document.getElementById("pseudoProfil").textContent = savedUsername;
-  }
-
-  if (savedProfilePhoto) {
-    // If it's a temp link, we load default image
-    if (savedProfilePhoto.startsWith('blob:')) {
-      localStorage.removeItem("profilePhoto");
-    } else {
-      let profileImg = document.getElementById("profilPhoto");
-      if (profileImg) {
-        profileImg.src = savedProfilePhoto;
-      }
-    }
-  }
-}
-
-applySavedData();
-
-// Photo
-const profileImg = document.getElementById("profilPhoto");
-const editPhotoInput = document.getElementById("editPhotoInput");
-
-if (profileImg) {
-  profileImg.addEventListener("click", () => {
-    //editPhotoInput.click();
-  });
-}
-
-// Select random banner 
 const banners = [
   "/assets/img/profile/banner2.png",
   "/assets/img/profile/banner3.png",
@@ -541,38 +487,31 @@ const banners = [
   "/assets/img/profile/banner5.png",
 ];
 
-const bannerImg = document.getElementById("banner");
-
 function getRandomBanner() {
   const randomIndex = Math.floor(Math.random() * banners.length);
   return banners[randomIndex];
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (devMode) {
-    printInfos(profil);
-  } else {
-    const username = getUsernameFromURL();
-    if (username) {
-      fetchUserProfile(username).then(profile => {
-        if (profile) {
-          printInfos(profile);
-        }
-      });
-    }
-  }
+function applySavedData() {
+  let savedUsername = localStorage.getItem("username");
+  let savedProfilePhoto = localStorage.getItem("profilePhoto");
 
+  if (savedUsername) {
+    profil.username = savedUsername;
+  }
+  if (savedProfilePhoto && !savedProfilePhoto.startsWith('blob:')) {
+    profil.avatar_url = savedProfilePhoto;
+  }
+  printInfos(profil);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  applySavedData();
+
+  const bannerImg = document.getElementById("banner");
   if (bannerImg) {
     bannerImg.src = getRandomBanner();
   }
+
+  getProfil();
 });
-
-function selectRandomProfilePhoto() {
-  const profilePhotos = [
-    "/assets/img/profile/profil2.png",
-    "/assets/img/profile/profil3.png",
-  ];
-
-  const randomIndex = Math.floor(Math.random() * profilePhotos.length);
-  return profilePhotos[randomIndex];
-}
