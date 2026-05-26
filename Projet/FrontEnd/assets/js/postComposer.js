@@ -194,6 +194,11 @@ if (composerInput && composerPreview) {
         case "list":
           prefixSelectedLines("#- ");
           break;
+        case "image": {
+          const fileInput = document.getElementById("img-upload-input");
+          if (fileInput) fileInput.click();
+          break;
+        }
         case "align-left":
           wrapSelectedLinesWithTag("left");
           break;
@@ -251,4 +256,53 @@ if (replyIndicator && replyTargetMeta && replyTargetMessage && clearReplyTargetB
   });
 
   clearReplyTargetButton.addEventListener("click", clearReplyTarget);
+}
+
+const imgUploadBtn = document.getElementById("img-upload-btn");
+const imgUploadInput = document.getElementById("img-upload-input");
+const composerTextarea = document.getElementById("reply-box");
+
+if (imgUploadBtn && imgUploadInput && composerTextarea) {
+  imgUploadInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    imgUploadBtn.textContent = "...";
+    imgUploadBtn.disabled = true;
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const resp = await fetch("/api/upload", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => null);
+        alert(err?.error || "Upload failed");
+        return;
+      }
+
+      const result = await resp.json();
+      const url = result.url || `/api/cdn/${result.filename}`;
+      const md = `![image](${url})`;
+
+      const pos = composerTextarea.selectionStart ?? composerTextarea.value.length;
+      const before = composerTextarea.value.slice(0, pos);
+      const after = composerTextarea.value.slice(pos);
+      const needsNewline = before.length > 0 && !before.endsWith("\n") ? "\n" : "";
+      composerTextarea.value = before + needsNewline + md + "\n" + after;
+      composerTextarea.focus();
+      composerTextarea.dispatchEvent(new Event("input", { bubbles: true }));
+    } catch {
+      alert("Upload failed");
+    } finally {
+      imgUploadBtn.textContent = "IMG";
+      imgUploadBtn.disabled = false;
+      imgUploadInput.value = "";
+    }
+  });
 }
