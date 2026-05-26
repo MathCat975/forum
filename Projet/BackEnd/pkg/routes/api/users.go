@@ -140,15 +140,83 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
 
+type connexionServiceResponse struct {
+	Git    *string `json:"git"`
+	Google *string `json:"google"`
+	Email  *string `json:"email"`
+}
+
 type userProfileResponse struct {
-	Username     string    `json:"username"`
-	AvatarUrl    string    `json:"avatar_url"`
-	Role         string    `json:"role"`
-	CreatedAt    time.Time `json:"created_at"`
-	PostCount    int64     `json:"post_count"`
-	CommentCount int64     `json:"comment_count"`
-	LikeCount    int64     `json:"like_count"`
-	DislikeCount int64     `json:"dislike_count"`
+	Username          string                    `json:"username"`
+	AvatarUrl         string                    `json:"avatar_url"`
+	Role              string                    `json:"role"`
+	CreatedAt         time.Time                 `json:"created_at"`
+	PostCount         int64                     `json:"post_count"`
+	CommentCount      int64                     `json:"comment_count"`
+	LikeCount         int64                     `json:"like_count"`
+	DislikeCount      int64                     `json:"dislike_count"`
+	ConnexionService  *connexionServiceResponse `json:"connexionService,omitempty"`
+	LastPosts         []structs.Post            `json:"lastPosts"`
+}
+
+func buildConnexionService(user *structs.User, accounts []structs.UserOAuthAccount) *connexionServiceResponse {
+	resp := &connexionServiceResponse{}
+	if user.Email != "" {
+		email := user.Email
+		resp.Email = &email
+	}
+	for _, acc := range accounts {
+		if acc.ProviderEmail == "" {
+			continue
+		}
+		providerEmail := acc.ProviderEmail
+		switch acc.Provider {
+		case "github":
+			resp.Git = &providerEmail
+		case "google":
+			resp.Google = &providerEmail
+		}
+	}
+	return resp
+}
+
+func loadUserProfile(user *structs.User, includeConnexion bool) (*userProfileResponse, error) {
+	database := db.GetDB()
+
+	postCount, commentCount, likeCount, dislikeCount, err := database.UserStats(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	lastPosts, err := database.UserLatestPosts(user.ID, 5)
+	if err != nil {
+		return nil, err
+	}
+	if lastPosts == nil {
+		lastPosts = []structs.Post{}
+	}
+
+	resp := &userProfileResponse{
+		Username:     user.Username,
+		AvatarUrl:    user.AvatarUrl,
+		Role:         user.Role,
+		CreatedAt:    user.CreatedAt,
+		PostCount:    postCount,
+		CommentCount: commentCount,
+		LikeCount:    likeCount,
+		DislikeCount: dislikeCount,
+		LastPosts:    lastPosts,
+	}
+
+	if includeConnexion {
+		accounts, err := database.GetOAuthAccountsByUserID(user.ID)
+		if err != nil {
+			return nil, err
+		}
+		resp.ConnexionService = buildConnexionService(user, accounts)
+	}
+
+	return resp, nil
 }
 
 type editUserRequest struct {
@@ -265,23 +333,14 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts, comments, likes, dislikes, err := db.GetDB().UserStats(user.ID)
+	profile, err := loadUserProfile(user, false)
 	if err != nil {
-		routes.JsonError(w, "failed to load user stats", http.StatusInternalServerError)
+		routes.JsonError(w, "failed to load user profile", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(userProfileResponse{
-		Username:     user.Username,
-		AvatarUrl:    user.AvatarUrl,
-		Role:         user.Role,
-		CreatedAt:    user.CreatedAt,
-		PostCount:    posts,
-		CommentCount: comments,
-		LikeCount:    likes,
-		DislikeCount: dislikes,
-	})
+	json.NewEncoder(w).Encode(profile)
 }
 
 func GetSelfHandler(w http.ResponseWriter, r *http.Request) {
@@ -302,21 +361,12 @@ func GetSelfHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts, comments, likes, dislikes, err := db.GetDB().UserStats(user.ID)
+	profile, err := loadUserProfile(user, true)
 	if err != nil {
-		routes.JsonError(w, "failed to load user stats", http.StatusInternalServerError)
+		routes.JsonError(w, "failed to load user profile", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(userProfileResponse{
-		Username:     user.Username,
-		AvatarUrl:    user.AvatarUrl,
-		Role:         user.Role,
-		CreatedAt:    user.CreatedAt,
-		PostCount:    posts,
-		CommentCount: comments,
-		LikeCount:    likes,
-		DislikeCount: dislikes,
-	})
+	json.NewEncoder(w).Encode(profile)
 }

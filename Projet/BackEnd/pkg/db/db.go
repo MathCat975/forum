@@ -47,6 +47,7 @@ func Open(path string) (*DB, error) {
 		_ = instance.Migrate("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'")
 		_ = instance.Migrate("CREATE UNIQUE INDEX IF NOT EXISTS idx_postvotes_user_post ON postvotes(user_id, post_id)")
 		_ = instance.Migrate("CREATE UNIQUE INDEX IF NOT EXISTS idx_oauth_provider_user ON useroauthaccounts(provider, provider_user_id)")
+		_ = instance.Migrate("ALTER TABLE useroauthaccounts ADD COLUMN provider_email TEXT NOT NULL DEFAULT ''")
 	})
 	if initErr != nil {
 		return nil, initErr

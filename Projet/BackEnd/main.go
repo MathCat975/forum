@@ -47,6 +47,7 @@ func main() {
 
 	http.HandleFunc("/api/user/profile", auth.RequireAuth(api.GetUserProfileHandler))
 	http.HandleFunc("/api/user/me", auth.RequireAuth(api.GetSelfHandler))
+	http.HandleFunc("/api/user/oauth", auth.RequireAuth(api.DisconnectOAuthHandler))
 	http.HandleFunc("/api/user", auth.RequireAuth(
 		ratelimit.PerUser(ratelimit.EditProfile, api.EditUserHandler)))
 
