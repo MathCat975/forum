@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum | Post</title>
-    <link rel="stylesheet" href="/assets/css/theme.css">
-    <link rel="stylesheet" href="/assets/css/main.css">
-    <link rel="stylesheet" href="/assets/css/post.css">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/post.css">
 </head>
 <body>
     <header class="protocol-topbar" aria-label="Site header">
@@ -54,7 +54,7 @@
                 <a href="#archive"><span>##</span>Archive</a>
             </nav>
 
-            <a class="init-thread" href="/front/post">Create post</a>
+            <a class="init-thread" href="/front/create-post">Create post</a>
 
             <nav class="directory-footer" aria-label="Support links">
                 <a href="/front/login"><span>+</span>Settings</a>
@@ -65,8 +65,7 @@
         <section class="operations post-operations" aria-label="Post thread">
             <div class="thread-wrap">
                 <section class="thread-header" aria-label="Thread title">
-                    <p class="thread-path">node_05 &gt; ex032 &gt; secured_channels</p>
-                    <h1>Vulnerability discovered in the neural-link v9 protocols</h1>
+                    <h1>forum1</h1>
                     <div class="thread-stats" aria-label="Thread statistics">
                         <span>2 hours ago</span>
                         <span>14 replies</span>
@@ -116,7 +115,6 @@
                     </div>
                 </article>
 
-                <!-- Single comment item kept intentionally for backend wiring -->
                 <article
                     class="thread-card thread-card--reply"
                     data-reply-author="cyber_punk_42"
@@ -164,6 +162,17 @@
                     </div>
 
                     <label class="sr-only" for="reply-box">Write your reply</label>
+                    <div class="composer-toolbar" aria-label="Formatting tools">
+                        <button type="button" class="composer-tool" data-action="bold" aria-label="Bold"><strong>B</strong></button>
+                        <button type="button" class="composer-tool" data-action="italic" aria-label="Italic"><em>I</em></button>
+                        <button type="button" class="composer-tool" data-action="heading1" aria-label="Heading 1">H1</button>
+                        <button type="button" class="composer-tool" data-action="heading2" aria-label="Heading 2">H2</button>
+                        <button type="button" class="composer-tool" data-action="quote" aria-label="Quote">"</button>
+                        <button type="button" class="composer-tool" data-action="list" aria-label="List">#-</button>
+                        <button type="button" class="composer-tool" data-action="align-left" aria-label="Align left">L</button>
+                        <button type="button" class="composer-tool" data-action="align-center" aria-label="Align center">C</button>
+                        <button type="button" class="composer-tool" data-action="align-right" aria-label="Align right">R</button>
+                    </div>
                     <div class="composer-editor-shell">
                         <div
                             id="reply-preview"
@@ -202,5 +211,6 @@
         </nav>
     </footer>
     <script src="../assets/js/postComposer.js"></script>
+    <script src="../assets/js/threadView.js"></script>
 </body>
 </html>

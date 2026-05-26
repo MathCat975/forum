@@ -296,6 +296,68 @@
     text-transform: uppercase;
 }
 
+.create-thread-form {
+    margin-top: 0;
+}
+
+.create-thread-field {
+    margin-bottom: 1.25rem;
+}
+
+.create-thread-field__label,
+.create-thread-field label {
+    display: block;
+    margin-bottom: 0.55rem;
+    color: rgba(159, 186, 255, 0.85);
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.create-thread-field input[type="text"] {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(57, 57, 57, 0.85);
+    color: #fff;
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.4;
+    outline: none;
+}
+
+.create-thread-field input[type="text"]::placeholder {
+    color: rgba(232, 232, 232, 0.34);
+}
+
+.create-thread-field input[type="text"]:focus {
+    border-color: rgba(61, 108, 224, 0.58);
+    box-shadow: inset 0 0 0 1px rgba(61, 108, 224, 0.18);
+}
+
+.create-thread-error {
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.9rem;
+    border-left: 2px solid #ff6b6b;
+    background: rgba(255, 107, 107, 0.08);
+    color: #ffb4b4;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.create-thread-error[hidden] {
+    display: none;
+}
+
+.init-thread.is-active {
+    border-color: rgba(61, 108, 224, 0.65);
+    background: rgba(61, 108, 224, 0.12);
+    color: #fff;
+}
+
 .reply-indicator {
     display: flex;
     align-items: flex-start;
@@ -357,6 +419,41 @@
 
 .reply-indicator__clear:hover {
     color: #fff;
+}
+
+.composer-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 0.8rem;
+}
+
+.composer-tool {
+    min-width: 36px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(32, 32, 34, 0.96), rgba(18, 18, 19, 0.98));
+    color: rgba(232, 232, 232, 0.76);
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 150ms ease, color 150ms ease, transform 150ms ease, background-color 150ms ease;
+}
+
+.composer-tool:hover,
+.composer-tool:focus-visible {
+    border-color: rgba(61, 108, 224, 0.55);
+    color: #fff;
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.composer-tool strong,
+.composer-tool em {
+    font-size: 0.82rem;
 }
 
 .composer-editor-shell {
@@ -437,6 +534,14 @@
 .md-line--quote .md-line__content {
     color: rgba(232, 232, 232, 0.78);
     font-style: italic;
+}
+
+.md-line--align-center {
+    text-align: center;
+}
+
+.md-line--align-right {
+    text-align: right;
 }
 
 .md-line--list .md-line__content::before {

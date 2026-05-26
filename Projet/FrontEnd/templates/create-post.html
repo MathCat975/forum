@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum | Create post</title>
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/post.css">
+</head>
+<body>
+    <header class="protocol-topbar" aria-label="Site header">
+        <a class="protocol-brand" href="/front/index" aria-label="Forum home">
+            <span class="brand-node" aria-hidden="true">></span>
+            <span>meow</span>
+        </a>
+
+        <nav class="protocol-tabs" aria-label="Sections">
+            <a href="/front/index">Forums</a>
+            <a href="/front/register">Upgrades</a>
+        </nav>
+
+        <form class="protocol-search" role="search">
+            <label class="sr-only" for="global-search">Search for posts</label>
+            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
+        </form>
+
+        <nav class="protocol-actions" aria-label="Account">
+            <a href="/front/login" aria-label="Notifications">
+                <img src="/assets/img/header/notif.png" alt="">
+            </a>
+            <a href="/front/login" aria-label="Messages">
+                <img src="/assets/img/header/message.png" alt="">
+            </a>
+            <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
+        </nav>
+    </header>
+
+    <main class="protocol-shell post-shell">
+        <aside class="directory-panel" aria-label="Directory">
+            <div class="directory-head">
+                <span class="terminal-icon" aria-hidden="true">></span>
+                <div>
+                    <strong>Directory</strong>
+                    <small>Protocol v4.2.0</small>
+                </div>
+            </div>
+
+            <nav class="directory-nav" aria-label="Forum navigation">
+                <a href="/front/index"><span>::</span>Main Feed</a>
+                <a href="#trending"><span>--</span>Trending</a>
+                <a class="nav-link-neutral" href="#private"><span>[]</span>Private Nodes</a>
+                <a href="#logs"><span>==</span>System Logs</a>
+                <a href="#archive"><span>##</span>Archive</a>
+            </nav>
+
+            <a class="init-thread is-active" href="/front/create-post" aria-current="page">Create post</a>
+
+            <nav class="directory-footer" aria-label="Support links">
+                <a href="/front/login"><span>+</span>Settings</a>
+                <a href="#"><span>?</span>Support</a>
+            </nav>
+        </aside>
+
+        <section class="operations post-operations" aria-label="Create forum thread">
+            <div class="thread-wrap">
+                <section class="thread-header" aria-label="Page title">
+                    <p class="thread-path">New thread</p>
+                    <h1>Start a forum</h1>
+                    <div class="thread-stats" aria-label="Instructions">
+                        <span>Set a title and opening message</span>
+                        <span>Replies open after publish</span>
+                    </div>
+                </section>
+
+                <form id="create-thread-form" class="composer-panel create-thread-form" aria-labelledby="create-thread-title">
+                    <div class="composer-head">
+                        <h2 id="create-thread-title">Thread details</h2>
+                    </div>
+
+                    <div class="create-thread-field">
+                        <label for="thread-title">Title</label>
+                        <input
+                            id="thread-title"
+                            name="title"
+                            type="text"
+                            maxlength="120"
+                            placeholder="e.g. Neural-link packet leakage"
+                            required
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="create-thread-field">
+                        <span class="create-thread-field__label" id="opening-message-label">Opening message</span>
+
+                        <div class="composer-toolbar" aria-label="Formatting tools">
+                            <button type="button" class="composer-tool" data-action="bold" aria-label="Bold"><strong>B</strong></button>
+                            <button type="button" class="composer-tool" data-action="italic" aria-label="Italic"><em>I</em></button>
+                            <button type="button" class="composer-tool" data-action="heading1" aria-label="Heading 1">H1</button>
+                            <button type="button" class="composer-tool" data-action="heading2" aria-label="Heading 2">H2</button>
+                            <button type="button" class="composer-tool" data-action="quote" aria-label="Quote">"</button>
+                            <button type="button" class="composer-tool" data-action="list" aria-label="List">#-</button>
+                            <button type="button" class="composer-tool" data-action="align-left" aria-label="Align left">L</button>
+                            <button type="button" class="composer-tool" data-action="align-center" aria-label="Align center">C</button>
+                            <button type="button" class="composer-tool" data-action="align-right" aria-label="Align right">R</button>
+                        </div>
+
+                        <label class="sr-only" for="reply-box">Opening message</label>
+                        <div class="composer-editor-shell">
+                            <div
+                                id="reply-preview"
+                                class="composer-preview"
+                                aria-hidden="true"
+                                data-placeholder="Describe what this forum is about..."
+                            ></div>
+                            <textarea
+                                id="reply-box"
+                                class="composer-input"
+                                name="body"
+                                rows="9"
+                                placeholder="Describe what this forum is about..."
+                                spellcheck="true"
+                                aria-labelledby="opening-message-label"
+                                required
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <p id="create-thread-error" class="create-thread-error" role="alert" hidden></p>
+
+                    <div class="composer-actions">
+                        <div class="composer-buttons">
+                            <a class="composer-button composer-button--ghost" href="/front/index">Cancel</a>
+                            <button type="submit" class="composer-button composer-button--primary">Publish forum</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="protocol-footer">
+        <strong>meow</strong>
+        <nav aria-label="Footer">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">API</a>
+            <a href="#">Donations</a>
+        </nav>
+    </footer>
+    <script src="../assets/js/postComposer.js"></script>
+    <script src="../assets/js/createPost.js"></script>
+</body>
+</html>

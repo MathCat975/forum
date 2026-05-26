@@ -5,6 +5,7 @@ const replyTargetMeta = document.getElementById("reply-target-meta");
 const replyTargetMessage = document.getElementById("reply-target-message");
 const clearReplyTargetButton = document.getElementById("clear-reply-target");
 const replyTriggers = document.querySelectorAll(".thread-reply-trigger");
+const composerTools = document.querySelectorAll(".composer-tool");
 
 if (composerInput && composerPreview) {
   const TOKEN_PATTERN = /(\*\*[^*\n]+?\*\*|~~[^~\n]+?~~|`[^`\n]+?`|\*[^*\n]+?\*)/g;
@@ -22,6 +23,70 @@ if (composerInput && composerPreview) {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+
+  const getSelectionRange = () => ({
+    start: composerInput.selectionStart ?? 0,
+    end: composerInput.selectionEnd ?? 0,
+  });
+
+  const updateComposerValue = (value, start, end = start) => {
+    composerInput.value = value;
+    composerInput.focus();
+    composerInput.setSelectionRange(start, end);
+    renderPreview();
+  };
+
+  const wrapSelection = (prefix, suffix, fallback = "") => {
+    const { start, end } = getSelectionRange();
+    const currentValue = composerInput.value;
+    const selected = currentValue.slice(start, end);
+    const content = selected || fallback;
+    const nextValue = `${currentValue.slice(0, start)}${prefix}${content}${suffix}${currentValue.slice(end)}`;
+    const contentStart = start + prefix.length;
+    const contentEnd = contentStart + content.length;
+
+    updateComposerValue(nextValue, contentStart, contentEnd);
+  };
+
+  const prefixSelectedLines = (prefix) => {
+    const { start, end } = getSelectionRange();
+    const currentValue = composerInput.value;
+    const lineStart = currentValue.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
+    const lineEndIndex = currentValue.indexOf("\n", end);
+    const lineEnd = lineEndIndex === -1 ? currentValue.length : lineEndIndex;
+    const selectedBlock = currentValue.slice(lineStart, lineEnd);
+    const lines = selectedBlock.split("\n");
+    const nextBlock = lines
+      .map((line) => (line.startsWith(prefix) ? line : `${prefix}${line}`))
+      .join("\n");
+    const nextValue = `${currentValue.slice(0, lineStart)}${nextBlock}${currentValue.slice(lineEnd)}`;
+
+    updateComposerValue(nextValue, lineStart, lineStart + nextBlock.length);
+  };
+
+  const wrapSelectedLinesWithTag = (tag) => {
+    const { start, end } = getSelectionRange();
+    const currentValue = composerInput.value;
+    const lineStart = currentValue.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
+    const lineEndIndex = currentValue.indexOf("\n", end);
+    const lineEnd = lineEndIndex === -1 ? currentValue.length : lineEndIndex;
+    const selectedBlock = currentValue.slice(lineStart, lineEnd);
+    const lines = selectedBlock.split("\n");
+    const openTag = `[${tag}]`;
+    const closeTag = `[/${tag}]`;
+    const nextBlock = lines
+      .map((line) => {
+        if (line.startsWith(openTag) && line.endsWith(closeTag)) {
+          return line;
+        }
+
+        return `${openTag}${line}${closeTag}`;
+      })
+      .join("\n");
+    const nextValue = `${currentValue.slice(0, lineStart)}${nextBlock}${currentValue.slice(lineEnd)}`;
+
+    updateComposerValue(nextValue, lineStart, lineStart + nextBlock.length);
+  };
 
   const renderToken = (token) => {
     if (token.startsWith("**") && token.endsWith("**")) {
@@ -65,6 +130,14 @@ if (composerInput && composerPreview) {
   };
 
   const renderLine = (line) => {
+    const alignmentMatch = line.match(/^\[(left|center|right)\](.*)\[\/\1\]$/);
+
+    if (alignmentMatch) {
+      const [, align, contentValue] = alignmentMatch;
+      const content = renderInlineContent(contentValue);
+      return `<div class="md-line md-line--align-${align}"><span class="md-syntax md-syntax--block">[${align}]</span><span class="md-line__content">${content || "<br>"}</span><span class="md-syntax">[/${align}]</span></div>`;
+    }
+
     for (const block of BLOCK_PATTERNS) {
       if (line.startsWith(block.prefix)) {
         const content = renderInlineContent(line.slice(block.prefix.length));
@@ -97,6 +170,44 @@ if (composerInput && composerPreview) {
   composerInput.addEventListener("input", renderPreview);
   composerInput.addEventListener("scroll", syncScroll);
   window.addEventListener("resize", syncHeight);
+
+  composerTools.forEach((tool) => {
+    tool.addEventListener("click", () => {
+      const action = tool.dataset.action;
+
+      switch (action) {
+        case "bold":
+          wrapSelection("**", "**", "bold text");
+          break;
+        case "italic":
+          wrapSelection("*", "*", "italic text");
+          break;
+        case "heading1":
+          prefixSelectedLines("# ");
+          break;
+        case "heading2":
+          prefixSelectedLines("## ");
+          break;
+        case "quote":
+          prefixSelectedLines("> ");
+          break;
+        case "list":
+          prefixSelectedLines("#- ");
+          break;
+        case "align-left":
+          wrapSelectedLinesWithTag("left");
+          break;
+        case "align-center":
+          wrapSelectedLinesWithTag("center");
+          break;
+        case "align-right":
+          wrapSelectedLinesWithTag("right");
+          break;
+        default:
+          break;
+      }
+    });
+  });
 
   renderPreview();
 }
