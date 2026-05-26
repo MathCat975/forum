@@ -75,3 +75,16 @@ func (db *DB) UserStats(userID uint) (posts, comments, likes, dislikes int64, er
 	dislikes, err = db.Table("postvotes").Where(inClause, ids...).Where("value = ?", -1).Count()
 	return
 }
+
+func (db *DB) UserLatestPosts(userID uint, limit int) ([]structs.Post, error) {
+	var posts []structs.Post
+	err := db.Table("posts").
+		Where("author_id = ?", userID).
+		OrderBy("created_at DESC").
+		Limit(limit).
+		Find(&posts)
+	if err != nil {
+		return nil, fmt.Errorf("UserLatestPosts: %w", err)
+	}
+	return posts, nil
+}

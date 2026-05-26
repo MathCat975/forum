@@ -201,6 +201,7 @@ func OAuthCompleteHandler(w http.ResponseWriter, r *http.Request) {
 		UserID:         created.ID,
 		Provider:       pending.Provider,
 		ProviderUserID: pending.ProviderUserID,
+		ProviderEmail:  pending.Email,
 		CreatedAt:      time.Now(),
 	}); err != nil {
 		routes.JsonError(w, "failed to link oauth account", http.StatusInternalServerError)
@@ -224,4 +225,73 @@ func issueSession(w http.ResponseWriter, user *structs.User) {
 		return
 	}
 	auth.SetTokenCookie(w, tok)
+}
+
+type disconnectOAuthRequest struct {
+	Provider string `json:"provider"`
+}
+
+func DisconnectOAuthHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		routes.JsonError(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	claims, ok := auth.ClaimsFromContext(r.Context())
+	if !ok {
+		routes.JsonError(w, "authentication required", http.StatusUnauthorized)
+		return
+	}
+
+	var req disconnectOAuthRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		routes.JsonError(w, "invalid JSON", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	provider := strings.TrimSpace(strings.ToLower(req.Provider))
+	if provider == "git" {
+		provider = "github"
+	}
+	if provider != "github" && provider != "google" {
+		routes.JsonError(w, "provider must be github or google", http.StatusBadRequest)
+		return
+	}
+
+	database := db.GetDB()
+
+	user, err := database.GetUserByID(claims.UserID)
+	if err != nil {
+		routes.JsonError(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	if _, err := database.GetOAuthAccountByUserAndProvider(user.ID, provider); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			routes.JsonError(w, "oauth account not linked", http.StatusNotFound)
+			return
+		}
+		routes.JsonError(w, "failed to load oauth account", http.StatusInternalServerError)
+		return
+	}
+
+	accounts, err := database.GetOAuthAccountsByUserID(user.ID)
+	if err != nil {
+		routes.JsonError(w, "failed to load oauth accounts", http.StatusInternalServerError)
+		return
+	}
+
+	if user.PasswordHash == nil && len(accounts) <= 1 {
+		routes.JsonError(w, "cannot disconnect last sign-in method", http.StatusBadRequest)
+		return
+	}
+
+	if err := database.DeleteOAuthAccount(user.ID, provider); err != nil {
+		routes.JsonError(w, "failed to disconnect oauth account", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
