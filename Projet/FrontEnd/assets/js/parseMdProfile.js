@@ -6,23 +6,16 @@ const profil = {
   username: localStorage.getItem("username") || "TestUser",
   avatar_url: localStorage.getItem("profilePhoto") || "/assets/img/profile/profil2.png",
   role: "User",
-  id: "",
   created_at: "",
   online: true,
-  lastConnexion: "Unknown",
   post_count: 0,
   comment_count: 0,
   like_count: 0,
   dislike_count: 0,
   connexionService: {
     git: "",
+    google: "",
     email: "",
-    none: ""
-  },
-  connexionType: {
-    git: false,
-    email: false,
-    none: true
   },
   lastPosts: {}
 };
