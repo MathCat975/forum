@@ -92,11 +92,11 @@
                         </div>
                     </div>
 
-                    <!--<div id="InfosBtns" class="infosPart">
-                        <button>More</button>
-                        <button>Trustscan</button>
-                        <button>Items</button>
-                    </div> -->
+                    <div class="infosPart account-sign-out">
+                        <button type="button" id="signOutBtn" class="btn-sign-out" hidden>
+                            Sign out
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -162,6 +162,13 @@
 
     <input type="file" id="editPhotoInput" accept="image/*">
 
+    <form id="logout-form" class="sr-only" method="post" action="/api/logout" hidden>
+        <button type="submit">Sign out</button>
+    </form>
+
+    <p id="message" class="profile-message" role="alert" hidden></p>
+
+    <script src="/assets/js/api.js"></script>
     <script src="/assets/js/parseMdProfile.js" defer></script>
 
      <footer class="protocol-footer">

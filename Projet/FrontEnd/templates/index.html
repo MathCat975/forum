@@ -14,7 +14,6 @@
 
 <body>
     <div class="page-shell">
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="brand">
                 <span class="brand-mark">></span>
@@ -42,7 +41,6 @@
         </aside>
 
         <main class="content">
-            <!-- TOPBAR -->
             <header class="topbar">
                 <nav class="topbar-nav">
                     <a href="#feed">Forums</a>
@@ -66,7 +64,6 @@
                 </div>
             </header>
 
-            <!-- HERO PANEL -->
             <section class="hero-panel">
                 <div class="hero-copy">
                     <p class="eyebrow">Search Protocol</p>
@@ -87,7 +84,6 @@
                 </div>
             </section>
 
-            <!-- SEARCH PANEL -->
             <section class="search-panel" id="search">
                 <div class="search-bar">
                     <label class="search-input-wrap" for="searchInput">
@@ -129,7 +125,6 @@
                 <p id="searchMessage" class="search-message" aria-live="polite"></p>
             </section>
 
-            <!-- RESULTS LAYOUT -->
             <section class="results-layout">
                 <div class="results-column">
                     <div class="section-heading">
@@ -137,50 +132,14 @@
                             <p class="eyebrow">Query Output</p>
                             <h2>Matched signals</h2>
                         </div>
-                        <div id="resultsCountDisplay" class="results-count">Showing latest nodes</div>
+                        <div class="section-heading-actions">
+                            <div id="resultsCount" class="results-count">Showing latest nodes</div>
+                            <button id="showFeedButton" class="secondary-button" type="button" hidden>View forum feed</button>
+                        </div>
                     </div>
 
                     <div id="resultsList" class="results-list">
-                        <!-- Forum Categories as Results -->
-                        <section class="post-cluster post-cluster--blue">
-                            <header class="cluster-head">
-                                <h3>category1</h3>
-                            </header>
-                            <div class="cluster-rows">
-                                <article class="post-row">
-                                    <div class="post-glyph post-glyph--primary">#</div>
-                                    <div class="post-copy">
-                                        <a href="#">Announcements & Global Directives</a>
-                                        <p>Official protocol updates and network expansion logs.</p>
-                                    </div>
-                                    <div class="post-stat"><strong>1,204</strong><span>nodes</span></div>
-                                    <div class="post-activity">
-                                        <a href="#">Network upgrade v0.1</a>
-                                        <span>9 mins ago by Admin</span>
-                                    </div>
-                                </article>
-                            </div>
-                        </section>
-
-                        <section class="post-cluster post-cluster--lime">
-                            <header class="cluster-head">
-                                <h3>category2</h3>
-                            </header>
-                            <div class="cluster-rows">
-                                <article class="post-row">
-                                    <div class="post-glyph post-glyph--tertiary">?</div>
-                                    <div class="post-copy">
-                                        <a href="#">Software & Tools</a>
-                                        <p>Buy, sell, or trade custom script packages.</p>
-                                    </div>
-                                    <div class="post-stat"><strong>312</strong><span>assets</span></div>
-                                    <div class="post-activity">
-                                        <a href="#">WTS custom UI toolkit</a>
-                                        <span>1 hour ago by Merchant</span>
-                                    </div>
-                                </article>
-                            </div>
-                        </section>
+                        <div class="empty-state">Loading forum transmissions...</div>
                     </div>
 
                     <div class="pagination">
@@ -190,7 +149,6 @@
                     </div>
                 </div>
 
-                <!-- INSIGHTS COLUMN -->
                 <aside class="insights-column">
                     <div class="info-card">
                         <p class="card-title">Live Pulse</p>
@@ -232,6 +190,7 @@
         </nav>
     </footer>
 
+    <script src="/assets/js/api.js"></script>
     <script src="/assets/js/index.js"></script>
 </body>
 

@@ -36,6 +36,7 @@ func main() {
 	http.HandleFunc("/api/register", ratelimit.PerIP(ratelimit.Register, api.RegisterHandler))
 
 	http.HandleFunc("/api/login", ratelimit.PerIP(ratelimit.Login, api.LoginHandler))
+	http.HandleFunc("/api/logout", api.LogoutHandler)
 
 	http.HandleFunc("/api/auth/github", ratelimit.PerIP(ratelimit.Login, api.GitHubLoginHandler))
 	http.HandleFunc("/api/auth/github/callback", api.GitHubCallbackHandler)

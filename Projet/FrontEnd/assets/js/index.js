@@ -13,9 +13,13 @@ const prevPageButton = document.getElementById("prevPageButton");
 const nextPageButton = document.getElementById("nextPageButton");
 const pageIndicator = document.getElementById("pageIndicator");
 
+const CLUSTER_STYLES = ["post-cluster--blue", "post-cluster--lime", "post-cluster--cyan"];
+const categoryNameById = new Map();
+
 let currentPage = 1;
 let lastHasMore = false;
 let isLoading = false;
+let feedLoaded = false;
 
 function highlightMatch(text, query) {
     const safeText = String(text ?? "");
@@ -38,7 +42,46 @@ function formatDate(value) {
     return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
 }
 
+function formatRelativeTime(value) {
+    if (!value) {
+        return "Unknown time";
+    }
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+        return value;
+    }
+
+    const elapsedMs = Date.now() - parsed.getTime();
+    const elapsedMinutes = Math.max(1, Math.floor(elapsedMs / 60000));
+
+    if (elapsedMinutes < 60) {
+        return `${elapsedMinutes} min ago`;
+    }
+
+    const elapsedHours = Math.floor(elapsedMinutes / 60);
+    if (elapsedHours < 24) {
+        return `${elapsedHours} hour${elapsedHours === 1 ? "" : "s"} ago`;
+    }
+
+    const elapsedDays = Math.floor(elapsedHours / 24);
+    return `${elapsedDays} day${elapsedDays === 1 ? "" : "s"} ago`;
+}
+
+function truncateText(text, maxLength = 140) {
+    const value = String(text ?? "").trim();
+    if (value.length <= maxLength) {
+        return value;
+    }
+
+    return `${value.slice(0, maxLength - 3)}...`;
+}
+
 function setMessage(message, tone = "") {
+    if (!searchMessage) {
+        return;
+    }
+
     searchMessage.textContent = message;
     searchMessage.className = "search-message";
 
@@ -53,17 +96,26 @@ function getAuthorName(item) {
         item.author ||
         item.user?.username ||
         item.owner?.username ||
-        "Unknown operator"
+        (item.authorId || item.author_id ? `Operator #${item.authorId || item.author_id}` : "Unknown operator")
     );
 }
 
 function getCategoryLabel(item) {
-    return (
-        item.category?.name ||
-        item.category_name ||
-        item.categoryName ||
-        (item.category_id ? `Category #${item.category_id}` : "Unclassified")
-    );
+    if (item.category?.name) {
+        return item.category.name;
+    }
+
+    if (item.category_name || item.categoryName) {
+        return item.category_name || item.categoryName;
+    }
+
+    const categoryId = item.categoryId || item.category_id;
+
+    if (categoryId && categoryNameById.has(categoryId)) {
+        return categoryNameById.get(categoryId);
+    }
+
+    return categoryId ? `Category #${categoryId}` : "Unclassified";
 }
 
 function getPrimaryBody(item, scope) {
@@ -72,6 +124,161 @@ function getPrimaryBody(item, scope) {
     }
 
     return item.message || item.excerpt || item.content || "";
+}
+
+function getPostGlyph(title) {
+    const trimmed = String(title ?? "").trim();
+    if (!trimmed) {
+        return "#";
+    }
+
+    return forumEscapeHtml(trimmed.charAt(0).toUpperCase());
+}
+
+function buildPostRow(post) {
+    const title = forumEscapeHtml(post.title || "Untitled post");
+    const excerpt = forumEscapeHtml(truncateText(post.message));
+    const author = forumEscapeHtml(getAuthorName(post));
+    const when = forumEscapeHtml(formatRelativeTime(post.createdAt || post.created_at));
+    const postId = encodeURIComponent(post.id);
+
+    return `
+        <article class="post-row">
+            <div class="post-glyph post-glyph--primary" aria-hidden="true">${getPostGlyph(post.title)}</div>
+            <div class="post-copy">
+                <a href="/front/index?post=${postId}">${title}</a>
+                <p>${excerpt}</p>
+            </div>
+            <div class="post-stat">
+                <strong>${post.id}</strong>
+                <span>thread</span>
+            </div>
+            <div class="post-activity">
+                <a href="/front/index?post=${postId}">${title}</a>
+                <span>${when} by ${author}</span>
+            </div>
+        </article>
+    `;
+}
+
+function buildCategoryCluster(category, posts, styleClass) {
+    const rows = posts.map((post) => buildPostRow(post)).join("");
+
+    return `
+        <section class="post-cluster ${styleClass}" aria-labelledby="category-${category.id}">
+            <header class="cluster-head">
+                <h3 id="category-${category.id}">${forumEscapeHtml(category.name)}</h3>
+                <span class="cluster-group">${forumEscapeHtml(category.group || "")}</span>
+            </header>
+            <div class="cluster-rows">
+                ${rows}
+            </div>
+        </section>
+    `;
+}
+
+function setFeedMode(active) {
+    const showFeedButton = document.getElementById("showFeedButton");
+
+    if (showFeedButton) {
+        showFeedButton.hidden = active;
+    }
+}
+
+function renderForumFeed(groups, totalPosts) {
+    if (!resultsList) {
+        return;
+    }
+
+    if (groups.length === 0) {
+        resultsList.innerHTML = `
+            <div class="empty-state">
+                No forums posted yet. Sign in to create the first thread.
+            </div>
+        `;
+    } else {
+        resultsList.innerHTML = groups
+            .map((group, index) =>
+                buildCategoryCluster(
+                    group.category,
+                    group.posts,
+                    CLUSTER_STYLES[index % CLUSTER_STYLES.length]
+                )
+            )
+            .join("");
+    }
+
+    if (resultsCount) {
+        resultsCount.textContent = `${totalPosts} post${totalPosts === 1 ? "" : "s"} live on the network`;
+    }
+
+    if (pageIndicator) {
+        pageIndicator.textContent = "Forum feed";
+    }
+
+    if (prevPageButton) {
+        prevPageButton.disabled = true;
+    }
+
+    if (nextPageButton) {
+        nextPageButton.disabled = true;
+    }
+
+    setFeedMode(true);
+}
+
+async function loadForumFeed() {
+    if (!resultsList) {
+        return;
+    }
+
+    resultsList.innerHTML = `
+        <div class="empty-state">Loading forum transmissions...</div>
+    `;
+
+    if (resultsCount) {
+        resultsCount.textContent = "Loading forums...";
+    }
+
+    try {
+        const categories = await forumFetch("/api/categories");
+        categoryNameById.clear();
+
+        for (const category of categories) {
+            categoryNameById.set(category.id, category.name);
+        }
+
+        const groups = await Promise.all(
+            categories.map(async (category) => {
+                const payload = await forumFetch(
+                    `/api/posts/list?category_id=${category.id}&size=20&page=1`
+                );
+                return {
+                    category,
+                    posts: payload.posts || [],
+                };
+            })
+        );
+
+        const activeGroups = groups.filter((group) => group.posts.length > 0);
+        const totalPosts = activeGroups.reduce((sum, group) => sum + group.posts.length, 0);
+
+        renderForumFeed(activeGroups, totalPosts);
+        feedLoaded = true;
+        setMessage("Forum feed synced with the network.", "is-success");
+    } catch (error) {
+        resultsList.innerHTML = `
+            <div class="empty-state">
+                Could not load forums. ${forumEscapeHtml(error.message || "Try again later.")}
+            </div>
+        `;
+
+        if (resultsCount) {
+            resultsCount.textContent = "Feed unavailable";
+        }
+
+        setMessage(error.message || "Failed to load forum feed.", "is-error");
+    }
 }
 
 function buildResultCard(item, query, scope) {
@@ -87,34 +294,44 @@ function buildResultCard(item, query, scope) {
         <article class="result-card">
             <div class="result-meta">
                 <span class="result-type">${typeLabel}</span>
-                <span class="result-sector">${getCategoryLabel(item)}</span>
+                <span class="result-sector">${forumEscapeHtml(getCategoryLabel(item))}</span>
             </div>
-            <h3 class="result-title">${highlightMatch(title, query)}</h3>
-            <p class="result-body">${highlightMatch(body, query)}</p>
+            <h3 class="result-title">${highlightMatch(forumEscapeHtml(title), forumEscapeHtml(query))}</h3>
+            <p class="result-body">${highlightMatch(forumEscapeHtml(body), forumEscapeHtml(query))}</p>
             <div class="result-footer">
                 <div class="result-stats">
-                    <span>By ${getAuthorName(item)}</span>
+                    <span>By ${forumEscapeHtml(getAuthorName(item))}</span>
                     <span>${replyCount} replies</span>
                     <span>${viewCount} views</span>
-                    <span>${formatDate(item.created_at)}</span>
+                    <span>${formatDate(item.createdAt || item.created_at)}</span>
                 </div>
-                <a href="#" class="result-link">Open Transmission</a>
             </div>
         </article>
     `;
 }
 
 function updatePagination(page, hasMore) {
-    pageIndicator.textContent = `Page ${page}`;
-    prevPageButton.disabled = page <= 1 || isLoading;
-    nextPageButton.disabled = !hasMore || isLoading;
+    if (pageIndicator) {
+        pageIndicator.textContent = `Page ${page}`;
+    }
+
+    if (prevPageButton) {
+        prevPageButton.disabled = page <= 1 || isLoading;
+    }
+
+    if (nextPageButton) {
+        nextPageButton.disabled = !hasMore || isLoading;
+    }
 }
 
 function renderResults(payload, scope, query) {
     const items = scope === "comments" ? (payload.comments || []) : (payload.posts || []);
     const label = scope === "comments" ? "comments" : "posts";
 
-    resultsCount.textContent = `${payload.total ?? items.length} ${label}`;
+    if (resultsCount) {
+        resultsCount.textContent = `${payload.total ?? items.length} ${label}`;
+    }
+
     updatePagination(payload.page || currentPage, Boolean(payload.has_more));
 
     if (items.length === 0) {
@@ -141,7 +358,7 @@ function getSearchParams(pageOverride) {
 
     if (!q && !username && !categoryId && !from && !to) {
         return {
-            error: "At least one filter is required: q, username, category_id, from, or to."
+            error: "At least one filter is required: q, username, category_id, from, or to.",
         };
     }
 
@@ -187,38 +404,35 @@ async function executeSearch(pageOverride = 1) {
                 Add at least one valid filter before executing the search.
             </div>
         `;
-        resultsCount.textContent = "0 results";
+
+        if (resultsCount) {
+            resultsCount.textContent = "0 results";
+        }
+
         updatePagination(1, false);
         return;
     }
 
     currentPage = pageOverride;
     isLoading = true;
+    setFeedMode(false);
     updatePagination(currentPage, false);
     searchButton.disabled = true;
     setMessage("Scanning the network...", "is-success");
 
     try {
-        const response = await fetch(`/api/search?${request.params.toString()}`);
-        let payload = {};
-
-        try {
-            payload = await response.json();
-        } catch (error) {
-            payload = {};
-        }
-
-        if (!response.ok) {
-            const errorMessage = payload.error || payload.message || "Search failed.";
-            throw new Error(errorMessage);
-        }
+        const payload = await forumFetch(`/api/search?${request.params.toString()}`);
 
         lastHasMore = Boolean(payload.has_more);
         renderResults(payload, request.scope, request.query);
         setMessage(`Search completed on page ${payload.page || currentPage}.`, "is-success");
     } catch (error) {
         lastHasMore = false;
-        resultsCount.textContent = "0 results";
+
+        if (resultsCount) {
+            resultsCount.textContent = "0 results";
+        }
+
         updatePagination(currentPage, false);
         resultsList.innerHTML = `
             <div class="empty-state">
@@ -240,36 +454,36 @@ document.querySelectorAll("[data-query]").forEach((button) => {
     });
 });
 
-searchButton.addEventListener("click", () => executeSearch(1));
+searchButton?.addEventListener("click", () => executeSearch(1));
 
-searchInput.addEventListener("keydown", (event) => {
+searchInput?.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         executeSearch(1);
     }
 });
 
 [scopeFilter, usernameFilter, categoryFilter, fromFilter, toFilter, sizeFilter].forEach((element) => {
-    element.addEventListener("change", () => {
+    element?.addEventListener("change", () => {
         currentPage = 1;
         updatePagination(currentPage, false);
     });
 });
 
-prevPageButton.addEventListener("click", () => {
+prevPageButton?.addEventListener("click", () => {
     if (currentPage > 1 && !isLoading) {
         executeSearch(currentPage - 1);
     }
 });
 
-nextPageButton.addEventListener("click", () => {
+nextPageButton?.addEventListener("click", () => {
     if (lastHasMore && !isLoading) {
         executeSearch(currentPage + 1);
     }
 });
 
-resultsList.innerHTML = `
-    <div class="empty-state">
-        Ready for search. Fill one or more filters, then execute the scan.
-    </div>
-`;
+document.getElementById("showFeedButton")?.addEventListener("click", () => {
+    loadForumFeed();
+});
+
+loadForumFeed();
 updatePagination(1, false);

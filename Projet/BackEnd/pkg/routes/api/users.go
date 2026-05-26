@@ -140,6 +140,18 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
 
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		routes.JsonError(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	auth.ClearTokenCookie(w)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+}
+
 type connexionServiceResponse struct {
 	Git    *string `json:"git"`
 	Google *string `json:"google"`

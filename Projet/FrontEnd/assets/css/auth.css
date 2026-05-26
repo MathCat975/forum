@@ -408,3 +408,29 @@
     color: var(--text);
     background: rgba(255, 255, 255, 0.04);
 }
+
+.auth-message {
+    margin: 0 2rem 1rem;
+    padding: 0.75rem 0.9rem;
+    border-left: 2px solid rgba(61, 108, 224, 0.7);
+    background: rgba(61, 108, 224, 0.08);
+    color: rgba(232, 232, 232, 0.88);
+    font-size: 0.84rem;
+    line-height: 1.5;
+}
+
+.auth-message[hidden] {
+    display: none;
+}
+
+.auth-message--error {
+    border-left-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.08);
+    color: #ffb4b4;
+}
+
+.auth-message--success {
+    border-left-color: #7dff9a;
+    background: rgba(125, 255, 154, 0.08);
+    color: #c8ffd6;
+}

@@ -29,10 +29,10 @@
         </form>
 
         <nav class="protocol-actions" aria-label="Account">
-            <a href="/assets/templateslogin" aria-label="Notifications">
+            <a href="/front/login" aria-label="Notifications">
                 <img src="/assets/img/header/notif.png" alt="">
             </a>
-            <a href="/assets/templateslogin.html" aria-label="Messages">
+            <a href="/front/login" aria-label="Messages">
                 <img src="/assets/img/header/message.png" alt="">
             </a>
             <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
@@ -48,7 +48,9 @@
             </header>
 
             <div class="auth-body">
-                <form class="auth-form">
+                <p id="authMessage" class="auth-message" role="alert" hidden></p>
+
+                <form id="register-form" class="auth-form">
                     <div class="field">
                         <label class="sr-only" for="username">Username</label>
                         <input id="username" name="username" type="text" placeholder="Username" autocomplete="username" required>
@@ -101,6 +103,7 @@
         </section>
     </main>
 
-    <script src="/assets/js/chrome.js" defer></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
 </body>
 </html>

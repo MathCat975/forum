@@ -501,6 +501,62 @@ main {
     border-radius: var(--radius-sm);
 }
 
+.profile-message {
+    position: fixed;
+    top: 5.5rem;
+    right: 1.5rem;
+    z-index: 10000;
+    max-width: min(360px, calc(100vw - 2rem));
+    padding: 0.85rem 1rem;
+    border-left: 2px solid #ff6b6b;
+    background: rgba(20, 20, 20, 0.96);
+    color: #ffb4b4;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    box-shadow: var(--shadow);
+}
+
+.profile-message[hidden] {
+    display: none;
+}
+
+.account-sign-out {
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-sign-out {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 107, 107, 0.45);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 107, 107, 0.08);
+    color: #ffb4b4;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.btn-sign-out:hover {
+    border-color: rgba(255, 107, 107, 0.75);
+    background: rgba(255, 107, 107, 0.16);
+    color: #ffd4d4;
+}
+
+.btn-sign-out:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-sign-out[hidden] {
+    display: none;
+}
+
 .btnRemove {
     background: var(--primary);
     color: white;

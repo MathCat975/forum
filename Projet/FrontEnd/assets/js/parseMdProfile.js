@@ -1,5 +1,6 @@
 let currentUserProfile = null;
 let currentEditField = null;
+let viewingOwnProfile = false;
 
 const devMode = false;
 const profil = {
@@ -17,7 +18,13 @@ const profil = {
     google: "",
     email: "",
   },
-  lastPosts: {}
+  connexionType: {
+    git: false,
+    google: false,
+    email: false,
+    none: true,
+  },
+  lastPosts: [],
 };
 
 // Get data
@@ -48,6 +55,8 @@ async function getProfil() {
 
     // Get profile (with stats)
     const targetUsername = getUsernameFromURL() || me.username;
+    viewingOwnProfile = targetUsername === me.username;
+    updateSignOutVisibility();
     const profileRes = await fetch("/api/user/profile?username=" + encodeURIComponent(targetUsername), {
       method: "GET",
       credentials: "include"
@@ -59,35 +68,35 @@ async function getProfil() {
     }
 
     const data = await profileRes.json();
+    const profileSource = viewingOwnProfile ? { ...data, ...me } : data;
 
-    profil.username = data.username;
-    profil.avatar_url = data.avatar_url || "/assets/img/profile/profil2.png";
-    profil.role = data.role || "User";
-    profil.id = data.id;
-    profil.created_at = data.created_at;
+    profil.username = profileSource.username;
+    profil.avatar_url = profileSource.avatar_url || "/assets/img/profile/profil2.png";
+    profil.role = profileSource.role || "User";
+    profil.id = profileSource.id;
+    profil.created_at = profileSource.created_at;
     profil.online = true;
     profil.lastConnexion = "Online";
-    profil.post_count = data.post_count || 0;
-    profil.comment_count = data.comment_count || 0;
-    profil.like_count = data.like_count || 0;
-    profil.dislike_count = data.dislike_count || 0;
+    profil.post_count = profileSource.post_count || 0;
+    profil.comment_count = profileSource.comment_count || 0;
+    profil.like_count = profileSource.like_count || 0;
+    profil.dislike_count = profileSource.dislike_count || 0;
 
-    if (data.oauth_providers && data.oauth_providers.includes("github")) {
-      profil.connexionType.none = false;
-      profil.connexionType.git = true;
-      profil.connexionService.git = data.email;
-    } else if (data.email) {
-      profil.connexionType.none = false;
-      profil.connexionType.email = true;
-      profil.connexionService.email = data.email;
-    } else {
-      profil.connexionType.none = true;
-      profil.connexionType.git = false;
-      profil.connexionType.email = false;
-      profil.connexionService = { git: "", email: "", none: "" };
-    }
+    const connexion = profileSource.connexionService || {};
+    profil.connexionService = {
+      git: connexion.git || "",
+      google: connexion.google || "",
+      email: connexion.email || "",
+    };
+    profil.connexionType.git = Boolean(profil.connexionService.git);
+    profil.connexionType.google = Boolean(profil.connexionService.google);
+    profil.connexionType.email = Boolean(profil.connexionService.email);
+    profil.connexionType.none =
+      !profil.connexionType.git &&
+      !profil.connexionType.google &&
+      !profil.connexionType.email;
 
-    profil.lastPosts = data.last_posts || {};
+    profil.lastPosts = Array.isArray(profileSource.lastPosts) ? profileSource.lastPosts : [];
 
     printInfos(profil);
     printLastPosts();
@@ -97,28 +106,134 @@ async function getProfil() {
   }
 }
 
-// Disconnect
-
-const disconnect = (type) => {
-  if (type === "Git") {
-    profil.connexionType.git = false;
-    profil.connexionService.git = "";
-  } else if (type === "Google") {
-    profil.connexionType.email = false;
-    profil.connexionService.email = "";
+function updateSignOutVisibility() {
+  const signOutBtn = document.getElementById("signOutBtn");
+  if (!signOutBtn) {
+    return;
   }
 
-  if (!profil.connexionType.git && !profil.connexionType.email) {
-    profil.connexionType.none = true;
+  signOutBtn.hidden = !viewingOwnProfile;
+}
+
+async function isSessionActive() {
+  try {
+    const response = await fetch("/api/user/me", {
+      method: "GET",
+      credentials: "include",
+      cache: "no-store",
+    });
+    return response.ok;
+  } catch {
+    return true;
+  }
+}
+
+function clearLocalSession() {
+  localStorage.removeItem("username");
+  localStorage.removeItem("profilePhoto");
+}
+
+function finishSignOut() {
+  clearLocalSession();
+  window.location.replace("/front/login");
+}
+
+function postLogoutViaForm() {
+  return new Promise((resolve) => {
+    const logoutForm = document.getElementById("logout-form");
+    if (!logoutForm) {
+      resolve(false);
+      return;
+    }
+
+    logoutForm.action = `${window.location.origin}/api/logout`;
+
+    const iframe = document.createElement("iframe");
+    iframe.name = "logout-frame";
+    iframe.hidden = true;
+    iframe.setAttribute("aria-hidden", "true");
+    document.body.appendChild(iframe);
+
+    const previousTarget = logoutForm.target;
+    logoutForm.target = "logout-frame";
+
+    const cleanup = () => {
+      logoutForm.target = previousTarget;
+      iframe.remove();
+      resolve(true);
+    };
+
+    iframe.addEventListener("load", () => setTimeout(cleanup, 150), { once: true });
+    logoutForm.requestSubmit();
+    setTimeout(cleanup, 1500);
+  });
+}
+
+async function requestLogout() {
+  try {
+    const payload = await forumFetch("/api/logout", {
+      method: "POST",
+      body: "{}",
+    });
+
+    if (payload?.status === "ok") {
+      return true;
+    }
+  } catch (error) {
+    console.warn("Logout API request failed:", error);
   }
 
-  printInfos(profil);
+  await postLogoutViaForm();
+  return true;
+}
 
-  if (currentEditField === 'connexionService') {
-    closeEditFieldModal();
-    setTimeout(() => {
-      openEditFieldModal('connexionService');
-    }, 10);
+async function signOutAccount() {
+  const signOutBtn = document.getElementById("signOutBtn");
+  if (!signOutBtn || signOutBtn.disabled) {
+    return;
+  }
+
+  signOutBtn.disabled = true;
+
+  try {
+    await requestLogout();
+
+    if (!(await isSessionActive())) {
+      finishSignOut();
+      return;
+    }
+
+    signOutBtn.disabled = false;
+    await displayAlertMessage(
+      "Could not end your session. Use the same address as the forum (for example http://localhost:8080) and restart the server if needed."
+    );
+  } catch (error) {
+    signOutBtn.disabled = false;
+    await displayAlertMessage(error.message || "Sign out failed. Try again.");
+  }
+}
+
+// Disconnect OAuth provider
+
+const disconnect = async (type) => {
+  const provider = type === "Git" ? "github" : "google";
+
+  try {
+    await forumFetch("/api/user/oauth", {
+      method: "DELETE",
+      body: JSON.stringify({ provider }),
+    });
+    await displayAlertMessage("Connection removed.", true);
+    await getProfil();
+
+    if (currentEditField === "connexionService") {
+      closeEditFieldModal();
+      setTimeout(() => {
+        openEditFieldModal("connexionService");
+      }, 10);
+    }
+  } catch (error) {
+    await displayAlertMessage(error.message || "Failed to remove connection.");
   }
 };
 
@@ -129,26 +244,29 @@ const postContentDom = document.getElementById("postContent");
 function printLastPosts() {
   postContentDom.innerHTML = "";
 
-  if (!profil.lastPosts || Object.keys(profil.lastPosts).length === 0) {
+  if (!Array.isArray(profil.lastPosts) || profil.lastPosts.length === 0) {
     postContentDom.innerHTML = "<p>No recent posts.</p>";
     return;
   }
 
-  for (let [key, value] of Object.entries(profil.lastPosts)) {
-    let div = document.createElement("div");
+  for (const post of profil.lastPosts) {
+    const div = document.createElement("div");
     div.className = "cardPost";
-    div.id = key;
+    div.id = `post-${post.id}`;
 
-    let contentText = value.content || "";
+    let contentText = post.message || post.content || "";
     if (contentText.length > 100) {
-      contentText = contentText.substring(0, 100) + "...";
+      contentText = `${contentText.substring(0, 100)}...`;
     }
 
+    const createdAt = post.createdAt || post.created_at;
+    const postDate = createdAt ? new Date(createdAt).toLocaleDateString() : "";
+
     div.innerHTML = `
-      <h4>${value.title}</h4>
+      <h4>${post.title || "Untitled post"}</h4>
       <p>${contentText}</p>
-      <span class="postDate">${new Date(value.date).toLocaleDateString()}</span>
-      <button class="viewPostButton">See post</button>
+      <span class="postDate">${postDate}</span>
+      <button class="viewPostButton" type="button">See post</button>
     `;
     postContentDom.appendChild(div);
   }
@@ -204,7 +322,10 @@ function printInfos(profile) {
   const infosNameDom = document.getElementById("infosNameEmail");
   if (profile.connexionType.git) {
     serviceDom.textContent = profile.connexionService.git || "Connected via GitHub";
-    infosNameDom.textContent = "Git Account";
+    infosNameDom.textContent = "GitHub";
+  } else if (profile.connexionType.google) {
+    serviceDom.textContent = profile.connexionService.google || "Connected via Google";
+    infosNameDom.textContent = "Google";
   } else if (profile.connexionType.email) {
     serviceDom.textContent = profile.connexionService.email;
     infosNameDom.textContent = "Email";
@@ -309,7 +430,7 @@ function openEditFieldModal(fieldType) {
     }
 
     // Google
-    if (!profil.connexionType.email) {
+    if (!profil.connexionType.google) {
       btnDisconnectGoogle.style.display = "none";
     } else {
       btnEmail.style.borderColor = "var(--primary)";
@@ -499,6 +620,8 @@ function applySavedData() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("signOutBtn")?.addEventListener("click", signOutAccount);
+
   applySavedData();
 
   const bannerImg = document.getElementById("banner");
