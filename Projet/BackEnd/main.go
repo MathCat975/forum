@@ -103,6 +103,9 @@ func main() {
 	http.HandleFunc("/front/post", func(w http.ResponseWriter, r *http.Request) {
 		front.PageHandler(w, r, "post")
 	})
+	http.HandleFunc("/front/create-post", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "create-post")
+	})
 
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

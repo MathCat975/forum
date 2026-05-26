@@ -3,9 +3,21 @@ let currentEditField = null;
 let viewingOwnProfile = false;
 
 const devMode = false;
+const DEFAULT_AVATAR_URL = "/assets/img/profile/profil2.png";
+
+function normalizeAvatarUrl(avatarUrl) {
+  if (!avatarUrl) {
+    const saved = localStorage.getItem("profilePhoto");
+    return saved || DEFAULT_AVATAR_URL;
+  }
+  if (avatarUrl === "default.png") return DEFAULT_AVATAR_URL;
+  if (avatarUrl.startsWith("blob:")) return avatarUrl;
+  return avatarUrl;
+}
+
 const profil = {
   username: localStorage.getItem("username") || "TestUser",
-  avatar_url: localStorage.getItem("profilePhoto") || "/assets/img/profile/profil2.png",
+  avatar_url: normalizeAvatarUrl(localStorage.getItem("profilePhoto") || DEFAULT_AVATAR_URL),
   role: "User",
   created_at: "",
   online: true,
@@ -21,7 +33,19 @@ const profil = {
   lastPosts: [],
 };
 
-// Get data
+function updateSignOutVisibility() {
+  const signOutBtn = document.getElementById("signOutBtn");
+  const container = document.querySelector(".account-sign-out");
+
+  const shouldShow = viewingOwnProfile === true;
+
+  if (signOutBtn) {
+    signOutBtn.hidden = !shouldShow;
+  }
+  if (container) {
+    container.hidden = !shouldShow;
+  }
+}
 
 function getUsernameFromURL() {
   let params = new URLSearchParams(window.location.search);
@@ -30,15 +54,15 @@ function getUsernameFromURL() {
 
 async function getProfil() {
   try {
-    // Get self info
     const result = await fetch("/api/user/me", {
       method: "GET",
-      credentials: "include"
+      credentials: "include",
+      cache: "no-store",
     });
 
     if (!result.ok) {
       if (result.status === 401) {
-        //window.location.href = "/front/login";
+        window.location.href = "/front/login";
         return;
       }
       console.error("Failed to fetch self:", result.status);
@@ -47,13 +71,13 @@ async function getProfil() {
 
     const me = await result.json();
 
-    // Get profile (with stats)
     const targetUsername = getUsernameFromURL() || me.username;
     viewingOwnProfile = targetUsername === me.username;
     updateSignOutVisibility();
     const profileRes = await fetch("/api/user/profile?username=" + encodeURIComponent(targetUsername), {
       method: "GET",
-      credentials: "include"
+      credentials: "include",
+      cache: "no-store",
     });
 
     if (!profileRes.ok) {
@@ -65,7 +89,7 @@ async function getProfil() {
     const profileSource = viewingOwnProfile ? { ...data, ...me } : data;
 
     profil.username = profileSource.username;
-    profil.avatar_url = profileSource.avatar_url || "/assets/img/profile/profil2.png";
+    profil.avatar_url = normalizeAvatarUrl(profileSource.avatar_url);
     profil.role = profileSource.role || "User";
     profil.id = profileSource.id;
     profil.created_at = profileSource.created_at;
@@ -93,13 +117,6 @@ async function getProfil() {
   }
 }
 
-function updateSignOutVisibility() {
-  const signOutBtn = document.getElementById("signOutBtn");
-  if (signOutBtn) {
-    signOutBtn.hidden = !viewingOwnProfile;
-  }
-}
-
 async function isSessionActive() {
   try {
     const response = await fetch("/api/user/me", {
@@ -109,7 +126,7 @@ async function isSessionActive() {
     });
     return response.ok;
   } catch {
-    return true;
+    return false;
   }
 }
 
@@ -189,16 +206,14 @@ async function signOutAccount() {
     }
 
     signOutBtn.disabled = false;
-    await displayAlertMessage(
+    alert(
       "Could not end your session. Use the same address as the forum (for example http://localhost:8080) and restart the server if needed."
     );
   } catch (error) {
     signOutBtn.disabled = false;
-    await displayAlertMessage(error.message || "Sign out failed. Try again.");
+    alert(error.message || "Sign out failed. Try again.");
   }
 }
-
-// Disconnect OAuth provider
 
 const disconnect = async (type) => {
   const provider = type === "Git" ? "github" : "google";
@@ -208,7 +223,7 @@ const disconnect = async (type) => {
       method: "DELETE",
       body: JSON.stringify({ provider }),
     });
-    await displayAlertMessage("Connection removed.", true);
+    alert("Connection removed.");
     await getProfil();
 
     if (currentEditField === "connexionService") {
@@ -218,11 +233,9 @@ const disconnect = async (type) => {
       }, 10);
     }
   } catch (error) {
-    await displayAlertMessage(error.message || "Failed to remove connection.");
+    alert(error.message || "Failed to remove connection.");
   }
 };
-
-// Posts
 
 const postContentDom = document.getElementById("postContent");
 
@@ -261,20 +274,16 @@ function printLastPosts() {
   }
 }
 
-// Display info
-
 function printInfos(profile) {
   if (!profile) {
     return;
   }
 
-  // Username
   const pseudoDom = document.getElementById("pseudoProfil");
   if (pseudoDom) {
     pseudoDom.textContent = profile.username;
   }
 
-  // Avatar
   const photoDom = document.getElementById("profilPhoto");
   if (photoDom) {
     photoDom.src = profile.avatar_url;
@@ -283,7 +292,6 @@ function printInfos(profile) {
     localStorage.setItem("profilePhoto", profile.avatar_url);
   }
 
-  // Online Offline
   const onlineBall = document.getElementById("isOnlineBall");
   const onlineText = document.getElementById("isOnline");
   if (profile.online === 1 || profile.online === true) {
@@ -304,25 +312,21 @@ function printInfos(profile) {
     }
   }
 
-  // Last visit
   const lastVisitDom = document.getElementById("lastVisit");
   if (lastVisitDom) {
     lastVisitDom.textContent = profile.lastConnexion;
   }
 
-  // Role
   const roleDom = document.getElementById("userRole");
   if (roleDom) {
     roleDom.textContent = profile.role || "User";
   }
 
-  // Create date
   const creationDateDom = document.getElementById("creationDate");
   if (creationDateDom && profile.created_at) {
     creationDateDom.textContent = new Date(profile.created_at).toLocaleDateString();
   }
 
-  // Connect service
   const serviceDom = document.getElementById("connexionService");
   const infosNameDom = document.getElementById("infosNameEmail");
   if (profile.connexionService.git !== "") {
@@ -355,7 +359,6 @@ function printInfos(profile) {
     }
   }
 
-  // Stats
   const stats = {
     statsPosts: profile.post_count,
     statsComments: profile.comment_count,
@@ -369,8 +372,6 @@ function printInfos(profile) {
     }
   }
 }
-
-// Modal
 
 function openEditFieldModal(fieldType) {
   currentEditField = fieldType;
@@ -410,7 +411,6 @@ function openEditFieldModal(fieldType) {
     let divBtnConnexion = document.createElement("div");
     divBtnConnexion.id = "divBtnConnexion";
 
-    // Git
     let btnGitDiv = document.createElement("div");
     btnGitDiv.id = "btnGitDiv";
 
@@ -431,7 +431,6 @@ function openEditFieldModal(fieldType) {
     });
     btnGitDiv.appendChild(btnDisconnectGit);
 
-    // Google
     let btnEmailDiv = document.createElement("div");
     btnEmailDiv.id = "btnEmailDiv";
 
@@ -456,7 +455,6 @@ function openEditFieldModal(fieldType) {
     divBtnConnexion.appendChild(btnEmailDiv);
     container?.appendChild(divBtnConnexion);
 
-    // Git
     if (profil.connexionService.git === "") {
       btnDisconnectGit.style.display = "none";
     } else {
@@ -466,7 +464,6 @@ function openEditFieldModal(fieldType) {
       btnDisconnectGit.style.display = "block";
     }
 
-    // Google
     if (profil.connexionService.google === "") {
       btnDisconnectGoogle.style.display = "none";
     } else {
@@ -505,28 +502,6 @@ function closeEditFieldModal() {
   currentEditField = null;
 }
 
-// Save
-
-async function displayAlertMessage(text, isSuccess = false) {
-  const messageDom = document.getElementById("message");
-  if (!messageDom) {
-    alert(text);
-    return;
-  }
-  messageDom.textContent = text;
-  messageDom.style.display = "block";
-  if (isSuccess) {
-    messageDom.style.backgroundColor = "rgb(122, 216, 122)";
-  } else {
-    messageDom.style.backgroundColor = "transparent";
-  }
-
-  await new Promise(resolve => {
-    setTimeout(resolve, 2000);
-  });
-  messageDom.style.display = "none";
-}
-
 async function saveEditField() {
   if (!currentEditField) {
     return;
@@ -535,7 +510,7 @@ async function saveEditField() {
   let value = document.getElementById("editFieldInput")?.value.trim();
 
   if (!value && currentEditField === 'username') {
-    await displayAlertMessage("Please enter a value!");
+    alert("Please enter a value!");
     return;
   }
 
@@ -558,20 +533,18 @@ async function saveEditField() {
       if (response.ok) {
         profil.username = value;
         localStorage.setItem("username", value);
-        await displayAlertMessage(data.message || "Profile updated!", true);
+        alert(data.message || "Profile updated!");
         printInfos(profil);
         closeEditFieldModal();
       } else {
-        await displayAlertMessage(data.error || "Error during update. Please try again.");
+        alert(data.error || "Error during update. Please try again.");
       }
     } catch (error) {
       console.error(error);
-      await displayAlertMessage("Error during update. Please try again.");
+      alert("Error during update. Please try again.");
     }
   }
 }
-
-// Edit banner
 
 document.getElementById("editPhotoInput")?.addEventListener('change', async (e) => {
   const file = e.target.files[0];
@@ -599,10 +572,50 @@ document.getElementById("editPhotoInput")?.addEventListener('change', async (e) 
       localStorage.setItem("profilePhoto", result.url);
       profil.avatar_url = result.url;
       printInfos(profil);
+
+      try {
+        const updateResp = await fetch("/api/user", {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ avatar_url: result.url }),
+        });
+
+        const updateData = await updateResp.json().catch(() => null);
+        if (!updateResp.ok) {
+          const errMsg =
+            updateData?.error || updateData?.message || `Unknown error (${updateResp.status})`;
+          throw new Error(`Save avatar failed (${updateResp.status}): ${errMsg}`);
+        }
+
+        if (updateData?.avatar_url) {
+          profil.avatar_url = updateData.avatar_url;
+          localStorage.setItem("profilePhoto", updateData.avatar_url);
+          printInfos(profil);
+        }
+
+        alert("Profile photo updated.");
+        try {
+          const verifyResp = await fetch("/api/user/me", {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+          });
+          if (verifyResp.ok) {
+            const me = await verifyResp.json();
+            if (me?.avatar_url && me.avatar_url !== result.url) {
+              alert(`DB avatar_url differs. Expected: ${result.url} - Got: ${me.avatar_url}`);
+            }
+          }
+        } catch {
+        }
+      } catch (saveErr) {
+        alert(saveErr.message || "Could not save profile photo to database.");
+      }
     }
   } catch (error) {
     console.error("Upload error:", error);
-    await displayAlertMessage("Error during upload");
+    alert("Error during upload");
   }
 });
 
@@ -616,8 +629,6 @@ document.getElementById("editUserBtn")?.addEventListener("click", () => {
 document.getElementById("editConnexionServiceBtn")?.addEventListener("click", () => {
   openEditFieldModal('connexionService');
 });
-
-// Event listener
 
 document.getElementById("cancelEditField")?.addEventListener("click", closeEditFieldModal);
 document.getElementById("editFieldModalOverlay")?.addEventListener("click", closeEditFieldModal);
@@ -638,8 +649,6 @@ document.getElementById("editFieldInput")?.addEventListener("keydown", (e) => {
   }
 });
 
-// Random banner
-
 const banners = [
   "/assets/img/profile/banner2.png",
   "/assets/img/profile/banner3.png",
@@ -659,8 +668,8 @@ function applySavedData() {
   if (savedUsername) {
     profil.username = savedUsername;
   }
-  if (savedProfilePhoto && !savedProfilePhoto.startsWith('blob:')) {
-    profil.avatar_url = savedProfilePhoto;
+  if (savedProfilePhoto) {
+    profil.avatar_url = normalizeAvatarUrl(savedProfilePhoto);
   }
   printInfos(profil);
 }
