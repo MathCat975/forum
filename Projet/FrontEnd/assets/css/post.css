@@ -599,8 +599,14 @@
 }
 
 .composer-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 38px;
     padding: 0 1.1rem;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .composer-button--ghost {
