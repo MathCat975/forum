@@ -8,6 +8,7 @@ import (
 	"main/pkg/structs"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -34,8 +35,31 @@ type voteRequest struct {
 
 type postResponse struct {
 	structs.Post
-	Likes    int64 `json:"likes"`
-	Dislikes int64 `json:"dislikes"`
+	Likes    int64  `json:"likes"`
+	Dislikes int64  `json:"dislikes"`
+	Username string `json:"username"`
+}
+
+type commentResponse struct {
+	ID        uint      `json:"id"`
+	AuthorId  uint      `json:"author_id"`
+	PostId    uint      `json:"post_id"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
+	Username  string    `json:"username"`
+}
+
+type postDetailResponse struct {
+	ID         uint              `json:"id"`
+	AuthorId   uint              `json:"author_id"`
+	CategoryId uint              `json:"category_id"`
+	Message    string            `json:"message"`
+	Title      string            `json:"title"`
+	CreatedAt  time.Time         `json:"created_at"`
+	Comments   []commentResponse `json:"comments"`
+	Likes      int64             `json:"likes"`
+	Dislikes   int64             `json:"dislikes"`
+	Username   string            `json:"username"`
 }
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +111,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	_ = json.NewEncoder(w).Encode(map[string]any{"status": "ok", "id": post.ID})
 }
 
 func GetPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -113,13 +137,45 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 		routes.JsonError(w, "failed to load comments", http.StatusInternalServerError)
 		return
 	}
-	post.Comments = comments
-
 	likes, _ := db.GetDB().Table("postvotes").Where("post_id = ?", id).Where("value = ?", 1).Count()
 	dislikes, _ := db.GetDB().Table("postvotes").Where("post_id = ?", id).Where("value = ?", -1).Count()
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(postResponse{Post: post, Likes: likes, Dislikes: dislikes})
+	username := ""
+	if author, err := db.GetDB().GetUserByID(post.AuthorId); err == nil {
+		username = author.Username
+	}
+
+	enrichedComments := make([]commentResponse, 0, len(comments))
+	for _, comment := range comments {
+		if strings.TrimSpace(comment.Message) == "" {
+			continue
+		}
+		item := commentResponse{
+			ID:        comment.ID,
+			AuthorId:  comment.AuthorId,
+			PostId:    comment.PostId,
+			Message:   comment.Message,
+			CreatedAt: comment.CreatedAt,
+		}
+		if author, err := db.GetDB().GetUserByID(comment.AuthorId); err == nil {
+			item.Username = author.Username
+		}
+		enrichedComments = append(enrichedComments, item)
+	}
+
+	_ = json.NewEncoder(w).Encode(postDetailResponse{
+		ID:         post.ID,
+		AuthorId:   post.AuthorId,
+		CategoryId: post.CategoryId,
+		Message:    post.Message,
+		Title:      post.Title,
+		CreatedAt:  post.CreatedAt,
+		Comments:   enrichedComments,
+		Likes:      likes,
+		Dislikes:   dislikes,
+		Username:   username,
+	})
 }
 
 func EditPostHandler(w http.ResponseWriter, r *http.Request) {

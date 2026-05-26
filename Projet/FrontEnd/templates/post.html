@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum | Post</title>
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/post.css">
+</head>
+<body>
+    <header class="protocol-topbar" aria-label="Site header">
+        <a class="protocol-brand" href="/front/index" aria-label="Forum home">
+            <span class="brand-node" aria-hidden="true">></span>
+            <span>meow</span>
+        </a>
+
+        <nav class="protocol-tabs" aria-label="Sections">
+            <a href="/front/index" aria-current="page">Forums</a>
+            <a href="/front/register">Upgrades</a>
+        </nav>
+
+        <form class="protocol-search" role="search">
+            <label class="sr-only" for="global-search">Search for posts</label>
+            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
+        </form>
+
+        <nav class="protocol-actions" aria-label="Account">
+            <a href="/front/login" aria-label="Notifications">
+                <img src="/assets/img/header/notif.png" alt="">
+            </a>
+            <a href="/front/login" aria-label="Messages">
+                <img src="/assets/img/header/message.png" alt="">
+            </a>
+            <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
+        </nav>
+    </header>
+
+    <main class="protocol-shell post-shell">
+        <aside class="directory-panel" aria-label="Directory">
+            <div class="directory-head">
+                <span class="terminal-icon" aria-hidden="true">></span>
+                <div>
+                    <strong>Directory</strong>
+                    <small>Protocol v4.2.0</small>
+                </div>
+            </div>
+
+            <nav class="directory-nav" aria-label="Forum navigation">
+                <a href="/front/index"><span>::</span>Main Feed</a>
+            </nav>
+
+            <a class="init-thread" href="/front/create-post">Create post</a>
+
+            <nav class="directory-footer" aria-label="Account links">
+                <a href="/front/profile"><span>+</span>Profile</a>
+            </nav>
+        </aside>
+
+        <section class="operations post-operations" aria-label="Post thread">
+            <div class="thread-wrap">
+                <section class="thread-header" aria-label="Thread title">
+                    <h1>forum1</h1>
+                    <div class="thread-stats" aria-label="Thread statistics">
+                        <span>2 hours ago</span>
+                        <span>14 replies</span>
+                        <span>1.2k views</span>
+                    </div>
+                </section>
+
+                <article
+                    class="thread-card thread-card--primary"
+                    data-reply-author="null_vector"
+                    data-reply-label="Original post"
+                    data-reply-message="I've been monitoring the uplink traffic from the new v9 Neural-Link implants. There's a consistent packet leakage occurring during the REM sleep synchronization phase."
+                >
+                    <aside class="thread-author" aria-label="Original author">
+                        <div class="avatar-frame avatar-frame--blue">
+                            <div class="avatar-core" aria-hidden="true"></div>
+                        </div>
+                        <strong>null_vector</strong>
+                        <dl class="author-meta">
+                            <div>
+                                <dt>Joined</dt>
+                                <dd>Jan 2033</dd>
+                            </div>
+                            <div>
+                                <dt>Posts</dt>
+                                <dd>15</dd>
+                            </div>
+                        </dl>
+                    </aside>
+
+                    <div class="thread-copy">
+                        <p>I&apos;ve been monitoring the uplink traffic from the new v9 Neural-Link implants. There&apos;s a consistent packet leakage occurring during the REM sleep synchronization phase. It seems like the encryption handshake fails for approximately 4ms every cycle, leaving the visual cortex data buffer exposed.</p>
+                        <p>If someone were to time a packet injection during this window, they could potentially overlay subconscious commands or worse, extract direct visual feed data in raw hex format.</p>
+
+                        <div class="signal-block" role="note" aria-label="Code sample">
+                            <p>// vulnerable sequence detected in v9-alpha</p>
+                            <p>0x4F 0x2A [buffer_sync] 0x00 -- leak here</p>
+                            <p>exit 0x1A [ENCRYPT_RESTART]</p>
+                        </div>
+
+                        <p>Anyone else seeing this on their local nodes? This feels like a deliberate backdoor rather than a bug.</p>
+
+                        <div class="thread-actions" aria-label="Post actions">
+                            <button type="button">Upvote (42)</button>
+                            <button type="button" class="thread-reply-trigger">Reply</button>
+                        </div>
+                    </div>
+                </article>
+
+                <template id="reply-template">
+                    <article class="thread-card thread-card--reply">
+                        <aside class="thread-author thread-author--compact" aria-label="Reply author">
+                            <div class="avatar-frame avatar-frame--ghost">
+                                <div class="avatar-core avatar-core--ghost" aria-hidden="true"></div>
+                            </div>
+                            <strong></strong>
+                            <dl class="author-meta author-meta--compact">
+                                <div>
+                                    <dt>Posts</dt>
+                                    <dd></dd>
+                                </div>
+                            </dl>
+                        </aside>
+
+                        <div class="thread-copy">
+                            <p class="reply-quote"></p>
+                            <p></p>
+                            <div class="reply-meta">
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="thread-actions" aria-label="Reply actions">
+                                <button type="button" class="thread-reply-trigger">Reply</button>
+                            </div>
+                        </div>
+                    </article>
+                </template>
+
+                <form id="reply-form" class="composer-panel" aria-labelledby="create-post-title">
+                    <div class="composer-head">
+                        <h2 id="create-post-title">Create post</h2>
+                    </div>
+
+                    <div id="reply-indicator" class="reply-indicator" hidden>
+                        <div class="reply-indicator__copy">
+                            <span class="reply-indicator__eyebrow">Replying to</span>
+                            <strong id="reply-target-meta"></strong>
+                            <p id="reply-target-message"></p>
+                        </div>
+                        <button type="button" id="clear-reply-target" class="reply-indicator__clear">Clear</button>
+                    </div>
+
+                    <label class="sr-only" for="reply-box">Write your reply</label>
+                    <div class="composer-toolbar" aria-label="Formatting tools">
+                        <button type="button" class="composer-tool" data-action="bold" aria-label="Bold"><strong>B</strong></button>
+                        <button type="button" class="composer-tool" data-action="italic" aria-label="Italic"><em>I</em></button>
+                        <button type="button" class="composer-tool" data-action="heading1" aria-label="Heading 1">H1</button>
+                        <button type="button" class="composer-tool" data-action="heading2" aria-label="Heading 2">H2</button>
+                        <button type="button" class="composer-tool" data-action="quote" aria-label="Quote">"</button>
+                        <button type="button" class="composer-tool" data-action="list" aria-label="List">#-</button>
+                        <button type="button" class="composer-tool" data-action="align-left" aria-label="Align left">L</button>
+                        <button type="button" class="composer-tool" data-action="align-center" aria-label="Align center">C</button>
+                        <button type="button" class="composer-tool" data-action="align-right" aria-label="Align right">R</button>
+                    </div>
+                    <div class="composer-editor-shell">
+                        <div
+                            id="reply-preview"
+                            class="composer-preview"
+                            aria-hidden="true"
+                            data-placeholder="Type your encrypted response here..."
+                        ></div>
+                        <textarea
+                            id="reply-box"
+                            class="composer-input"
+                            name="reply"
+                            rows="7"
+                            placeholder="Type your encrypted response here..."
+                            spellcheck="true"
+                        ></textarea>
+                    </div>
+
+                    <div class="composer-actions">
+                        <div class="composer-buttons">
+                            <button type="button" class="composer-button composer-button--ghost">Preview</button>
+                            <button type="submit" class="composer-button composer-button--primary">Post reply</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="protocol-footer">
+        <strong>meow</strong>
+        <nav aria-label="Footer">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">API</a>
+            <a href="#">Donations</a>
+        </nav>
+    </footer>
+    <script src="../assets/js/postComposer.js"></script>
+    <script src="../assets/js/threadView.js"></script>
+</body>
+</html>

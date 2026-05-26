@@ -114,8 +114,35 @@ func (d *DB) Create(table string, src any) error {
 	}
 	placeholders := strings.TrimSuffix(strings.Repeat("?, ", len(cols)), ", ")
 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", table, strings.Join(cols, ", "), placeholders)
-	_, err := d.conn.Exec(query, vals...)
-	return err
+	res, err := d.conn.Exec(query, vals...)
+	if err != nil {
+		return err
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return nil
+	}
+
+	v := reflect.ValueOf(src)
+	if v.Kind() != reflect.Ptr || v.IsNil() {
+		return nil
+	}
+	v = v.Elem()
+	if v.Kind() != reflect.Struct {
+		return nil
+	}
+
+	f := v.FieldByName("ID")
+	if !f.IsValid() || !f.CanSet() {
+		return nil
+	}
+	if f.Kind() == reflect.Uint || f.Kind() == reflect.Uint64 || f.Kind() == reflect.Uint32 {
+		if id > 0 {
+			f.SetUint(uint64(id))
+		}
+	}
+	return nil
 }
 
 func (d *DB) Save(table string, src any) error {

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"main/pkg/auth"
@@ -46,9 +47,7 @@ var UploadImageHandler = auth.RequireAuth(func(w http.ResponseWriter, r *http.Re
 	}
 
 	ct := header.Header.Get("Content-Type")
-	switch ct {
-	case "image/jpeg", "image/png", "image/gif", "image/webp":
-	default:
+	if !strings.HasPrefix(ct, "image/") {
 		routes.JsonError(w, "unsupported image type (jpeg, png, gif, webp only)", http.StatusUnsupportedMediaType)
 		return
 	}
@@ -64,6 +63,12 @@ var UploadImageHandler = auth.RequireAuth(func(w http.ResponseWriter, r *http.Re
 	claims, _ := auth.ClaimsFromContext(r.Context())
 	filename := fmt.Sprintf("%d_%d.jpg", claims.UserID, time.Now().UnixNano())
 	fullPath := filepath.Join(uploadsDir, filename)
+
+	// Create uploads directory if it doesn't exist
+	if err := os.MkdirAll(uploadsDir, 0755); err != nil {
+		routes.JsonError(w, "failed to create upload directory", http.StatusInternalServerError)
+		return
+	}
 
 	out, err := os.Create(fullPath)
 	if err != nil {

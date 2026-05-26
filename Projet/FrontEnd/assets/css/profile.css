@@ -7,7 +7,6 @@
 body {
     overflow-x: hidden;
     font-family: "Space Grotesk", Inter, system-ui, sans-serif;
-    background-color: var(--neutral);
 }
 
 main {
@@ -25,29 +24,52 @@ main {
     position: relative;
     width: 100%;
     border-radius: var(--radius-sm);
-    overflow: hidden;
     box-shadow: var(--shadow);
 }
 
 #profileHead img {
     width: 100%;
-    height: 225px;
+    height: 250px;
     display: block;
     position: relative;
-    opacity: 0.5;
+    opacity: 1;
 }
 
 #profilePhotoName {
     position: absolute;
     bottom: 20px;
     left: 2rem;
+    padding: 0.5rem 1rem;
     display: flex;
     align-items: flex-end;
     flex-direction: row;
     gap: 1.5rem;
+    transform: translateY(65%) !important;
+    z-index: 8888;
+    /*background-color: rgba(27, 27, 27, 0.4) !important;*/
+    border-radius: var(--radius-sm);
 }
 
-#profilePhotoName > img {
+#isOnlineBall {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 15px;
+    left: 95px;
+    border: 1px solid white;
+    z-index: 9999;
+}
+
+.Online {
+    background-color: green !important;
+}
+
+.Offline {
+    background-color: red !important;
+}
+
+#profilePhotoName>img {
     width: 100px;
     height: 100px;
     border-radius: 50%;
@@ -57,19 +79,25 @@ main {
     transition: opacity 0.3s;
     flex-shrink: 0;
     opacity: 1 !important;
+    border: 3px solid var(--primary);
 }
 
-#profilePhotoName > img:hover {
+#profilePhotoName>img:hover {
     opacity: 0.7 !important;
 }
 
 #photoName {
-    transform: translateY(-150%);
+    transform: translateY(-15%) !important;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
     gap: 0.25rem;
+    margin-left: -0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 0.3rem 0.6rem;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-sm);
 }
 
 #photoName h4 {
@@ -78,6 +106,7 @@ main {
     color: var(--text);
     text-transform: uppercase;
     margin: 0;
+    letter-spacing: 0.5px;
 }
 
 #photoName p {
@@ -119,12 +148,12 @@ main {
 
 /* Main content */
 
-#profileContent { 
+#profileContent {
     width: 100%;
     display: grid;
     grid-template-columns: 350px auto;
     gap: 2rem;
-    margin-top: 2.5rem;
+    margin-top: 4.5rem;
 }
 
 #left {
@@ -181,6 +210,19 @@ main {
     color: green;
 }
 
+.connexionServiceDiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.connexionServiceDiv button img {
+    width: 20px !important;
+    height: 20px !important;
+}
+
 #InfosBtns {
     justify-content: center;
     gap: 20px;
@@ -235,47 +277,95 @@ main {
 #postContent {
     background: var(--surface);
     border: 1px solid var(--border);
-    overflow: auto;
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     padding: 15px;
-    height: 200px;
+    height: 170px;
+    overflow-y: auto;
 }
 
 .cardPost {
     width: 100%;
-    height: 60px;
     display: flex;
     flex-direction: column;
-    padding: 5px 15px;
+    padding: 12px 15px;
+    background: var(--surface);
     border: 1px solid var(--border);
+    border-radius: 8px;
     position: relative;
+    transition: all 0.2s ease;
+}
+
+.cardPost:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-light);
+}
+
+.cardPost h4 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    color: var(--text);
+    max-width: 80%;
+}
+
+.cardPost p {
+    margin: 0 0 8px 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    overflow: hidden;
 }
 
 .viewPostButton {
     position: absolute;
-    right: 10px;
+    right: 30px;
     top: 50%;
     transform: translateY(-50%);
-    padding: 0.3rem 0.6rem;
+    padding: 6px 12px;
     font-size: 0.75rem;
+    font-weight: 600;
     background: var(--primary);
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 150ms ease;
 }
 
 .viewPostButton:hover {
-    transform: translateY(-50%) translateX(-2px);
+    background: var(--tertiary);
+    color: white;
+    transform: translateY(-50%) scale(1.05);
 }
 
 .postDate {
-    font-size: 0.75rem;
-    color: var(--text-muted);
+    font-size: 0.7rem;
+    color: var(--primary);
+    font-weight: 500;
 }
 
 /* Edit */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 #editFieldModalOverlay {
     position: fixed;
     display: none;
@@ -285,63 +375,221 @@ main {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 9999;
+    animation: overlayFadeIn 0.2s ease-out;
+    backdrop-filter: blur(2px);
 }
 
 #editFieldModal {
     position: fixed;
     display: none;
     flex-direction: column;
+    justify-content: center;
     gap: 1rem;
     padding: 1.5rem;
     background-color: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     z-index: 10000;
     width: 300px;
     height: auto;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.modal-resize {
+    width: 400px !important;
 }
 
 #editFieldModal form {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 1rem;
 }
 
+#editFieldModal h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 #editFieldModal label {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--text);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 #editFieldModal input {
-    padding: 0.5rem;
+    padding: 0.7rem 0.8rem;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-family: inherit;
+    background-color: var(--neutral);
+    color: var(--text);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
 }
 
 #editFieldModal input:focus {
     outline: none;
     border-color: var(--primary);
+    background-color: var(--surface);
 }
 
 #editFieldModal .modalButtons {
     display: flex;
     gap: 0.75rem;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
-#cancelEditField, #saveEditField {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.75rem;
+#divBtnConnexion {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0.75rem;
+}
+
+.oauthBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    width: 100%;
+}
+
+.oauthBtn:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.oauthBtn img {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+#btnGitDiv,
+#btnEmailDiv {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background: color-mix(in var(--neutral), 0.5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.profile-message {
+    position: fixed;
+    top: 5.5rem;
+    right: 1.5rem;
+    z-index: 10000;
+    max-width: min(360px, calc(100vw - 2rem));
+    padding: 0.85rem 1rem;
+    border-left: 2px solid #ff6b6b;
+    background: rgba(20, 20, 20, 0.96);
+    color: #ffb4b4;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    box-shadow: var(--shadow);
+}
+
+.profile-message[hidden] {
+    display: none;
+}
+
+.account-sign-out {
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-sign-out {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 107, 107, 0.45);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 107, 107, 0.08);
+    color: #ffb4b4;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.btn-sign-out:hover {
+    border-color: rgba(255, 107, 107, 0.75);
+    background: rgba(255, 107, 107, 0.16);
+    color: #ffd4d4;
+}
+
+.btn-sign-out:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-sign-out[hidden] {
+    display: none;
+}
+
+.btnRemove {
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.7rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    max-width: 100px;
+}
+
+.btnRemove:hover {
+    transform: translateY(-2px);
+}
+
+#cancelEditField,
+#saveEditField {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 150ms ease;
+    transition: all 0.2s ease;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 #saveEditField {
@@ -353,21 +601,35 @@ main {
     transform: translateY(-2px);
 }
 
+#saveEditField:active {
+    transform: translateY(0);
+}
+
 #cancelEditField {
-    background: var(--border);
+    background: var(--neutral);
     color: var(--text);
+    border: 1px solid var(--border);
 }
 
 #cancelEditField:hover {
     background: var(--border);
-    opacity: 0.8;
+    border-color: var(--border);
+}
+
+footer {
+    bottom: 0 !important;
+    position: fixed !important;
+    display: flex;
+    justify-self: center;
+    width: 100vw;
+    height: auto;
 }
 
 @media (max-width: 1200px) {
     #profileContent {
         grid-template-columns: 280px 1fr;
     }
-    
+
     #right {
         display: none;
     }
@@ -398,12 +660,12 @@ main {
     #photoName h4 {
         font-size: 1.3rem;
     }
-    
+
     #profileContent {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-    
+
     #left {
         grid-column: 1;
     }
@@ -419,16 +681,34 @@ main {
         height: 200px;
     }
 
+    #isOnlineBall {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 9px;
+        left: 80px;
+        border: 1px solid white;
+        z-index: 9999;
+    }
+
     #profilePhotoName {
-        transform: translateY(-70%);
-        bottom: -40px;
+        position: absolute;
+        bottom: 20px;
         left: 1rem;
-        gap: 0.75rem;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: flex-end;
+        flex-direction: row;
+        gap: 1.5rem;
+        transform: translateY(60%) !important;
+        z-index: 8888;
+        border-radius: var(--radius-sm);
     }
 
     #profilePhotoName img {
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
     }
 
     #photoName {
@@ -438,16 +718,16 @@ main {
     #photoName h4 {
         font-size: 1.1rem;
     }
-    
+
     #profileContent {
         grid-template-columns: 1fr;
     }
-    
+
     #status {
         flex-direction: row;
     }
-    
-    #status > div {
+
+    #status>div {
         flex: 1;
     }
 }
@@ -481,11 +761,11 @@ main {
     #photoName p {
         font-size: 0.8rem;
     }
-    
+
     #profileContent {
         grid-template-columns: 1fr;
     }
-    
+
     #status {
         flex-direction: column;
     }

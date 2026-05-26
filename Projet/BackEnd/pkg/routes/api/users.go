@@ -56,10 +56,11 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	hashStr := string(hashedPassword)
 	user := structs.User{
 		Username:     req.Username,
 		Email:        req.Email,
-		PasswordHash: string(hashedPassword),
+		PasswordHash: &hashStr,
 		CreatedAt:    time.Now(),
 		AvatarUrl:    "default.png",
 		Role:         "user",
@@ -106,7 +107,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch {
 	case req.Email != "":
-		user, lookupErr = db.GetDB().GetUserByEmail(req.Email)
+		user, lookupErr = db.GetDB().GetUserByEmail(strings.ToLower(strings.TrimSpace(req.Email)))
 	case req.Username != "":
 		user, lookupErr = db.GetDB().GetUserByUsername(req.Username)
 	default:
@@ -119,7 +120,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+	if user.PasswordHash == nil {
+		routes.JsonError(w, "invalid credentials", http.StatusUnauthorized)
+		return
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(*user.PasswordHash), []byte(req.Password)); err != nil {
 		routes.JsonError(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
@@ -135,15 +140,119 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
 
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		routes.JsonError(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	auth.ClearTokenCookie(w)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+}
+
+type connexionServiceResponse struct {
+	Git    *string `json:"git"`
+	Google *string `json:"google"`
+	Email  *string `json:"email"`
+}
+
 type userProfileResponse struct {
-	Username     string    `json:"username"`
-	AvatarUrl    string    `json:"avatar_url"`
-	Role         string    `json:"role"`
-	CreatedAt    time.Time `json:"created_at"`
-	PostCount    int64     `json:"post_count"`
-	CommentCount int64     `json:"comment_count"`
-	LikeCount    int64     `json:"like_count"`
-	DislikeCount int64     `json:"dislike_count"`
+	Username          string                    `json:"username"`
+	AvatarUrl         string                    `json:"avatar_url"`
+	Role              string                    `json:"role"`
+	CreatedAt         time.Time                 `json:"created_at"`
+	PostCount         int64                     `json:"post_count"`
+	CommentCount      int64                     `json:"comment_count"`
+	LikeCount         int64                     `json:"like_count"`
+	DislikeCount      int64                     `json:"dislike_count"`
+	ConnexionService  *connexionServiceResponse `json:"connexionService,omitempty"`
+	LastPosts         []postPreviewResponse    `json:"lastPosts"`
+}
+
+type postPreviewResponse struct {
+	ID             uint      `json:"id"`
+	Title          string    `json:"title"`
+	Message        string    `json:"message"`
+	CreatedAt      time.Time `json:"created_at"`
+	AuthorUsername string   `json:"author_username"`
+}
+
+func buildConnexionService(user *structs.User, accounts []structs.UserOAuthAccount) *connexionServiceResponse {
+	resp := &connexionServiceResponse{}
+	if user.Email != "" {
+		email := user.Email
+		resp.Email = &email
+	}
+	for _, acc := range accounts {
+		if acc.ProviderEmail == "" {
+			continue
+		}
+		providerEmail := acc.ProviderEmail
+		switch acc.Provider {
+		case "github":
+			resp.Git = &providerEmail
+		case "google":
+			resp.Google = &providerEmail
+		}
+	}
+	return resp
+}
+
+func loadUserProfile(user *structs.User, includeConnexion bool) (*userProfileResponse, error) {
+	database := db.GetDB()
+
+	postCount, commentCount, likeCount, dislikeCount, err := database.UserStats(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	lastPosts, err := database.UserLatestPosts(user.ID, 5)
+	if err != nil {
+		return nil, err
+	}
+	if lastPosts == nil {
+		lastPosts = []structs.Post{}
+	}
+
+	lastPostPreviews := make([]postPreviewResponse, 0, len(lastPosts))
+	for _, p := range lastPosts {
+		authorUsername := ""
+		if author, err := database.GetUserByID(p.AuthorId); err == nil {
+			authorUsername = author.Username
+		}
+
+		lastPostPreviews = append(lastPostPreviews, postPreviewResponse{
+			ID:             p.ID,
+			Title:          p.Title,
+			Message:        p.Message,
+			CreatedAt:      p.CreatedAt,
+			AuthorUsername: authorUsername,
+		})
+	}
+
+	resp := &userProfileResponse{
+		Username:     user.Username,
+		AvatarUrl:    user.AvatarUrl,
+		Role:         user.Role,
+		CreatedAt:    user.CreatedAt,
+		PostCount:    postCount,
+		CommentCount: commentCount,
+		LikeCount:    likeCount,
+		DislikeCount: dislikeCount,
+		LastPosts:    lastPostPreviews,
+	}
+
+	if includeConnexion {
+		accounts, err := database.GetOAuthAccountsByUserID(user.ID)
+		if err != nil {
+			return nil, err
+		}
+		resp.ConnexionService = buildConnexionService(user, accounts)
+	}
+
+	return resp, nil
 }
 
 type editUserRequest struct {
@@ -260,21 +369,40 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts, comments, likes, dislikes, err := db.GetDB().UserStats(user.ID)
+	profile, err := loadUserProfile(user, false)
 	if err != nil {
-		routes.JsonError(w, "failed to load user stats", http.StatusInternalServerError)
+		routes.JsonError(w, "failed to load user profile", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(userProfileResponse{
-		Username:     user.Username,
-		AvatarUrl:    user.AvatarUrl,
-		Role:         user.Role,
-		CreatedAt:    user.CreatedAt,
-		PostCount:    posts,
-		CommentCount: comments,
-		LikeCount:    likes,
-		DislikeCount: dislikes,
-	})
+	json.NewEncoder(w).Encode(profile)
+}
+
+func GetSelfHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		routes.JsonError(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	claims, ok := auth.ClaimsFromContext(r.Context())
+	if !ok {
+		routes.JsonError(w, "authentication required", http.StatusUnauthorized)
+		return
+	}
+
+	user, err := db.GetDB().GetUserByUsername(claims.Username)
+	if err != nil {
+		routes.JsonError(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	profile, err := loadUserProfile(user, true)
+	if err != nil {
+		routes.JsonError(w, "failed to load user profile", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(profile)
 }

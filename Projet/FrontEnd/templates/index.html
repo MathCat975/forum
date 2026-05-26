@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEOW | Forum</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/theme.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+
+<body class="index-hub">
+    <div class="page-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark">></span>
+                <div>
+                    <p class="brand-title">MEOW_PROTOCOL</p>
+                    <p class="brand-subtitle">v4.2.8 | live</p>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <a href="/front/index" class="side-link active"><span>::</span> Fil principal</a>
+            </nav>
+
+            <button class="thread-button"><a href="/front/create-post">Nouveau post</a></button>
+
+            <div class="sidebar-footer">
+                <a href="/front/profile" class="side-link subtle"><span>+</span> Profil</a>
+            </div>
+        </aside>
+
+        <main class="content index-content">
+            <header class="topbar">
+                <nav class="topbar-nav">
+                    <a href="/front/index">Forums</a>
+                    <a href="/front/register">Inscription</a>
+                    <a href="/front/login">Connexion</a>
+                </nav>
+
+                <div class="protocol-actions">
+                    <div class="topbar-status">
+                        <span class="status-dot"></span>
+                        <span>En ligne</span>
+                    </div>
+                    <a href="/front/profile" class="operator-badge" aria-label="Profil">ID</a>
+                </div>
+            </header>
+
+            <section class="index-hero" aria-label="Welcome">
+                <div class="index-hero__copy">
+                    <p class="eyebrow">Bienvenue sur le réseau</p>
+                    <h1>Explore, discute, poste.</h1>
+                    <p class="muted-copy">Parcours les threads du moment ou lance une recherche ciblée.</p>
+                </div>
+                <div class="index-hero__actions">
+                    <a class="primary-button" href="/front/create-post">Créer un post</a>
+                    <button id="showFeedButton" class="secondary-button" type="button" hidden>Voir le fil</button>
+                </div>
+            </section>
+
+            <section class="search-panel search-panel--compact" id="search">
+                <div class="search-bar">
+                    <label class="search-input-wrap" for="searchInput">
+                        <span class="search-icon">&#9906;</span>
+                        <input id="searchInput" type="text" placeholder="Rechercher un titre, un message..." />
+                    </label>
+                    <button id="searchButton" class="primary-button" type="button">Chercher</button>
+                </div>
+
+                <details class="filters-drawer">
+                    <summary>Filtres avancés</summary>
+                    <div class="filters">
+                        <select id="scopeFilter">
+                            <option value="all">Tout</option>
+                            <option value="titles">Titres</option>
+                            <option value="comments">Commentaires</option>
+                        </select>
+                        <input id="usernameFilter" class="filter-input" type="text" placeholder="Pseudo" />
+                        <input id="categoryFilter" class="filter-input" type="number" min="1" placeholder="Catégorie" />
+                        <input id="fromFilter" class="filter-input" type="date" />
+                        <input id="toFilter" class="filter-input" type="date" />
+                        <select id="sizeFilter">
+                            <option value="20">20 résultats</option>
+                            <option value="10">10 résultats</option>
+                            <option value="30">30 résultats</option>
+                            <option value="50">50 résultats</option>
+                        </select>
+                    </div>
+                </details>
+
+                <p id="searchMessage" class="search-message" aria-live="polite"></p>
+            </section>
+
+            <section class="results-layout results-layout--single">
+                <div class="results-column results-column--light">
+                    <div class="section-heading section-heading--compact">
+                        <div>
+                            <p class="eyebrow">Fil du forum</p>
+                            <h2>Derniers posts</h2>
+                        </div>
+                        <div id="resultsCount" class="results-count">Chargement...</div>
+                    </div>
+
+                    <div id="resultsList" class="results-list feed-grid">
+                        <div class="empty-state">Chargement des posts...</div>
+                    </div>
+
+                    <div class="pagination">
+                        <button id="prevPageButton" class="secondary-button" type="button">Précédent</button>
+                        <p id="pageIndicator" class="results-count">Page 1</p>
+                        <button id="nextPageButton" class="secondary-button" type="button">Suivant</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="protocol-footer">
+        <strong>meow</strong>
+        <nav aria-label="Footer">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+        </nav>
+    </footer>
+
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/index.js"></script>
+</body>
+
+</html>
