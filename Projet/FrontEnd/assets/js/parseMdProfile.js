@@ -38,7 +38,7 @@ async function getProfil() {
 
     if (!result.ok) {
       if (result.status === 401) {
-        window.location.href = "/front/login";
+        //window.location.href = "/front/login";
         return;
       }
       console.error("Failed to fetch self:", result.status);
@@ -82,13 +82,6 @@ async function getProfil() {
       google: connexion.google || "",
       email: connexion.email || "",
     };
-    profil.connexionType.git = Boolean(profil.connexionService.git);
-    profil.connexionType.google = Boolean(profil.connexionService.google);
-    profil.connexionType.email = Boolean(profil.connexionService.email);
-    profil.connexionType.none =
-      !profil.connexionType.git &&
-      !profil.connexionType.google &&
-      !profil.connexionType.email;
 
     profil.lastPosts = Array.isArray(profileSource.lastPosts) ? profileSource.lastPosts : [];
 
@@ -102,11 +95,9 @@ async function getProfil() {
 
 function updateSignOutVisibility() {
   const signOutBtn = document.getElementById("signOutBtn");
-  if (!signOutBtn) {
-    return;
+  if (signOutBtn) {
+    signOutBtn.hidden = !viewingOwnProfile;
   }
-
-  signOutBtn.hidden = !viewingOwnProfile;
 }
 
 async function isSessionActive() {
@@ -157,7 +148,7 @@ function postLogoutViaForm() {
       resolve(true);
     };
 
-    iframe.addEventListener("load", () => setTimeout(cleanup, 150), { once: true });
+    iframe.addEventListener("load", () => { setTimeout(cleanup, 150); }, { once: true });
     logoutForm.requestSubmit();
     setTimeout(cleanup, 1500);
   });
@@ -236,10 +227,14 @@ const disconnect = async (type) => {
 const postContentDom = document.getElementById("postContent");
 
 function printLastPosts() {
-  postContentDom.innerHTML = "";
+  if (postContentDom) {
+    postContentDom.innerHTML = "";
+  }
 
   if (!Array.isArray(profil.lastPosts) || profil.lastPosts.length === 0) {
-    postContentDom.innerHTML = "<p>No recent posts.</p>";
+    if (postContentDom) {
+      postContentDom.innerHTML = "<p>No recent posts.</p>";
+    }
     return;
   }
 
@@ -262,7 +257,7 @@ function printLastPosts() {
       <span class="postDate">${postDate}</span>
       <button class="viewPostButton" type="button">See post</button>
     `;
-    postContentDom.appendChild(div);
+    postContentDom?.appendChild(div);
   }
 }
 
@@ -275,11 +270,15 @@ function printInfos(profile) {
 
   // Username
   const pseudoDom = document.getElementById("pseudoProfil");
-  pseudoDom.textContent = profile.username;
+  if (pseudoDom) {
+    pseudoDom.textContent = profile.username;
+  }
 
   // Avatar
   const photoDom = document.getElementById("profilPhoto");
-  photoDom.src = profile.avatar_url;
+  if (photoDom) {
+    photoDom.src = profile.avatar_url;
+  }
   if (profile.avatar_url && !profile.avatar_url.startsWith('blob:')) {
     localStorage.setItem("profilePhoto", profile.avatar_url);
   }
@@ -288,44 +287,72 @@ function printInfos(profile) {
   const onlineBall = document.getElementById("isOnlineBall");
   const onlineText = document.getElementById("isOnline");
   if (profile.online === 1 || profile.online === true) {
-    onlineBall.className = "Online";
-    onlineText.textContent = "Online";
-    onlineText.style.color = "green";
+    if (onlineBall) {
+      onlineBall.className = "Online";
+    }
+    if (onlineText) {
+      onlineText.textContent = "Online";
+      onlineText.style.color = "green";
+    }
   } else {
-    onlineBall.className = "Offline";
-    onlineText.textContent = "Offline";
-    onlineText.style.color = "red";
+    if (onlineBall) {
+      onlineBall.className = "Offline";
+    }
+    if (onlineText) {
+      onlineText.textContent = "Offline";
+      onlineText.style.color = "red";
+    }
   }
 
   // Last visit
   const lastVisitDom = document.getElementById("lastVisit");
-  lastVisitDom.textContent = profile.lastConnexion;
+  if (lastVisitDom) {
+    lastVisitDom.textContent = profile.lastConnexion;
+  }
 
   // Role
   const roleDom = document.getElementById("userRole");
-  roleDom.textContent = profile.role || "User";
+  if (roleDom) {
+    roleDom.textContent = profile.role || "User";
+  }
 
   // Create date
   const creationDateDom = document.getElementById("creationDate");
-  if (profile.created_at) {
+  if (creationDateDom && profile.created_at) {
     creationDateDom.textContent = new Date(profile.created_at).toLocaleDateString();
   }
 
   // Connect service
   const serviceDom = document.getElementById("connexionService");
   const infosNameDom = document.getElementById("infosNameEmail");
-  if (profile.connexionType.git) {
-    serviceDom.textContent = profile.connexionService.git || "Connected via GitHub";
-    infosNameDom.textContent = "GitHub";
-  } else if (profile.connexionType.google) {
-    serviceDom.textContent = profile.connexionService.google || "Connected via Google";
-    infosNameDom.textContent = "Google";
-  } else if (profile.connexionType.email) {
-    serviceDom.textContent = profile.connexionService.email;
-    infosNameDom.textContent = "Email";
+  if (profile.connexionService.git !== "") {
+    if (serviceDom) {
+      serviceDom.textContent = profile.connexionService.git;
+    }
+    if (infosNameDom) {
+      infosNameDom.textContent = "GitHub";
+    }
+  } else if (profile.connexionService.google !== "") {
+    if (serviceDom) {
+      serviceDom.textContent = profile.connexionService.google;
+    }
+    if (infosNameDom) {
+      infosNameDom.textContent = "Google";
+    }
+  } else if (profile.connexionService.email !== "") {
+    if (serviceDom) {
+      serviceDom.textContent = profile.connexionService.email;
+    }
+    if (infosNameDom) {
+      infosNameDom.textContent = "Email";
+    }
   } else {
-    serviceDom.textContent = "No service linked";
-    infosNameDom.textContent = "Status";
+    if (serviceDom) {
+      serviceDom.textContent = "No service linked";
+    }
+    if (infosNameDom) {
+      infosNameDom.textContent = "Status";
+    }
   }
 
   // Stats
@@ -337,7 +364,9 @@ function printInfos(profile) {
   };
   for (let [id, val] of Object.entries(stats)) {
     const statDom = document.getElementById(id);
-    statDom.textContent = val || 0;
+    if (statDom) {
+      statDom.textContent = val || 0;
+    }
   }
 }
 
@@ -350,19 +379,33 @@ function openEditFieldModal(fieldType) {
   const label = document.getElementById("editFieldLabel");
   const saveBtn = document.getElementById("saveEditField");
 
-  container.innerHTML = "";
+  if (container) {
+    container.innerHTML = "";
+  }
 
   if (fieldType === 'username') {
-    saveBtn.style.display = "block";
-    input.style.display = "block";
-    input.value = document.getElementById("pseudoProfil").textContent || "";
-    label.textContent = "Username";
+    if (saveBtn) {
+      saveBtn.style.display = "block";
+    }
+    if (input) {
+      input.style.display = "block";
+      input.value = document.getElementById("pseudoProfil")?.textContent || "";
+    }
+    if (label) {
+      label.textContent = "Username";
+    }
   }
 
   if (fieldType === 'connexionService') {
-    saveBtn.style.display = "none";
-    input.style.display = "none";
-    label.textContent = "Connect your account";
+    if (saveBtn) {
+      saveBtn.style.display = "none";
+    }
+    if (input) {
+      input.style.display = "none";
+    }
+    if (label) {
+      label.textContent = "Connect your account";
+    }
 
     let divBtnConnexion = document.createElement("div");
     divBtnConnexion.id = "divBtnConnexion";
@@ -411,10 +454,10 @@ function openEditFieldModal(fieldType) {
 
     divBtnConnexion.appendChild(btnGitDiv);
     divBtnConnexion.appendChild(btnEmailDiv);
-    container.appendChild(divBtnConnexion);
+    container?.appendChild(divBtnConnexion);
 
     // Git
-    if (!profil.connexionType.git) {
+    if (profil.connexionService.git === "") {
       btnDisconnectGit.style.display = "none";
     } else {
       btnGit.style.borderColor = "var(--primary)";
@@ -424,7 +467,7 @@ function openEditFieldModal(fieldType) {
     }
 
     // Google
-    if (!profil.connexionType.google) {
+    if (profil.connexionService.google === "") {
       btnDisconnectGoogle.style.display = "none";
     } else {
       btnEmail.style.borderColor = "var(--primary)";
@@ -433,25 +476,32 @@ function openEditFieldModal(fieldType) {
       btnDisconnectGoogle.style.display = "block";
     }
 
-    const modal = document.getElementById("editFieldModal");
-    modal.classList.add("modal-resize");
+    document.getElementById("editFieldModal")?.classList.add("modal-resize");
   }
 
   const modal = document.getElementById("editFieldModal");
   const overlay = document.getElementById("editFieldModalOverlay");
-  modal.style.display = "flex";
-  overlay.style.display = "block";
+  if (modal) {
+    modal.style.display = "flex";
+  }
+  if (overlay) {
+    overlay.style.display = "block";
+  }
   if (fieldType === 'username') {
-    input.focus();
+    input?.focus();
   }
 }
 
 function closeEditFieldModal() {
   const modal = document.getElementById("editFieldModal");
   const overlay = document.getElementById("editFieldModalOverlay");
-  modal.style.display = "none";
-  modal.classList.remove("modal-resize");
-  overlay.style.display = "none";
+  if (modal) {
+    modal.style.display = "none";
+    modal.classList.remove("modal-resize");
+  }
+  if (overlay) {
+    overlay.style.display = "none";
+  }
   currentEditField = null;
 }
 
@@ -482,7 +532,7 @@ async function saveEditField() {
     return;
   }
 
-  let value = document.getElementById("editFieldInput").value.trim();
+  let value = document.getElementById("editFieldInput")?.value.trim();
 
   if (!value && currentEditField === 'username') {
     await displayAlertMessage("Please enter a value!");
@@ -531,7 +581,9 @@ document.getElementById("editPhotoInput")?.addEventListener('change', async (e) 
 
   let urlImage = URL.createObjectURL(file);
   const photoEl = document.getElementById('profilPhoto');
-  photoEl.src = urlImage;
+  if (photoEl) {
+    photoEl.src = urlImage;
+  }
 
   let formData = new FormData();
   formData.append("image", file);
@@ -555,7 +607,7 @@ document.getElementById("editPhotoInput")?.addEventListener('change', async (e) 
 });
 
 document.querySelector('#profilPhoto')?.addEventListener('click', () => {
-  document.getElementById("editPhotoInput").click();
+  document.getElementById("editPhotoInput")?.click();
 });
 
 document.getElementById("editUserBtn")?.addEventListener("click", () => {
@@ -575,7 +627,7 @@ document.getElementById("saveEditField")?.addEventListener("click", (e) => {
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && document.getElementById("editFieldModal").style.display === "flex") {
+  if (e.key === "Escape" && document.getElementById("editFieldModal")?.style.display === "flex") {
     closeEditFieldModal();
   }
 });
