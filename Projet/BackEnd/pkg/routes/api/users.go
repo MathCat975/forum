@@ -107,7 +107,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch {
 	case req.Email != "":
-		user, lookupErr = db.GetDB().GetUserByEmail(req.Email)
+		user, lookupErr = db.GetDB().GetUserByEmail(strings.ToLower(strings.TrimSpace(req.Email)))
 	case req.Username != "":
 		user, lookupErr = db.GetDB().GetUserByUsername(req.Username)
 	default:

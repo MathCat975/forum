@@ -13,7 +13,6 @@ const prevPageButton = document.getElementById("prevPageButton");
 const nextPageButton = document.getElementById("nextPageButton");
 const pageIndicator = document.getElementById("pageIndicator");
 
-const CLUSTER_STYLES = ["post-cluster--blue", "post-cluster--lime", "post-cluster--cyan"];
 const categoryNameById = new Map();
 
 let currentPage = 1;
@@ -135,45 +134,25 @@ function getPostGlyph(title) {
     return forumEscapeHtml(trimmed.charAt(0).toUpperCase());
 }
 
-function buildPostRow(post) {
-    const title = forumEscapeHtml(post.title || "Untitled post");
-    const excerpt = forumEscapeHtml(truncateText(post.message));
+function buildFeedCard(post, categoryName) {
+    const title = forumEscapeHtml(post.title || "Sans titre");
+    const excerpt = forumEscapeHtml(truncateText(post.message, 110));
     const author = forumEscapeHtml(getAuthorName(post));
     const when = forumEscapeHtml(formatRelativeTime(post.createdAt || post.created_at));
+    const category = forumEscapeHtml(categoryName || "Forum");
     const postId = encodeURIComponent(post.id);
+    const glyph = getPostGlyph(post.title);
 
     return `
-        <article class="post-row">
-            <div class="post-glyph post-glyph--primary" aria-hidden="true">${getPostGlyph(post.title)}</div>
-            <div class="post-copy">
-                <a href="/front/post?id=${postId}">${title}</a>
-                <p>${excerpt}</p>
-            </div>
-            <div class="post-stat">
-                <strong>${post.id}</strong>
-                <span>thread</span>
-            </div>
-            <div class="post-activity">
-                <a href="/front/post?id=${postId}">${title}</a>
-                <span>${when} by ${author}</span>
-            </div>
-        </article>
-    `;
-}
-
-function buildCategoryCluster(category, posts, styleClass) {
-    const rows = posts.map((post) => buildPostRow(post)).join("");
-
-    return `
-        <section class="post-cluster ${styleClass}" aria-labelledby="category-${category.id}">
-            <header class="cluster-head">
-                <h3 id="category-${category.id}">${forumEscapeHtml(category.name)}</h3>
-                <span class="cluster-group">${forumEscapeHtml(category.group || "")}</span>
-            </header>
-            <div class="cluster-rows">
-                ${rows}
-            </div>
-        </section>
+        <a class="feed-card" href="/front/post?id=${postId}">
+            <span class="feed-card__glyph" aria-hidden="true">${glyph}</span>
+            <span class="feed-card__body">
+                <span class="feed-card__tag">${category}</span>
+                <strong class="feed-card__title">${title}</strong>
+                <span class="feed-card__excerpt">${excerpt}</span>
+                <span class="feed-card__meta">${when} · ${author}</span>
+            </span>
+        </a>
     `;
 }
 
@@ -192,24 +171,23 @@ function renderForumFeed(groups, totalPosts) {
 
     if (groups.length === 0) {
         resultsList.innerHTML = `
-            <div class="empty-state">
-                No forums posted yet. Sign in to create the first thread.
+            <div class="empty-state feed-grid__empty">
+                Aucun post pour l'instant. Connecte-toi pour lancer le premier thread.
             </div>
         `;
     } else {
-        resultsList.innerHTML = groups
-            .map((group, index) =>
-                buildCategoryCluster(
-                    group.category,
-                    group.posts,
-                    CLUSTER_STYLES[index % CLUSTER_STYLES.length]
-                )
-            )
-            .join("");
+        const cards = [];
+        for (const group of groups) {
+            for (const post of group.posts) {
+                cards.push(buildFeedCard(post, group.category?.name));
+            }
+        }
+        resultsList.innerHTML = cards.join("");
+        resultsList.classList.add("feed-grid");
     }
 
     if (resultsCount) {
-        resultsCount.textContent = `${totalPosts} post${totalPosts === 1 ? "" : "s"} live on the network`;
+        resultsCount.textContent = `${totalPosts} post${totalPosts > 1 ? "s" : ""} actif${totalPosts > 1 ? "s" : ""}`;
     }
 
     if (pageIndicator) {
@@ -265,7 +243,7 @@ async function loadForumFeed() {
 
         renderForumFeed(activeGroups, totalPosts);
         feedLoaded = true;
-        setMessage("Forum feed synced with the network.", "is-success");
+        setMessage("Fil du forum chargé.", "is-success");
     } catch (error) {
         resultsList.innerHTML = `
             <div class="empty-state">

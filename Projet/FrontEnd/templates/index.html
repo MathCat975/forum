@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEOW | Shadow Protocol</title>
+    <title>MEOW | Forum</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,106 +12,108 @@
     <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 
-<body>
+<body class="index-hub">
     <div class="page-shell">
         <aside class="sidebar">
             <div class="brand">
                 <span class="brand-mark">></span>
                 <div>
                     <p class="brand-title">MEOW_PROTOCOL</p>
-                    <p class="brand-subtitle">v4.2.8 | search_active</p>
+                    <p class="brand-subtitle">v4.2.8 | live</p>
                 </div>
             </div>
 
             <nav class="side-nav">
-                <a href="/front/index" class="side-link active"><span>::</span> Main Feed</a>
+                <a href="/front/index" class="side-link active"><span>::</span> Fil principal</a>
             </nav>
 
-            <button class="thread-button"> <a href="/front/create-post">Initialize Thread</a></button>
+            <button class="thread-button"><a href="/front/create-post">Nouveau post</a></button>
 
             <div class="sidebar-footer">
-                <a href="/front/profile" class="side-link subtle"><span>+</span> Profile</a>
+                <a href="/front/profile" class="side-link subtle"><span>+</span> Profil</a>
             </div>
         </aside>
 
-        <main class="content">
+        <main class="content index-content">
             <header class="topbar">
                 <nav class="topbar-nav">
-                    <a href="#feed">Forums</a>
-                    <a href="/front/register">Upgrades</a>
-                    <a href="#market">Market</a>
-                    <a href="#wiki">Wiki</a>
+                    <a href="/front/index">Forums</a>
+                    <a href="/front/register">Inscription</a>
+                    <a href="/front/login">Connexion</a>
                 </nav>
 
                 <div class="protocol-actions">
                     <div class="topbar-status">
                         <span class="status-dot"></span>
-                        <span>Encrypted relay online</span>
+                        <span>En ligne</span>
                     </div>
-                    <a href="/front/login" aria-label="Notifications">
-                        <img src="/assets/img/header/notif.png" alt="!">
-                    </a>
-                    <a href="/front/login" aria-label="Messages">
-                        <img src="/assets/img/header/message.png" alt="M">
-                    </a>
-                    <a class="operator-badge" href="/front/profile">ID</a>
+                    <a href="/front/profile" class="operator-badge" aria-label="Profil">ID</a>
                 </div>
             </header>
 
-            <section class="search-panel" id="search">
+            <section class="index-hero" aria-label="Welcome">
+                <div class="index-hero__copy">
+                    <p class="eyebrow">Bienvenue sur le réseau</p>
+                    <h1>Explore, discute, poste.</h1>
+                    <p class="muted-copy">Parcours les threads du moment ou lance une recherche ciblée.</p>
+                </div>
+                <div class="index-hero__actions">
+                    <a class="primary-button" href="/front/create-post">Créer un post</a>
+                    <button id="showFeedButton" class="secondary-button" type="button" hidden>Voir le fil</button>
+                </div>
+            </section>
+
+            <section class="search-panel search-panel--compact" id="search">
                 <div class="search-bar">
                     <label class="search-input-wrap" for="searchInput">
                         <span class="search-icon">&#9906;</span>
-                        <input id="searchInput" type="text" placeholder="Keyword (q): title, message, comment..." />
+                        <input id="searchInput" type="text" placeholder="Rechercher un titre, un message..." />
                     </label>
-                    <button id="searchButton" class="primary-button">Execute Scan</button>
+                    <button id="searchButton" class="primary-button" type="button">Chercher</button>
                 </div>
 
-                <div class="filters">
-                    <select id="scopeFilter">
-                        <option value="all">Scope: all</option>
-                        <option value="titles">Scope: titles</option>
-                        <option value="comments">Scope: comments</option>
-                    </select>
-                    <input id="usernameFilter" class="filter-input" type="text" placeholder="Username" />
-                    <input id="categoryFilter" class="filter-input" type="number" min="1" placeholder="Category ID" />
-                    <input id="fromFilter" class="filter-input" type="date" />
-                    <input id="toFilter" class="filter-input" type="date" />
-                    <select id="sizeFilter">
-                        <option value="20">Size: 20</option>
-                        <option value="10">Size: 10</option>
-                        <option value="30">Size: 30</option>
-                        <option value="50">Size: 50</option>
-                    </select>
-                </div>
+                <details class="filters-drawer">
+                    <summary>Filtres avancés</summary>
+                    <div class="filters">
+                        <select id="scopeFilter">
+                            <option value="all">Tout</option>
+                            <option value="titles">Titres</option>
+                            <option value="comments">Commentaires</option>
+                        </select>
+                        <input id="usernameFilter" class="filter-input" type="text" placeholder="Pseudo" />
+                        <input id="categoryFilter" class="filter-input" type="number" min="1" placeholder="Catégorie" />
+                        <input id="fromFilter" class="filter-input" type="date" />
+                        <input id="toFilter" class="filter-input" type="date" />
+                        <select id="sizeFilter">
+                            <option value="20">20 résultats</option>
+                            <option value="10">10 résultats</option>
+                            <option value="30">30 résultats</option>
+                            <option value="50">50 résultats</option>
+                        </select>
+                    </div>
+                </details>
 
-                <p class="search-hint">
-                    Public endpoint: <code>/api/search</code>. At least one filter is required.
-                </p>
                 <p id="searchMessage" class="search-message" aria-live="polite"></p>
             </section>
 
-            <section class="results-layout">
-                <div class="results-column">
-                    <div class="section-heading">
+            <section class="results-layout results-layout--single">
+                <div class="results-column results-column--light">
+                    <div class="section-heading section-heading--compact">
                         <div>
-                            <p class="eyebrow">Query Output</p>
-                            <h2>Matched signals</h2>
+                            <p class="eyebrow">Fil du forum</p>
+                            <h2>Derniers posts</h2>
                         </div>
-                        <div class="section-heading-actions">
-                            <div id="resultsCount" class="results-count">Showing latest nodes</div>
-                            <button id="showFeedButton" class="secondary-button" type="button" hidden>View forum feed</button>
-                        </div>
+                        <div id="resultsCount" class="results-count">Chargement...</div>
                     </div>
 
-                    <div id="resultsList" class="results-list">
-                        <div class="empty-state">Loading forum transmissions...</div>
+                    <div id="resultsList" class="results-list feed-grid">
+                        <div class="empty-state">Chargement des posts...</div>
                     </div>
 
                     <div class="pagination">
-                        <button id="prevPageButton" class="secondary-button" type="button">Previous</button>
+                        <button id="prevPageButton" class="secondary-button" type="button">Précédent</button>
                         <p id="pageIndicator" class="results-count">Page 1</p>
-                        <button id="nextPageButton" class="secondary-button" type="button">Next</button>
+                        <button id="nextPageButton" class="secondary-button" type="button">Suivant</button>
                     </div>
                 </div>
             </section>
@@ -123,8 +125,6 @@
         <nav aria-label="Footer">
             <a href="#">Privacy</a>
             <a href="#">Terms</a>
-            <a href="#">API</a>
-            <a href="#">Donations</a>
         </nav>
     </footer>
 

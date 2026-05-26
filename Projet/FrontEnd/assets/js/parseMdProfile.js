@@ -199,16 +199,8 @@ async function signOutAccount() {
 
   try {
     await requestLogout();
-
-    if (!(await isSessionActive())) {
-      finishSignOut();
-      return;
-    }
-
-    signOutBtn.disabled = false;
-    alert(
-      "Could not end your session. Use the same address as the forum (for example http://localhost:8080) and restart the server if needed."
-    );
+    clearLocalSession();
+    finishSignOut();
   } catch (error) {
     signOutBtn.disabled = false;
     alert(error.message || "Sign out failed. Try again.");

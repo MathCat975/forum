@@ -38,6 +38,38 @@ const redirectAfterAuth = () => {
   window.location.href = "/front/index";
 };
 
+const shouldShowAuthPage = async () => {
+  try {
+    const resp = await fetch("/api/user/me", {
+      method: "GET",
+      credentials: "include",
+      cache: "no-store",
+    });
+    return !resp.ok;
+  } catch {
+    return true;
+  }
+};
+
+const persistSessionUsername = async () => {
+  try {
+    const profile = await forumFetch("/api/user/me");
+    if (profile?.username) {
+      localStorage.setItem("username", profile.username);
+    }
+  } catch {
+    // Session cookie is enough; profile sync can happen later.
+  }
+};
+
+if (loginForm || registerForm) {
+  (async () => {
+    if (!(await shouldShowAuthPage())) {
+      redirectAfterAuth();
+    }
+  })();
+}
+
 if (loginForm) {
   const params = new URLSearchParams(window.location.search);
   const oauthError = params.get("error");
@@ -65,9 +97,10 @@ if (loginForm) {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
+      await persistSessionUsername();
       redirectAfterAuth();
     } catch (error) {
-      setAuthMessage(error.message || "Sign in failed.", "error");
+      setAuthMessage(error.message || "Invalid email or password.", "error");
     } finally {
       setFormBusy(loginForm, false);
     }
@@ -95,6 +128,7 @@ if (registerForm) {
         method: "POST",
         body: JSON.stringify({ username, email, password }),
       });
+      await persistSessionUsername();
       redirectAfterAuth();
     } catch (error) {
       setAuthMessage(error.message || "Registration failed.", "error");

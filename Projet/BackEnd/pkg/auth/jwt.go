@@ -71,13 +71,17 @@ func ParseToken(tokenStr string) (*Claims, error) {
 	return claims, nil
 }
 
+func cookieSecure() bool {
+	return os.Getenv("COOKIE_SECURE") == "true"
+}
+
 func SetTokenCookie(w http.ResponseWriter, tokenStr string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    tokenStr,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   cookieSecure(),
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   int(jwtExpiry.Seconds()),
 	})
@@ -89,7 +93,7 @@ func ClearTokenCookie(w http.ResponseWriter) {
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   cookieSecure(),
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   -1,
 	})
