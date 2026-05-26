@@ -1,0 +1,9 @@
+run/
+database.db
+database.db-shm
+database.db-wal
+uploads/
+*.exe
+.env
+.git
+ReadMe.MD

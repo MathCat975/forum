@@ -6,7 +6,9 @@ const escapeHtml = (value) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
-const TOKEN_RE = /(\*\*[^*\n]+?\*\*|~~[^~\n]+?~~|`[^`\n]+?`|\*[^*\n]+?\*)/g;
+const TOKEN_RE = /(\!\[[^\]]*\]\([^)]+\)|\*\*[^*\n]+?\*\*|~~[^~\n]+?~~|`[^`\n]+?`|\*[^*\n]+?\*)/g;
+const IMG_URL_RE = /^https?:\/\/\S+\.(jpg|jpeg|png|gif|webp|svg)(\?\S*)?$/i;
+const CDN_URL_RE = /^\/api\/cdn\/\S+$/;
 
 function renderInline(text) {
   let cursor = 0;
@@ -14,7 +16,12 @@ function renderInline(text) {
   for (const m of text.matchAll(TOKEN_RE)) {
     const t = m[0], i = m.index ?? 0;
     html += escapeHtml(text.slice(cursor, i));
-    if (t.startsWith("**") && t.endsWith("**")) html += `<strong>${escapeHtml(t.slice(2, -2))}</strong>`;
+    const imgMatch = t.match(/^\!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imgMatch) {
+      const alt = escapeHtml(imgMatch[1]);
+      const src = escapeHtml(imgMatch[2]);
+      html += `<img src="${src}" alt="${alt}" class="msg-img" loading="lazy">`;
+    } else if (t.startsWith("**") && t.endsWith("**")) html += `<strong>${escapeHtml(t.slice(2, -2))}</strong>`;
     else if (t.startsWith("*") && t.endsWith("*")) html += `<em>${escapeHtml(t.slice(1, -1))}</em>`;
     else if (t.startsWith("~~") && t.endsWith("~~")) html += `<s>${escapeHtml(t.slice(2, -2))}</s>`;
     else if (t.startsWith("`") && t.endsWith("`")) html += `<code>${escapeHtml(t.slice(1, -1))}</code>`;
@@ -25,8 +32,18 @@ function renderInline(text) {
   return html;
 }
 
+function renderLine(line) {
+  const trimmed = line.trim();
+  if (IMG_URL_RE.test(trimmed) || CDN_URL_RE.test(trimmed)) {
+    return `<p><img src="${escapeHtml(trimmed)}" alt="image" class="msg-img" loading="lazy"></p>`;
+  }
+  return null;
+}
+
 function renderMarkdown(raw) {
   return raw.split("\n").map((line) => {
+    const imgLine = renderLine(line);
+    if (imgLine) return imgLine;
     const align = line.match(/^\[(left|center|right)\](.*)\[\/\1\]$/);
     if (align) return `<div style="text-align:${align[1]}">${renderInline(align[2])}</div>`;
     if (line.startsWith("# ")) return `<h3>${renderInline(line.slice(2))}</h3>`;
@@ -52,7 +69,7 @@ const replyInput = document.getElementById("reply-box");
 
 let currentPostId = null;
 let currentUserRole = null;
-let currentUserId = null;
+let currentUsername = null;
 let currentUserVote = 0;
 
 const formatRelativeTime = (value) => {
@@ -73,6 +90,7 @@ async function fetchCurrentUser() {
     if (!resp.ok) return;
     const data = await resp.json();
     currentUserRole = data.role;
+    currentUsername = data.username;
     if (currentUserRole === "admin") {
       const adminLink = document.getElementById("admin-link");
       if (adminLink) adminLink.hidden = false;
@@ -208,7 +226,8 @@ const hydratePost = (postPayload) => {
       avatarFrame.innerHTML = `<img src="${avatarSrc(post.avatar_url)}" alt="" class="avatar-img">`;
     }
 
-    if (currentUserRole === "admin") {
+    const canDeletePost = currentUserRole === "admin" || (currentUsername && username === currentUsername);
+    if (canDeletePost) {
       const deleteBtn = document.getElementById("admin-delete-post");
       if (deleteBtn) {
         deleteBtn.hidden = false;
@@ -251,7 +270,8 @@ const hydratePost = (postPayload) => {
       if (metaSpans[0]) metaSpans[0].textContent = `Post #${idx + 1}`;
       if (metaSpans[1]) metaSpans[1].textContent = formatRelativeTime(reply.created_at || reply.createdAt);
 
-      if (currentUserRole === "admin") {
+      const canDeleteComment = currentUserRole === "admin" || (currentUsername && replyUsername === currentUsername);
+      if (canDeleteComment) {
         const deleteCommentBtn = clone.querySelector(".admin-delete-comment");
         if (deleteCommentBtn) {
           deleteCommentBtn.hidden = false;
