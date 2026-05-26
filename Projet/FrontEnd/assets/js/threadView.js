@@ -1,7 +1,5 @@
-const CREATE_THREAD_STORAGE_KEY = "forum:pendingThread";
-
 const escapeHtml = (value) =>
-  value
+  String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -11,48 +9,54 @@ const escapeHtml = (value) =>
 const threadTitleHeading = document.querySelector(".thread-header h1");
 const threadStats = document.querySelector(".thread-stats");
 const primaryThreadCard = document.querySelector(".thread-card--primary");
-const sampleReplyCards = document.querySelectorAll(".thread-card--reply");
-const replyComposerTitle = document.getElementById("create-post-title");
+const replyTemplate = document.getElementById("reply-template");
+const replyForm = document.getElementById("reply-form");
+const replyInput = document.getElementById("reply-box");
 
-const formatRelativeTime = (timestamp) => {
-  const elapsedMinutes = Math.max(1, Math.floor((Date.now() - timestamp) / 60000));
+let currentPostId = null;
 
-  if (elapsedMinutes < 60) {
-    return `${elapsedMinutes} min ago`;
-  }
-
+const formatRelativeTime = (value) => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "Unknown time";
+  const elapsedMinutes = Math.max(1, Math.floor((Date.now() - parsed.getTime()) / 60000));
+  if (elapsedMinutes < 60) return `${elapsedMinutes} min ago`;
   const elapsedHours = Math.floor(elapsedMinutes / 60);
-  return `${elapsedHours} hour${elapsedHours === 1 ? "" : "s"} ago`;
+  if (elapsedHours < 24) return `${elapsedHours} hour${elapsedHours === 1 ? "" : "s"} ago`;
+  const elapsedDays = Math.floor(elapsedHours / 24);
+  return `${elapsedDays} day${elapsedDays === 1 ? "" : "s"} ago`;
 };
 
-const setTextContent = (root, selector, value) => {
-  const node = root?.querySelector(selector);
-  if (node) {
-    node.textContent = value;
-  }
-};
+const hydratePost = (postPayload) => {
+  const post = postPayload?.post || postPayload?.Post || postPayload;
+  if (!post) return;
+  currentPostId = post.id || post.ID || currentPostId;
 
-const hydrateCreatedThread = (thread) => {
   if (threadTitleHeading) {
-    threadTitleHeading.textContent = thread.title;
+    threadTitleHeading.textContent = post.title || "Untitled post";
   }
+
+  const replies = (Array.isArray(post.comments) ? post.comments : []).filter((reply) =>
+    String(reply.message || "").trim()
+  );
 
   if (threadStats) {
     threadStats.innerHTML = `
-      <span>${formatRelativeTime(thread.createdAt)}</span>
-      <span>0 replies</span>
+      <span>${escapeHtml(formatRelativeTime(post.created_at || post.createdAt))}</span>
+      <span>${replies.length} replies</span>
       <span>1 view</span>
     `;
   }
 
   if (primaryThreadCard) {
-    primaryThreadCard.dataset.replyAuthor = thread.author;
+    const username = postPayload?.username || post.username || "Unknown";
+    primaryThreadCard.dataset.replyAuthor = username;
     primaryThreadCard.dataset.replyLabel = "Original post";
-    primaryThreadCard.dataset.replyMessage = thread.body;
+    primaryThreadCard.dataset.replyMessage = post.message || "";
 
     const copy = primaryThreadCard.querySelector(".thread-copy");
     if (copy) {
-      const paragraphs = thread.body
+      const body = String(post.message || "").trim();
+      const paragraphs = body
         .split(/\n{2,}/)
         .map((block) => block.trim())
         .filter(Boolean)
@@ -63,54 +67,96 @@ const hydrateCreatedThread = (thread) => {
       copy.innerHTML = `${paragraphs || "<p></p>"}`;
       if (actions) {
         copy.appendChild(actions);
-      } else {
-        copy.insertAdjacentHTML(
-          "beforeend",
-          `<div class="thread-actions" aria-label="Post actions">
-            <button type="button">Upvote (0)</button>
-            <button type="button" class="thread-reply-trigger">Reply</button>
-          </div>`
-        );
       }
     }
 
-    setTextContent(primaryThreadCard, ".thread-author strong", thread.author);
+    const authorStrong = primaryThreadCard.querySelector(".thread-author strong");
+    if (authorStrong) {
+      authorStrong.textContent = username;
+    }
   }
 
-  sampleReplyCards.forEach((card) => {
-    card.hidden = true;
-  });
+  const threadWrap = primaryThreadCard?.parentElement;
+  if (replyTemplate && threadWrap && replies.length > 0) {
+    threadWrap.querySelectorAll("[data-rendered-reply='1']").forEach((node) => node.remove());
 
-  if (replyComposerTitle) {
-    replyComposerTitle.textContent = "Reply to thread";
+    const templateCard = replyTemplate.content.querySelector(".thread-card--reply");
+    if (!templateCard) return;
+
+    replies.forEach((reply, idx) => {
+      const clone = templateCard.cloneNode(true);
+      clone.setAttribute("data-rendered-reply", "1");
+      const replyUsername =
+        reply.username || reply.author || reply.author_username || "Unknown";
+      clone.dataset.replyAuthor = replyUsername;
+      clone.dataset.replyLabel = `Post #${idx + 1}`;
+      clone.dataset.replyMessage = reply.message || "";
+
+      const strong = clone.querySelector(".thread-author strong");
+      if (strong) strong.textContent = replyUsername;
+
+      const quote = clone.querySelector(".reply-quote");
+      if (quote) quote.textContent = "";
+
+      const bodyP = clone.querySelector(".thread-copy > p:not(.reply-quote)");
+      if (bodyP) bodyP.innerHTML = escapeHtml(reply.message || "").replace(/\n/g, "<br>");
+
+      const metaSpans = clone.querySelectorAll(".reply-meta span");
+      if (metaSpans[0]) metaSpans[0].textContent = `Post #${idx + 1}`;
+      if (metaSpans[1]) metaSpans[1].textContent = formatRelativeTime(reply.created_at || reply.createdAt);
+
+      threadWrap.insertBefore(clone, replyForm);
+    });
+  } else if (threadWrap) {
+    threadWrap.querySelectorAll("[data-rendered-reply='1']").forEach((node) => node.remove());
   }
 };
 
-const loadCreatedThread = () => {
+const loadPostFromApi = async () => {
   const params = new URLSearchParams(window.location.search);
-  const threadId = params.get("thread");
+  const id = params.get("id");
+  if (!id) return;
+  currentPostId = id;
 
-  if (!threadId) {
-    return;
-  }
-
-  const raw = sessionStorage.getItem(CREATE_THREAD_STORAGE_KEY);
-  if (!raw) {
-    return;
-  }
-
-  let thread;
-  try {
-    thread = JSON.parse(raw);
-  } catch {
-    return;
-  }
-
-  if (!thread || thread.id !== threadId) {
-    return;
-  }
-
-  hydrateCreatedThread(thread);
+  const resp = await fetch(`/api/posts?id=${encodeURIComponent(id)}`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+  if (!resp.ok) return;
+  const payload = await resp.json().catch(() => null);
+  hydratePost(payload);
 };
 
-loadCreatedThread();
+loadPostFromApi().catch(() => {});
+
+if (replyForm && replyInput) {
+  replyForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const message = replyInput.value.trim();
+    if (!message) return;
+    if (!currentPostId) return;
+
+    const submitBtn = replyForm.querySelector(".composer-button--primary");
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const resp = await fetch("/api/posts/reply", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ post_id: Number(currentPostId), message }),
+      });
+      const payload = await resp.json().catch(() => null);
+      if (!resp.ok) {
+        throw new Error(payload?.error || payload?.message || `Reply failed (${resp.status})`);
+      }
+      replyInput.value = "";
+      await loadPostFromApi();
+    } catch (err) {
+      alert(err?.message || "Reply failed.");
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+}

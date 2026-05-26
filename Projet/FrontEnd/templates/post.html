@@ -115,39 +115,36 @@
                     </div>
                 </article>
 
-                <article
-                    class="thread-card thread-card--reply"
-                    data-reply-author="cyber_punk_42"
-                    data-reply-label="Post #1"
-                    data-reply-message="Confirmed on my test rig. I just pulled the logs and the timing matches exactly. This is big."
-                >
-                    <aside class="thread-author thread-author--compact" aria-label="Reply author">
-                        <div class="avatar-frame avatar-frame--ghost">
-                            <div class="avatar-core avatar-core--ghost" aria-hidden="true"></div>
-                        </div>
-                        <strong>cyber_punk_42</strong>
-                        <dl class="author-meta author-meta--compact">
-                            <div>
-                                <dt>Posts</dt>
-                                <dd>12</dd>
+                <template id="reply-template">
+                    <article class="thread-card thread-card--reply">
+                        <aside class="thread-author thread-author--compact" aria-label="Reply author">
+                            <div class="avatar-frame avatar-frame--ghost">
+                                <div class="avatar-core avatar-core--ghost" aria-hidden="true"></div>
                             </div>
-                        </dl>
-                    </aside>
+                            <strong></strong>
+                            <dl class="author-meta author-meta--compact">
+                                <div>
+                                    <dt>Posts</dt>
+                                    <dd></dd>
+                                </div>
+                            </dl>
+                        </aside>
 
-                    <div class="thread-copy">
-                        <p class="reply-quote">If someone were to time a packet injection during this window, they could potentially overlay subconscious commands...</p>
-                        <p>Confirmed on my test rig. I just pulled the logs and the timing matches exactly. This is big. If this is the persistence marker, the entire privacy layer is compromised. I&apos;m seeing the same hex values at 0x4F.</p>
-                        <div class="reply-meta">
-                            <span>Post #1</span>
-                            <span>2 hours ago</span>
+                        <div class="thread-copy">
+                            <p class="reply-quote"></p>
+                            <p></p>
+                            <div class="reply-meta">
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="thread-actions" aria-label="Reply actions">
+                                <button type="button" class="thread-reply-trigger">Reply</button>
+                            </div>
                         </div>
-                        <div class="thread-actions" aria-label="Reply actions">
-                            <button type="button" class="thread-reply-trigger">Reply</button>
-                        </div>
-                    </div>
-                </article>
+                    </article>
+                </template>
 
-                <section class="composer-panel" aria-labelledby="create-post-title">
+                <form id="reply-form" class="composer-panel" aria-labelledby="create-post-title">
                     <div class="composer-head">
                         <h2 id="create-post-title">Create post</h2>
                     </div>
@@ -196,7 +193,7 @@
                             <button type="submit" class="composer-button composer-button--primary">Post reply</button>
                         </div>
                     </div>
-                </section>
+                </form>
             </div>
         </section>
     </main>

@@ -1,12 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const loginForm = document.getElementById("loginForm");
+  const shouldShowAuthPage = async () => {
+    const savedUsername = localStorage.getItem("username");
+    if (savedUsername) {
+      return false;
+    }
+
+    try {
+      const resp = await fetch("/api/user/me", {
+        method: "GET",
+        credentials: "include",
+        cache: "no-store",
+      });
+      return !resp.ok;
+    } catch {
+      return true;
+    }
+  };
+
+  const loginForm = document.getElementById("login-form");
+
+  (async () => {
+    if (!(await shouldShowAuthPage())) {
+      window.location.replace("/front/index");
+      return;
+    }
+  })();
 
   loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
-    const errorMessage = document.getElementById("errorMessage");
+    const errorMessage = document.getElementById("authMessage");
 
     if (!emailInput || !passwordInput) {
       return;
@@ -29,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: {
           "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({
           email: email,
           password: password
@@ -38,22 +64,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Optionnel : Stocker le username dans le localStorage si renvoyé par l'API
-        if (data.username) {
-          localStorage.setItem("username", data.username);
-        }
         window.location.href = "/front/index";
       } else {
         if (errorMessage) {
           errorMessage.textContent = data.error || "Invalid email or password.";
-          errorMessage.style.display = "block";
+          errorMessage.hidden = false;
         }
       }
     } catch (error) {
       console.error("Login error:", error);
       if (errorMessage) {
         errorMessage.textContent = "An error occurred. Please try again later.";
-        errorMessage.style.display = "block";
+        errorMessage.hidden = false;
       }
     }
   });

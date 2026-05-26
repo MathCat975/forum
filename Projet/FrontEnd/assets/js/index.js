@@ -146,7 +146,7 @@ function buildPostRow(post) {
         <article class="post-row">
             <div class="post-glyph post-glyph--primary" aria-hidden="true">${getPostGlyph(post.title)}</div>
             <div class="post-copy">
-                <a href="/front/index?post=${postId}">${title}</a>
+                <a href="/front/post?id=${postId}">${title}</a>
                 <p>${excerpt}</p>
             </div>
             <div class="post-stat">
@@ -154,7 +154,7 @@ function buildPostRow(post) {
                 <span>thread</span>
             </div>
             <div class="post-activity">
-                <a href="/front/index?post=${postId}">${title}</a>
+                <a href="/front/post?id=${postId}">${title}</a>
                 <span>${when} by ${author}</span>
             </div>
         </article>

@@ -1,5 +1,30 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const registerForm = document.getElementById("registerForm");
+  const shouldShowAuthPage = async () => {
+    const savedUsername = localStorage.getItem("username");
+    if (savedUsername) {
+      return false;
+    }
+
+    try {
+      const resp = await fetch("/api/user/me", {
+        method: "GET",
+        credentials: "include",
+        cache: "no-store",
+      });
+      return !resp.ok;
+    } catch {
+      return true;
+    }
+  };
+
+  const registerForm = document.getElementById("register-form");
+
+  (async () => {
+    if (!(await shouldShowAuthPage())) {
+      window.location.replace("/front/index");
+      return;
+    }
+  })();
 
   registerForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -7,39 +32,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const usernameInput = document.getElementById("username");
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
-    const confirmPasswordInput = document.getElementById("confirmPassword");
-    const errorMessage = document.getElementById("errorMessage");
-    const successMessage = document.getElementById("successMessage");
+    const errorMessage = document.getElementById("authMessage");
 
-    if (!usernameInput || !emailInput || !passwordInput || !confirmPasswordInput) {
+    if (!usernameInput || !emailInput || !passwordInput) {
       return;
     }
 
     const username = usernameInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
-    const confirmPassword = confirmPasswordInput.value;
 
-    // Réinitialisation des messages
     if (errorMessage) {
-      errorMessage.style.display = "none";
-    }
-    if (successMessage) {
-      successMessage.style.display = "none";
+      errorMessage.textContent = "";
+      errorMessage.hidden = true;
     }
 
-    if (!username || !email || !password || !confirmPassword) {
+    if (!username || !email || !password) {
       if (errorMessage) {
         errorMessage.textContent = "All fields are required.";
-        errorMessage.style.display = "block";
-      }
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      if (errorMessage) {
-        errorMessage.textContent = "Passwords do not match.";
-        errorMessage.style.display = "block";
+        errorMessage.hidden = false;
       }
       return;
     }
@@ -50,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: {
           "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({
           username: username,
           email: email,
@@ -60,25 +72,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
-        if (successMessage) {
-          successMessage.textContent = data.message || "Registration successful! Redirecting...";
-          successMessage.style.display = "block";
-        }
-        // Redirection automatique vers la page de login après 2 secondes
-        setTimeout(() => {
-          window.location.href = "/front/login";
-        }, 2000);
+        window.location.href = "/front/index";
       } else {
         if (errorMessage) {
           errorMessage.textContent = data.error || "Registration failed. Please try again.";
-          errorMessage.style.display = "block";
+          errorMessage.hidden = false;
         }
       }
     } catch (error) {
       console.error("Register error:", error);
       if (errorMessage) {
         errorMessage.textContent = "An error occurred. Please try again later.";
-        errorMessage.style.display = "block";
+        errorMessage.hidden = false;
       }
     }
   });

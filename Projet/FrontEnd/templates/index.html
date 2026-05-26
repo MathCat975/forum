@@ -24,19 +24,13 @@
             </div>
 
             <nav class="side-nav">
-                <a href="#feed" class="side-link"><span>::</span> Main Feed</a>
-                <a href="#trending" class="side-link"><span>--</span> Trending</a>
-                <a href="#search" class="side-link active"><span>//</span> Search Nodes</a>
-                <a href="#private" class="side-link"><span>[]</span> Private Nodes</a>
-                <a href="#logs" class="side-link"><span>==</span> System Logs</a>
-                <a href="#archive" class="side-link"><span>##</span> Archive</a>
+                <a href="/front/index" class="side-link active"><span>::</span> Main Feed</a>
             </nav>
 
             <button class="thread-button"> <a href="/front/create-post">Initialize Thread</a></button>
 
             <div class="sidebar-footer">
-                <a href="/front/login" class="side-link subtle"><span>+</span> Settings</a>
-                <a href="#" class="side-link subtle"><span>?</span> Support</a>
+                <a href="/front/profile" class="side-link subtle"><span>+</span> Profile</a>
             </div>
         </aside>
 
@@ -64,26 +58,6 @@
                 </div>
             </header>
 
-            <section class="hero-panel">
-                <div class="hero-copy">
-                    <p class="eyebrow">Search Protocol</p>
-                    <h1>Locate threads, operators, and classified nodes.</h1>
-                    <p class="hero-text">
-                        Query the network, narrow by category, and surface the most active transmissions across the protocol.
-                    </p>
-                </div>
-                <div class="hero-stats">
-                    <div class="stat-card">
-                        <span class="stat-value">12.4K</span>
-                        <span class="stat-label">Indexed Threads</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-value">98.7%</span>
-                        <span class="stat-label">Search Integrity</span>
-                    </div>
-                </div>
-            </section>
-
             <section class="search-panel" id="search">
                 <div class="search-bar">
                     <label class="search-input-wrap" for="searchInput">
@@ -109,14 +83,6 @@
                         <option value="30">Size: 30</option>
                         <option value="50">Size: 50</option>
                     </select>
-                </div>
-
-                <div class="quick-tags">
-                    <button class="tag-chip" data-query="exploit">#exploit</button>
-                    <button class="tag-chip" data-query="security">#security</button>
-                    <button class="tag-chip" data-query="api">#api</button>
-                    <button class="tag-chip" data-query="bug">#bug</button>
-                    <button class="tag-chip" data-query="guide">#guide</button>
                 </div>
 
                 <p class="search-hint">
@@ -148,34 +114,6 @@
                         <button id="nextPageButton" class="secondary-button" type="button">Next</button>
                     </div>
                 </div>
-
-                <aside class="insights-column">
-                    <div class="info-card">
-                        <p class="card-title">Live Pulse</p>
-                        <ul class="mini-feed">
-                            <li>Vulnerability Disclosure Queue</li>
-                            <li>Encryption Exchange traffic spike</li>
-                            <li>Market access requests elevated</li>
-                        </ul>
-                    </div>
-
-                    <div class="info-card">
-                        <p class="card-title">Trending Queries</p>
-                        <div class="trend-list">
-                            <button class="trend-item" data-query="zero day">zero day</button>
-                            <button class="trend-item" data-query="credential leak">credential leak</button>
-                            <button class="trend-item" data-query="secure relay">secure relay</button>
-                            <button class="trend-item" data-query="forensics">forensics</button>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <p class="card-title">Search Tips</p>
-                        <p class="muted-copy">
-                            Combine operator names, technical keywords, or sector filters to surface precise transmissions faster.
-                        </p>
-                    </div>
-                </aside>
             </section>
         </main>
     </div>
