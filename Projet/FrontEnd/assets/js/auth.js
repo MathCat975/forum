@@ -35,7 +35,7 @@ const redirectAfterAuth = () => {
     return;
   }
 
-  window.location.href = "/front/index";
+  window.location.href = "/index";
 };
 
 const shouldShowAuthPage = async () => {

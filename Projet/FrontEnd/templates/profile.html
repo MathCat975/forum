@@ -1,136 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
+    <title>MEOW | Profile</title>
     <link rel="stylesheet" href="/assets/css/theme.css">
-    <link rel="stylesheet" href="/assets/css/chrome.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/profile.css">
 </head>
-
 <body>
-    <site-header title="Forum" subtitle="Account status"></site-header>
+    <header class="protocol-topbar" aria-label="Site header">
+        <a class="protocol-brand" href="/index" aria-label="Forum home">
+            <span class="brand-node" aria-hidden="true">></span>
+            <span>meow</span>
+        </a>
 
-    <main>
-        <div id="profileHead">
-            <img src="/assets/img/profile/banner.png" alt="Banner">
-            <span id="profilePhotoName">
-                <img src="/assets/img/profile/profil.png" alt="Profile Photo">
-                <div id="photoName">
-                    <div class="editableField">
-                        <h4 id="pseudoProfil">Username</h4>
-                        <button id="editUserBtn" class="editFieldBtn"><img src="/assets/img/profile/edit.png" alt="Edit Profile"></button>
-                    </div>
-                </div>
-            </span>
+        <nav class="protocol-tabs" aria-label="Sections">
+            <a href="/index">Forums</a>
+        </nav>
+
+        <div class="protocol-search">
+            <a href="/search" class="search-link-btn">Search</a>
         </div>
 
-        <div id="profileContent">
-            <div id="left">
-                <div id="infos">
-                    <div class="titleOfBlock">
-                        <p>Informations</p>
-                    </div>
+        <nav class="protocol-actions" aria-label="Account">
+            <a class="operator-badge" href="/profile" aria-label="Profile">ID</a>
+        </nav>
+    </header>
 
-                    <div class="infosPart">
-                        <p class="infosName">Role</p>
-                        <p class="infosValue" id="userRole">User</p>
-                    </div>
-
-                    <div class="infosPart">
-                        <p class="infosName">Status</p>
-                        <p class="infosValue" id="isOnline">Online</p>
-                    </div>
-
-                    <div class="infosPart">
-                        <p class="infosName">UID</p>
-                        <p class="infosValue" id="userUID">XXXXXX</p>
-                    </div>
-
-                    <div class="infosPart">
-                        <p class="infosName">Regisration Date</p>
-                        <p class="infosValue" id="creationDate">23 March, 2019</p>
-                    </div>
-
-                    <div class="infosPart">
-                        <p class="infosName">Last Visit</p>
-                        <p class="infosValue" id="lastVisit">Less than 1 minute ago</p>
-                    </div>
-
-                    <div id="InfosBtns" class="infosPart">
-                        <button>More</button>
-                        <button>Trustscan</button>
-                        <button>Items</button>
-                    </div>
+    <main class="protocol-shell">
+        <aside class="directory-panel" aria-label="Directory">
+            <div class="directory-head">
+                <span class="terminal-icon" aria-hidden="true">></span>
+                <div>
+                    <strong>Directory</strong>
+                    <small>Protocol v4.2.0</small>
                 </div>
             </div>
 
-            <div id="center">
-                <div id="statistiques">
-                    <div class="titleOfBlock">
-                        <p>Statistics</p>
-                    </div>
+            <nav class="directory-nav" aria-label="Forum navigation">
+                <a href="/index"><span>::</span>Main Feed</a>
+            </nav>
 
-                    <div id="statsContent">
-                        <div class="statsPart">
-                            <p class="statsValue" id="statsThreads">11</p>
-                            <p class="statsName">Threads</p>
+            <a class="init-thread" href="/create-post">Create post</a>
+
+            <nav class="directory-footer" aria-label="Account links">
+                <a href="/profile" class="is-active"><span>+</span>Profile</a>
+                <a href="/admin" id="admin-link" hidden><span>!</span>Admin</a>
+            </nav>
+        </aside>
+
+        <section class="operations" aria-label="Profile">
+            <section class="profile-banner">
+                <img src="/assets/img/profile/banner.png" alt="Banner" class="banner-img">
+                <div class="profile-identity">
+                    <img src="/assets/img/profile/profil.png" alt="Profile Photo" id="profile-avatar" class="profile-avatar">
+                    <div class="profile-name-wrap">
+                        <div class="profile-name-row">
+                            <h1 id="pseudoProfil">Username</h1>
+                            <button id="editUserBtn" class="btn-edit" title="Edit username">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </button>
                         </div>
-
-                        <div class="statsPart">
-                            <p class="statsValue" id="statsPosts">122</p>
-                            <p class="statsName">Posts</p>
-                        </div>
-
-                        <div class="statsPart">
-                            <p class="statsValue" id="statsLikesGiven">4</p>
-                            <p class="statsName">Likes Given</p>
-                        </div>
-
-                        <div class="statsPart">
-                            <p class="statsValue" id="statsComments">5</p>
-                            <p class="statsName">Commentaries</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="posts">
-
-                    <div class="titleOfBlock">
-                        <p>Lasts Posts</p>
-                    </div>
-
-                    <div id="postContent">
-                        <div class="cardPost" id="Post1">
-                            
-                        </div>
+                        <span class="profile-role" id="userRole">user</span>
                     </div>
                 </div>
+            </section>
+
+            <div class="profile-grid">
+                <section class="profile-card">
+                    <div class="card-header"><h3>Information</h3></div>
+                    <div class="info-row">
+                        <span class="info-label">Role</span>
+                        <span class="info-value" id="infoRole">User</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value info-value--online" id="isOnline">Online</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Joined</span>
+                        <span class="info-value" id="creationDate">-</span>
+                    </div>
+                    <div class="oauth-section" id="oauth-section" hidden>
+                        <div class="card-header"><h3>Connections</h3></div>
+                        <div class="oauth-row" id="oauth-github">
+                            <span class="oauth-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 007.86 10.92c.58.11.79-.25.79-.56v-2.17c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.69.08-.69 1.16.08 1.77 1.19 1.77 1.19 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.72-1.55-2.55-.29-5.23-1.28-5.23-5.67 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.14 1.17A10.9 10.9 0 0112 6.33c.97 0 1.95.13 2.86.38 2.18-1.48 3.14-1.17 3.14-1.17.62 1.59.23 2.76.11 3.05.73.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.66.41.35.78 1.04.78 2.1v3.12c0 .31.21.68.8.56A11.5 11.5 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+                                GitHub
+                            </span>
+                            <span class="oauth-status" id="oauth-github-status">Not connected</span>
+                            <button class="oauth-btn oauth-connect" id="oauth-github-btn" data-provider="github">Connect</button>
+                        </div>
+                        <div class="oauth-row" id="oauth-google">
+                            <span class="oauth-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.81 10.04H12v3.92h5.63c-.25 1.3-.99 2.41-2.11 3.16l3.41 2.64c1.99-1.84 3.14-4.55 3.14-7.76 0-.66-.06-1.31-.17-1.96z"/><path fill="#34A853" d="M12 22c2.84 0 5.22-.94 6.96-2.54l-3.41-2.64c-.95.64-2.17 1.02-3.55 1.02-2.73 0-5.04-1.84-5.86-4.3H2.62v2.72A10.5 10.5 0 0012 22z"/><path fill="#FBBC05" d="M6.14 13.54A6.32 6.32 0 015.81 12c0-.54.09-1.06.25-1.54V7.74H2.62A10.5 10.5 0 001.5 12c0 1.69.4 3.29 1.12 4.74z"/><path fill="#EA4335" d="M12 6.16c1.54 0 2.92.53 4.01 1.57l3-3C17.21 3.07 14.83 2 12 2 7.89 2 4.33 4.36 2.62 7.74l3.44 2.72c.82-2.46 3.13-4.3 5.94-4.3z"/></svg>
+                                Google
+                            </span>
+                            <span class="oauth-status" id="oauth-google-status">Not connected</span>
+                            <button class="oauth-btn oauth-connect" id="oauth-google-btn" data-provider="google">Connect</button>
+                        </div>
+                    </div>
+                    <div class="sign-out-wrap" id="sign-out-section">
+                        <button class="btn-sign-out" id="btn-sign-out">Sign out</button>
+                    </div>
+                </section>
+
+                <section class="profile-card">
+                    <div class="card-header"><h3>Statistics</h3></div>
+                    <div class="stats-row">
+                        <div class="stat-cell"><strong id="statsThreads">0</strong><span>Posts</span></div>
+                        <div class="stat-cell"><strong id="statsComments">0</strong><span>Comments</span></div>
+                        <div class="stat-cell stat-cell--green"><strong id="statsLikes">0</strong><span>Likes</span></div>
+                        <div class="stat-cell stat-cell--red"><strong id="statsDislikes">0</strong><span>Dislikes</span></div>
+                    </div>
+                </section>
+
+                <section class="profile-card profile-card--wide">
+                    <div class="card-header"><h3>Latest posts</h3></div>
+                    <div id="postContent" class="posts-list">
+                        <div class="cluster-empty">No posts yet.</div>
+                    </div>
+                </section>
             </div>
-        </div>
+        </section>
     </main>
-    
-    <div id="editFieldModalOverlay"></div>
-    <div id="editFieldModal">
-        <form action="">
-            <label id="editFieldLabel" for="editFieldInput">Field</label>
-            <input type="text" placeholder="Enter value" id="editFieldInput">
 
-            <div class="modalButtons">
+    <footer class="protocol-footer">
+        <strong>meow</strong>
+        <span class="footer-love">Made with &#9829; by Meow</span>
+    </footer>
+
+    <div id="editFieldModalOverlay" class="modal-overlay"></div>
+    <div id="editFieldModal" class="modal-box">
+        <form action="">
+            <label id="editFieldLabel" for="editFieldInput">Username</label>
+            <input type="text" placeholder="Enter value" id="editFieldInput">
+            <div class="modal-btns">
                 <button id="cancelEditField" type="button">Cancel</button>
                 <button id="saveEditField" type="button">Save</button>
             </div>
         </form>
     </div>
+    <input type="file" id="editPhotoInput" accept="image/*" style="display:none">
 
-    <input type="file" id="editPhotoInput" accept="image/*">
-
+    <script src="/assets/js/api.js"></script>
     <script src="/assets/js/parseMdProfile.js" defer></script>
-
-    <site-footer title="Forum"></site-footer>
-    <script src="/assets/js/chrome.js" defer></script>
 </body>
-
 </html>

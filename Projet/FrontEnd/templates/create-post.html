@@ -10,29 +10,21 @@
 </head>
 <body>
     <header class="protocol-topbar" aria-label="Site header">
-        <a class="protocol-brand" href="/front/index" aria-label="Forum home">
+        <a class="protocol-brand" href="/index" aria-label="Forum home">
             <span class="brand-node" aria-hidden="true">></span>
             <span>meow</span>
         </a>
 
         <nav class="protocol-tabs" aria-label="Sections">
-            <a href="/front/index">Forums</a>
-            <a href="/front/register">Upgrades</a>
+            <a href="/index">Forums</a>
         </nav>
 
-        <form class="protocol-search" role="search">
-            <label class="sr-only" for="global-search">Search for posts</label>
-            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
-        </form>
+        <div class="protocol-search">
+            <a href="/search" class="search-link-btn">Search</a>
+        </div>
 
         <nav class="protocol-actions" aria-label="Account">
-            <a href="/front/login" aria-label="Notifications">
-                <img src="/assets/img/header/notif.png" alt="">
-            </a>
-            <a href="/front/login" aria-label="Messages">
-                <img src="/assets/img/header/message.png" alt="">
-            </a>
-            <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
+            <a class="operator-badge" href="/profile" aria-label="Profile">ID</a>
         </nav>
     </header>
 
@@ -47,18 +39,14 @@
             </div>
 
             <nav class="directory-nav" aria-label="Forum navigation">
-                <a href="/front/index"><span>::</span>Main Feed</a>
-                <a href="#trending"><span>--</span>Trending</a>
-                <a class="nav-link-neutral" href="#private"><span>[]</span>Private Nodes</a>
-                <a href="#logs"><span>==</span>System Logs</a>
-                <a href="#archive"><span>##</span>Archive</a>
+                <a href="/index"><span>::</span>Main Feed</a>
             </nav>
 
-            <a class="init-thread is-active" href="/front/create-post" aria-current="page">Create post</a>
+            <a class="init-thread is-active" href="/create-post" aria-current="page">Create post</a>
 
-            <nav class="directory-footer" aria-label="Support links">
-                <a href="/front/login"><span>+</span>Settings</a>
-                <a href="#"><span>?</span>Support</a>
+            <nav class="directory-footer" aria-label="Account links">
+                <a href="/profile"><span>+</span>Profile</a>
+                <a href="/admin" id="admin-link" hidden><span>!</span>Admin</a>
             </nav>
         </aside>
 
@@ -85,10 +73,17 @@
                             name="title"
                             type="text"
                             maxlength="120"
-                            placeholder="e.g. This is an exemple."
+                            placeholder="e.g. This is an example."
                             required
                             autocomplete="off"
                         >
+                    </div>
+
+                    <div class="create-thread-field">
+                        <label for="thread-category">Category</label>
+                        <select id="thread-category" name="category_id" class="category-select" required>
+                            <option value="" disabled selected>Loading categories...</option>
+                        </select>
                     </div>
 
                     <div class="create-thread-field">
@@ -101,9 +96,6 @@
                             <button type="button" class="composer-tool" data-action="heading2" aria-label="Heading 2">H2</button>
                             <button type="button" class="composer-tool" data-action="quote" aria-label="Quote">"</button>
                             <button type="button" class="composer-tool" data-action="list" aria-label="List">#-</button>
-                            <button type="button" class="composer-tool" data-action="align-left" aria-label="Align left">L</button>
-                            <button type="button" class="composer-tool" data-action="align-center" aria-label="Align center">C</button>
-                            <button type="button" class="composer-tool" data-action="align-right" aria-label="Align right">R</button>
                         </div>
 
                         <label class="sr-only" for="reply-box">Opening message</label>
@@ -131,7 +123,7 @@
 
                     <div class="composer-actions">
                         <div class="composer-buttons">
-                            <a class="composer-button composer-button--ghost" href="/front/index">Cancel</a>
+                            <a class="composer-button composer-button--ghost" href="/index">Cancel</a>
                             <button type="submit" class="composer-button composer-button--primary">Publish forum</button>
                         </div>
                     </div>
@@ -142,13 +134,9 @@
 
     <footer class="protocol-footer">
         <strong>meow</strong>
-        <nav aria-label="Footer">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">API</a>
-            <a href="#">Donations</a>
-        </nav>
+        <span class="footer-love">Made with &#9829; by Meow</span>
     </footer>
+    <script src="../assets/js/api.js"></script>
     <script src="../assets/js/postComposer.js"></script>
     <script src="../assets/js/createPost.js"></script>
 </body>

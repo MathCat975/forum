@@ -81,31 +81,52 @@ func main() {
 
 	http.HandleFunc("/api/search", ratelimit.PerIP(ratelimit.Search, api.SearchHandler))
 
+	http.HandleFunc("/api/admin/users", auth.RequireAuth(
+		ratelimit.PerUser(ratelimit.AdminAction, api.ListUsersHandler)))
+	http.HandleFunc("/api/admin/users/role", auth.RequireAuth(
+		ratelimit.PerUser(ratelimit.AdminAction, api.ChangeUserRoleHandler)))
+	http.HandleFunc("/api/admin/users/delete", auth.RequireAuth(
+		ratelimit.PerUser(ratelimit.AdminAction, api.AdminDeleteUserHandler)))
+
 	// Static files
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("../FrontEnd/assets"))))
 
-	// Front routes
-	http.HandleFunc("/front/profile", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "profile")
+	// Page handler helper
+	page := func(name string) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			front.PageHandler(w, r, name)
+		}
+	}
+
+	// Root routes
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			http.Redirect(w, r, "/index", http.StatusFound)
+			return
+		}
+		http.NotFound(w, r)
 	})
-	http.HandleFunc("/front/ban", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "ban")
-	})
-	http.HandleFunc("/front/index", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "index")
-	})
-	http.HandleFunc("/front/login", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "login")
-	})
-	http.HandleFunc("/front/register", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "register")
-	})
-	http.HandleFunc("/front/post", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "post")
-	})
-	http.HandleFunc("/front/create-post", func(w http.ResponseWriter, r *http.Request) {
-		front.PageHandler(w, r, "create-post")
-	})
+	http.HandleFunc("/index", page("index"))
+	http.HandleFunc("/login", page("login"))
+	http.HandleFunc("/register", page("register"))
+	http.HandleFunc("/profile", page("profile"))
+	http.HandleFunc("/post", page("post"))
+	http.HandleFunc("/create-post", page("create-post"))
+	http.HandleFunc("/admin", page("admin"))
+	http.HandleFunc("/ban", page("ban"))
+	http.HandleFunc("/search", page("search"))
+	http.HandleFunc("/complete-signup", page("complete-signup"))
+
+	// Legacy /front/ routes
+	http.HandleFunc("/front/index", page("index"))
+	http.HandleFunc("/front/login", page("login"))
+	http.HandleFunc("/front/register", page("register"))
+	http.HandleFunc("/front/profile", page("profile"))
+	http.HandleFunc("/front/post", page("post"))
+	http.HandleFunc("/front/create-post", page("create-post"))
+	http.HandleFunc("/front/admin", page("admin"))
+	http.HandleFunc("/front/ban", page("ban"))
+	http.HandleFunc("/front/search", page("search"))
 
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

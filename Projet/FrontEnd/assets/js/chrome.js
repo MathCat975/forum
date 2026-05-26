@@ -265,10 +265,10 @@ class SiteHeader extends HTMLElement {
         const register = this.querySelectorAll("[data-register-link]");
         const ban = this.querySelectorAll("[data-ban-link]");
 
-        for (const el of home) el.setAttribute("href", resolve("/front/login"));
-        for (const el of login) el.setAttribute("href", resolve("/front/login"));
-        for (const el of register) el.setAttribute("href", resolve("/front/register"));
-        for (const el of ban) el.setAttribute("href", resolve("/front/ban"));
+        for (const el of home) el.setAttribute("href", resolve("/login"));
+        for (const el of login) el.setAttribute("href", resolve("/login"));
+        for (const el of register) el.setAttribute("href", resolve("/register"));
+        for (const el of ban) el.setAttribute("href", resolve("/ban"));
 
         const menuBtn = this.querySelector(".menu-btn");
         const drawer = this.querySelector("#mobile-drawer");
@@ -370,9 +370,9 @@ class SiteFooter extends HTMLElement {
             for (const el of this.querySelectorAll(selector)) el.setAttribute("href", resolve(href));
         };
 
-        setAll("[data-login-link]", "/front/login");
-        setAll("[data-register-link]", "/front/register");
-        setAll("[data-ban-link]", "/front/ban");
+        setAll("[data-login-link]", "/login");
+        setAll("[data-register-link]", "/register");
+        setAll("[data-ban-link]", "/ban");
 
         this.querySelector("[data-top]")?.addEventListener("click", () => {
             window.scrollTo({ top: 0, behavior: "smooth" });

@@ -123,6 +123,23 @@
     box-shadow: 0 0 24px rgba(125, 182, 255, 0.35);
 }
 
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.author-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 150ms;
+}
+
+.author-link:hover {
+    color: var(--tertiary);
+}
+
 .avatar-core--ghost {
     border-radius: 10px;
     background:
@@ -259,6 +276,63 @@
     border: 0;
 }
 
+.vote-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.75rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 4px;
+    background: transparent !important;
+    color: rgba(232, 232, 232, 0.6) !important;
+    font-size: 0.7rem !important;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.vote-btn svg {
+    flex-shrink: 0;
+}
+
+.vote-btn:hover {
+    border-color: rgba(61, 108, 224, 0.5) !important;
+    color: #fff !important;
+}
+
+.vote-like.vote-active {
+    border-color: rgba(76, 175, 80, 0.6) !important;
+    background: rgba(76, 175, 80, 0.12) !important;
+    color: #81c784 !important;
+}
+
+.vote-dislike.vote-active {
+    border-color: rgba(244, 67, 54, 0.6) !important;
+    background: rgba(244, 67, 54, 0.12) !important;
+    color: #e57373 !important;
+}
+
+.vote-count {
+    font-weight: 700;
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+}
+
+.admin-delete-post,
+.admin-delete-comment {
+    margin-left: auto;
+    padding: 0.4rem 0.7rem !important;
+    border: 1px solid rgba(244, 67, 54, 0.4) !important;
+    border-radius: 4px;
+    color: #e57373 !important;
+    font-size: 0.62rem !important;
+}
+
+.admin-delete-post:hover,
+.admin-delete-comment:hover {
+    background: rgba(244, 67, 54, 0.12) !important;
+    border-color: rgba(244, 67, 54, 0.7) !important;
+    color: #ff8a80 !important;
+}
+
 .thread-actions button:hover,
 .composer-button:hover {
     color: #fff;
@@ -327,6 +401,33 @@
     font-size: 1rem;
     line-height: 1.4;
     outline: none;
+}
+
+.category-select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(57, 57, 57, 0.85);
+    color: #fff;
+    font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    cursor: pointer;
+}
+
+.category-select:focus {
+    border-color: rgba(61, 108, 224, 0.58);
+}
+
+.category-select optgroup {
+    color: rgba(159, 186, 255, 0.85);
+    font-weight: 700;
+}
+
+.category-select option {
+    background: #1a1a1a;
+    color: #fff;
 }
 
 .create-thread-field input[type="text"]::placeholder {

@@ -13,4 +13,5 @@ var (
 	Upload        = New(10, time.Minute)
 	DeleteComment = New(20, time.Minute)
 	EditPost      = New(10, time.Minute)
+	AdminAction   = New(30, time.Minute)
 )

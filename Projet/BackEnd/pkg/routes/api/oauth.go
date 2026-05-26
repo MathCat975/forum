@@ -119,6 +119,23 @@ func handleCallback(w http.ResponseWriter, r *http.Request, name string) {
 		return
 	}
 
+	if cookie, cookieErr := r.Cookie("token"); cookieErr == nil {
+		if claims, parseErr := auth.ParseToken(cookie.Value); parseErr == nil {
+			newAcc := structs.UserOAuthAccount{
+				UserID:         claims.UserID,
+				Provider:       provider.Name(),
+				ProviderUserID: info.ProviderUserID,
+				ProviderEmail:  info.Email,
+			}
+			if createErr := database.CreateOAuthAccount(&newAcc); createErr != nil {
+				redirectErr(w, r, "provider_error")
+				return
+			}
+			http.Redirect(w, r, oauth.FrontendURL()+"/profile", http.StatusFound)
+			return
+		}
+	}
+
 	if _, err := database.GetUserByEmail(info.Email); err == nil {
 		redirectErr(w, r, "email_taken")
 		return

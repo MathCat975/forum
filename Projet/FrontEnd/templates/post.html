@@ -10,29 +10,21 @@
 </head>
 <body>
     <header class="protocol-topbar" aria-label="Site header">
-        <a class="protocol-brand" href="/front/index" aria-label="Forum home">
+        <a class="protocol-brand" href="/index" aria-label="Forum home">
             <span class="brand-node" aria-hidden="true">></span>
             <span>meow</span>
         </a>
 
         <nav class="protocol-tabs" aria-label="Sections">
-            <a href="/front/index" aria-current="page">Forums</a>
-            <a href="/front/register">Upgrades</a>
+            <a href="/index" aria-current="page">Forums</a>
         </nav>
 
-        <form class="protocol-search" role="search">
-            <label class="sr-only" for="global-search">Search for posts</label>
-            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
-        </form>
+        <div class="protocol-search">
+            <a href="/search" class="search-link-btn">Search</a>
+        </div>
 
         <nav class="protocol-actions" aria-label="Account">
-            <a href="/front/login" aria-label="Notifications">
-                <img src="/assets/img/header/notif.png" alt="">
-            </a>
-            <a href="/front/login" aria-label="Messages">
-                <img src="/assets/img/header/message.png" alt="">
-            </a>
-            <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
+            <a class="operator-badge" href="/profile" aria-label="Profile">ID</a>
         </nav>
     </header>
 
@@ -47,65 +39,52 @@
             </div>
 
             <nav class="directory-nav" aria-label="Forum navigation">
-                <a href="/front/index"><span>::</span>Main Feed</a>
+                <a href="/index"><span>::</span>Main Feed</a>
             </nav>
 
-            <a class="init-thread" href="/front/create-post">Create post</a>
+            <a class="init-thread" href="/create-post">Create post</a>
 
             <nav class="directory-footer" aria-label="Account links">
-                <a href="/front/profile"><span>+</span>Profile</a>
+                <a href="/profile"><span>+</span>Profile</a>
+                <a href="/admin" class="admin-link" id="admin-link" hidden><span>!</span>Admin</a>
             </nav>
         </aside>
 
         <section class="operations post-operations" aria-label="Post thread">
             <div class="thread-wrap">
                 <section class="thread-header" aria-label="Thread title">
-                    <h1>forum1</h1>
+                    <h1>Loading...</h1>
                     <div class="thread-stats" aria-label="Thread statistics">
-                        <span>2 hours ago</span>
-                        <span>14 replies</span>
-                        <span>1.2k views</span>
+                        <span></span>
                     </div>
                 </section>
 
                 <article
                     class="thread-card thread-card--primary"
-                    data-reply-author="null_vector"
+                    data-reply-author=""
                     data-reply-label="Original post"
-                    data-reply-message="I've been monitoring the uplink traffic from the new v9 Neural-Link implants. There's a consistent packet leakage occurring during the REM sleep synchronization phase."
+                    data-reply-message=""
                 >
                     <aside class="thread-author" aria-label="Original author">
                         <div class="avatar-frame avatar-frame--blue">
                             <div class="avatar-core" aria-hidden="true"></div>
                         </div>
-                        <strong>null_vector</strong>
-                        <dl class="author-meta">
-                            <div>
-                                <dt>Joined</dt>
-                                <dd>Jan 2033</dd>
-                            </div>
-                            <div>
-                                <dt>Posts</dt>
-                                <dd>15</dd>
-                            </div>
-                        </dl>
+                        <strong></strong>
                     </aside>
 
                     <div class="thread-copy">
-                        <p>I&apos;ve been monitoring the uplink traffic from the new v9 Neural-Link implants. There&apos;s a consistent packet leakage occurring during the REM sleep synchronization phase. It seems like the encryption handshake fails for approximately 4ms every cycle, leaving the visual cortex data buffer exposed.</p>
-                        <p>If someone were to time a packet injection during this window, they could potentially overlay subconscious commands or worse, extract direct visual feed data in raw hex format.</p>
-
-                        <div class="signal-block" role="note" aria-label="Code sample">
-                            <p>// vulnerable sequence detected in v9-alpha</p>
-                            <p>0x4F 0x2A [buffer_sync] 0x00 -- leak here</p>
-                            <p>exit 0x1A [ENCRYPT_RESTART]</p>
-                        </div>
-
-                        <p>Anyone else seeing this on their local nodes? This feels like a deliberate backdoor rather than a bug.</p>
-
+                        <p></p>
                         <div class="thread-actions" aria-label="Post actions">
-                            <button type="button">Upvote (42)</button>
+                            <button type="button" class="vote-btn vote-like" data-vote="1">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
+                                <span class="vote-count" id="like-count">0</span>
+                            </button>
+                            <button type="button" class="vote-btn vote-dislike" data-vote="-1">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17"/></svg>
+                                <span class="vote-count" id="dislike-count">0</span>
+                            </button>
                             <button type="button" class="thread-reply-trigger">Reply</button>
+                            <button type="button" class="admin-delete-post" id="admin-delete-post" hidden>Delete post</button>
                         </div>
                     </div>
                 </article>
@@ -117,12 +96,6 @@
                                 <div class="avatar-core avatar-core--ghost" aria-hidden="true"></div>
                             </div>
                             <strong></strong>
-                            <dl class="author-meta author-meta--compact">
-                                <div>
-                                    <dt>Posts</dt>
-                                    <dd></dd>
-                                </div>
-                            </dl>
                         </aside>
 
                         <div class="thread-copy">
@@ -134,6 +107,7 @@
                             </div>
                             <div class="thread-actions" aria-label="Reply actions">
                                 <button type="button" class="thread-reply-trigger">Reply</button>
+                                <button type="button" class="admin-delete-comment" hidden>Delete</button>
                             </div>
                         </div>
                     </article>
@@ -141,7 +115,7 @@
 
                 <form id="reply-form" class="composer-panel" aria-labelledby="create-post-title">
                     <div class="composer-head">
-                        <h2 id="create-post-title">Create post</h2>
+                        <h2 id="create-post-title">Reply</h2>
                     </div>
 
                     <div id="reply-indicator" class="reply-indicator" hidden>
@@ -161,30 +135,26 @@
                         <button type="button" class="composer-tool" data-action="heading2" aria-label="Heading 2">H2</button>
                         <button type="button" class="composer-tool" data-action="quote" aria-label="Quote">"</button>
                         <button type="button" class="composer-tool" data-action="list" aria-label="List">#-</button>
-                        <button type="button" class="composer-tool" data-action="align-left" aria-label="Align left">L</button>
-                        <button type="button" class="composer-tool" data-action="align-center" aria-label="Align center">C</button>
-                        <button type="button" class="composer-tool" data-action="align-right" aria-label="Align right">R</button>
                     </div>
                     <div class="composer-editor-shell">
                         <div
                             id="reply-preview"
                             class="composer-preview"
                             aria-hidden="true"
-                            data-placeholder="Type your encrypted response here..."
+                            data-placeholder="Type your reply here..."
                         ></div>
                         <textarea
                             id="reply-box"
                             class="composer-input"
                             name="reply"
                             rows="7"
-                            placeholder="Type your encrypted response here..."
+                            placeholder="Type your reply here..."
                             spellcheck="true"
                         ></textarea>
                     </div>
 
                     <div class="composer-actions">
                         <div class="composer-buttons">
-                            <button type="button" class="composer-button composer-button--ghost">Preview</button>
                             <button type="submit" class="composer-button composer-button--primary">Post reply</button>
                         </div>
                     </div>
@@ -195,13 +165,9 @@
 
     <footer class="protocol-footer">
         <strong>meow</strong>
-        <nav aria-label="Footer">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">API</a>
-            <a href="#">Donations</a>
-        </nav>
+        <span class="footer-love">Made with &#9829; by Meow</span>
     </footer>
+    <script src="../assets/js/api.js"></script>
     <script src="../assets/js/postComposer.js"></script>
     <script src="../assets/js/threadView.js"></script>
 </body>

@@ -11,30 +11,21 @@
 </head>
 <body>
     <header class="protocol-topbar" aria-label="Site header">
-        <a class="protocol-brand" href="/front/index" aria-label="Forum home">
+        <a class="protocol-brand" href="/index" aria-label="Forum home">
             <span class="brand-node" aria-hidden="true">></span>
             <span>meow</span>
         </a>
 
         <nav class="protocol-tabs" aria-label="Sections">
-            <a href="/front/index">Forums</a>
-            <a href="/front/register">Upgrades</a>
-            <a href="#wiki">Wiki</a>
+            <a href="/index">Forums</a>
         </nav>
 
-        <form class="protocol-search" role="search">
-            <label class="sr-only" for="global-search">Search for posts</label>
-            <input id="global-search" name="q" type="search" placeholder="Search for posts" autocomplete="off">
-        </form>
+        <div class="protocol-search">
+            <a href="/search" class="search-link-btn">Search</a>
+        </div>
 
         <nav class="protocol-actions" aria-label="Account">
-            <a href="/front/login" aria-label="Notifications">
-                <img src="/assets/img/header/notif.png" alt="">
-            </a>
-            <a href="/front/login" aria-label="Messages">
-                <img src="/assets/img/header/message.png" alt="">
-            </a>
-            <a class="operator-badge" href="/front/profile" aria-label="Login">ID</a>
+            <a class="operator-badge" href="/profile" aria-label="Profile">ID</a>
         </nav>
     </header>
 
@@ -96,7 +87,7 @@
 
                 <p class="auth-foot">
                     Already have an account?
-                    <a class="auth-link" href="/front/login">Connect</a>
+                    <a class="auth-link" href="/login">Connect</a>
                 </p>
             </div>
         </section>

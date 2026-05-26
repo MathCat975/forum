@@ -47,6 +47,7 @@ type commentResponse struct {
 	Message   string    `json:"message"`
 	CreatedAt time.Time `json:"created_at"`
 	Username  string    `json:"username"`
+	AvatarUrl string    `json:"avatar_url"`
 }
 
 type postDetailResponse struct {
@@ -60,6 +61,8 @@ type postDetailResponse struct {
 	Likes      int64             `json:"likes"`
 	Dislikes   int64             `json:"dislikes"`
 	Username   string            `json:"username"`
+	AvatarUrl  string            `json:"avatar_url"`
+	UserVote   int               `json:"user_vote"`
 }
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -140,10 +143,25 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 	likes, _ := db.GetDB().Table("postvotes").Where("post_id = ?", id).Where("value = ?", 1).Count()
 	dislikes, _ := db.GetDB().Table("postvotes").Where("post_id = ?", id).Where("value = ?", -1).Count()
 
+	var userVote int
+	if cookie, err := r.Cookie("token"); err == nil {
+		if claims, err := auth.ParseToken(cookie.Value); err == nil {
+			var existing structs.PostVote
+			if err := db.GetDB().Table("postvotes").
+				Where("user_id = ?", claims.UserID).
+				Where("post_id = ?", id).
+				First(&existing); err == nil {
+				userVote = existing.Value
+			}
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	username := ""
+	avatarUrl := ""
 	if author, err := db.GetDB().GetUserByID(post.AuthorId); err == nil {
 		username = author.Username
+		avatarUrl = author.AvatarUrl
 	}
 
 	enrichedComments := make([]commentResponse, 0, len(comments))
@@ -160,6 +178,7 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if author, err := db.GetDB().GetUserByID(comment.AuthorId); err == nil {
 			item.Username = author.Username
+			item.AvatarUrl = author.AvatarUrl
 		}
 		enrichedComments = append(enrichedComments, item)
 	}
@@ -174,7 +193,9 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 		Comments:   enrichedComments,
 		Likes:      likes,
 		Dislikes:   dislikes,
+		AvatarUrl:  avatarUrl,
 		Username:   username,
+		UserVote:   userVote,
 	})
 }
 

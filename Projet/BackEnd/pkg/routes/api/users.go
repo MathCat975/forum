@@ -129,6 +129,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if user.Role == "banned" {
+		routes.JsonError(w, "account banned", http.StatusForbidden)
+		return
+	}
+
 	tokenStr, err := auth.GenerateToken(user.ID, user.Username, user.Role)
 	if err != nil {
 		routes.JsonError(w, "failed to generate token", http.StatusInternalServerError)

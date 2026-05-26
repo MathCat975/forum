@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   (async () => {
     if (!(await shouldShowAuthPage())) {
-      window.location.replace("/front/index");
+      window.location.replace("/index");
       return;
     }
   })();
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
-        window.location.href = "/front/index";
+        window.location.href = "/index";
       } else {
         if (errorMessage) {
           errorMessage.textContent = data.error || "Registration failed. Please try again.";

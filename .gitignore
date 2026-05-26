@@ -6,3 +6,4 @@ database.db-wal
 Projet/BackEnd/.env
 Projet/BackEnd/go.mod
 .env
+/run
