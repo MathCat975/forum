@@ -83,7 +83,7 @@ func main() {
 
 	// Static files
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("../FrontEnd/assets"))))
-	
+
 	// Front routes
 	http.HandleFunc("/front/profile", func(w http.ResponseWriter, r *http.Request) {
 		front.PageHandler(w, r, "profile")
@@ -100,7 +100,9 @@ func main() {
 	http.HandleFunc("/front/register", func(w http.ResponseWriter, r *http.Request) {
 		front.PageHandler(w, r, "register")
 	})
-
+	http.HandleFunc("/front/post", func(w http.ResponseWriter, r *http.Request) {
+		front.PageHandler(w, r, "post")
+	})
 
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
