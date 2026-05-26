@@ -168,7 +168,15 @@ type userProfileResponse struct {
 	LikeCount         int64                     `json:"like_count"`
 	DislikeCount      int64                     `json:"dislike_count"`
 	ConnexionService  *connexionServiceResponse `json:"connexionService,omitempty"`
-	LastPosts         []structs.Post            `json:"lastPosts"`
+	LastPosts         []postPreviewResponse    `json:"lastPosts"`
+}
+
+type postPreviewResponse struct {
+	ID             uint      `json:"id"`
+	Title          string    `json:"title"`
+	Message        string    `json:"message"`
+	CreatedAt      time.Time `json:"created_at"`
+	AuthorUsername string   `json:"author_username"`
 }
 
 func buildConnexionService(user *structs.User, accounts []structs.UserOAuthAccount) *connexionServiceResponse {
@@ -208,6 +216,22 @@ func loadUserProfile(user *structs.User, includeConnexion bool) (*userProfileRes
 		lastPosts = []structs.Post{}
 	}
 
+	lastPostPreviews := make([]postPreviewResponse, 0, len(lastPosts))
+	for _, p := range lastPosts {
+		authorUsername := ""
+		if author, err := database.GetUserByID(p.AuthorId); err == nil {
+			authorUsername = author.Username
+		}
+
+		lastPostPreviews = append(lastPostPreviews, postPreviewResponse{
+			ID:             p.ID,
+			Title:          p.Title,
+			Message:        p.Message,
+			CreatedAt:      p.CreatedAt,
+			AuthorUsername: authorUsername,
+		})
+	}
+
 	resp := &userProfileResponse{
 		Username:     user.Username,
 		AvatarUrl:    user.AvatarUrl,
@@ -217,7 +241,7 @@ func loadUserProfile(user *structs.User, includeConnexion bool) (*userProfileRes
 		CommentCount: commentCount,
 		LikeCount:    likeCount,
 		DislikeCount: dislikeCount,
-		LastPosts:    lastPosts,
+		LastPosts:    lastPostPreviews,
 	}
 
 	if includeConnexion {

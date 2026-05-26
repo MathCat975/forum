@@ -267,10 +267,15 @@ function printLastPosts() {
     div.innerHTML = `
       <h4>${post.title || "Untitled post"}</h4>
       <p>${contentText}</p>
-      <span class="postDate">${postDate}</span>
+      <span class="postDate">By ${post.author_username || "Unknown"} - ${postDate}</span>
       <button class="viewPostButton" type="button">See post</button>
     `;
     postContentDom?.appendChild(div);
+
+    div.querySelector(".viewPostButton")?.addEventListener("click", () => {
+      if (!post.id) return;
+      window.location.href = `/front/post?id=${encodeURIComponent(post.id)}`;
+    });
   }
 }
 
