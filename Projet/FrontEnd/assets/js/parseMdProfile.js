@@ -18,12 +18,6 @@ const profil = {
     google: "",
     email: "",
   },
-  connexionType: {
-    git: false,
-    google: false,
-    email: false,
-    none: true,
-  },
   lastPosts: [],
 };
 
